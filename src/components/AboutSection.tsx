@@ -1,30 +1,6 @@
 import Image from "next/image";
-import Link from "next/link";
 
 export default function AboutSection() {
-  const images = [
-    {
-      src: "/biceps.png",
-      alt: "Man with Microphone",
-      gradient: "from-red-600 to-red-800",
-    },
-    {
-      src: "/cosplayer.png",
-      alt: "Cosplayer",
-      gradient: "from-purple-600 to-purple-800",
-    },
-    {
-      src: "/selfie.png",
-      alt: "Group Celebration",
-      gradient: "from-pink-600 to-red-600",
-    },
-    {
-      src: "/dj.png",
-      alt: "DJ Performing",
-      gradient: "from-purple-600 to-blue-600",
-    },
-    { src: "/gunner.png", alt: "gun", gradient: "from-purple-600 to-blue-600" },
-  ];
 
   return (
     <section
@@ -69,67 +45,9 @@ export default function AboutSection() {
               The sound of pure madness
             </p>
 
-            <Link
-              href="/about"
-              className="inline-block bg-black text-white font-bold text-sm md:text-base px-4 md:px-6 py-2 md:py-3 rounded-sm hover:bg-gray-900 transition"
-            >
-              MORE ABOUT MADOOZA →
-            </Link>
           </div>
         </div>
 
-        {/* Bottom Image Grid */}
-        <div className="relative">
-          {/* Left Button */}
-          <button
-            onClick={() => {
-              const carousel = document.querySelector("[data-carousel]");
-              if (carousel) carousel.scrollLeft -= 300;
-            }}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-black text-white p-2 md:p-3 rounded-full hover:bg-gray-900 transition hidden sm:block"
-            aria-label="Scroll left"
-          >
-            ←
-          </button>
-
-          {/* Carousel */}
-          <div
-            data-carousel
-            className="overflow-x-auto -mx-2 px-2"
-            role="region"
-            aria-label="Image carousel"
-          >
-            <div className="flex gap-2 md:gap-4 snap-x snap-mandatory">
-              {[...images, ...images].map((img, i) => (
-                <div
-                  key={i}
-                  className="snap-start shrink-0 rounded-lg overflow-hidden relative w-2/3 sm:w-1/2 md:w-1/3 lg:w-1/4"
-                  role="listitem"
-                >
-                  <Image
-                    src={img.src}
-                    alt={img.alt}
-                    width={400}
-                    height={300}
-                    className="w-full h-32 sm:h-40 md:h-48 lg:h-56 object-cover transition-transform duration-300"
-                  />
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Right Button */}
-          <button
-            onClick={() => {
-              const carousel = document.querySelector("[data-carousel]");
-              if (carousel) carousel.scrollLeft += 300;
-            }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-black text-white p-2 md:p-3 rounded-full hover:bg-gray-900 transition hidden sm:block"
-            aria-label="Scroll right"
-          >
-            →
-          </button>
-        </div>
       </div>
     </section>
   );
