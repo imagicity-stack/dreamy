@@ -113,9 +113,11 @@ h3,
 h4,
 h5,
 h6 {
-  font-family: var(--font-galindo), var(--font-tt-commons), sans-serif;
+  font-family: var(--font-oswald), var(--font-tt-commons), sans-serif;
 }
 
+.font-oswald,
 .font-castle {
-  font-family: var(--font-galindo), var(--font-tt-commons), sans-serif;
+  font-family: var(--font-oswald), var(--font-tt-commons), sans-serif;
+  font-weight: 600;
 }

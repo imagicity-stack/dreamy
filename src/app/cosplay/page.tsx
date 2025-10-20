@@ -2,58 +2,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import smilGif from "../../../public/Winky Smile.gif";
-import { useState } from "react";
 import Footer from "@/components/Footer";
 import CosplayBanner from "@/components/CosplayBanner";
 import CosplayNewsletter from "@/components/CosplayNewsletter";
 import Prize from "@/components/Prize";
 import Highlights from "@/components/Highlights";
-
-const festivals = [
-  {
-    name: "Bring Your Stall",
-   
-    desc: "Bring your brand, food, or art to life. Set up your stall and be part of Hazaribagh’s biggest youth carnival.",
-    color: "bg-red-500",
-    logo: "/D2.png",
-    text: "white",
-    color2: "yellow-300",
-  },
-  {
-    name: "Cosplay Event",
-    desc: "Step into your favorite character and own the stage. Be part of Hazaribagh’s first ever cosplay celebration.",
-    color: "bg-orange-500",
-    logo: "/D3.png",
-    text: "white",
-    color2: "[#A1FFFD]",
-  },
-  {
-    name: "PERFORMERS",
-    date: "Feb 21 – 23, 2025",
-    desc: "Show your talent — dance, sing, rap, paint, or perform live. This is your spotlight.",
-    color: "bg-[#A1FFFD]",
-    logo: "/D5.png",
-    text: "black",
-    color2: "pink-600",
-  },
-  {
-    name: "VOLUNTEERS",
-    desc: "Join the crew that’s making this madness possible. Let’s build Madooza together.",
-    color: "bg-blue-500",
-    logo: "/D1.png",
-    text: "white",
-    color2: "yellow-300",
-  },
-  {
-    name: "WANT TO SPOONSOR",
-    date: "May 16 – 18, 2025",
-    desc: "Each sub section will have a basic form (take reference from the existing site) and before applying a check box- I have read the terms and conditions.",
-    color: "bg-green-400",
-    logo: "/D4.png",
-    text: "black",
-    color2: "blue-600",
-  },
-];
 
 const highlights = [
   {
@@ -92,7 +45,7 @@ export default function Home() {
         </video>
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none flex-col gap-4 sm:gap-6 md:gap-8 lg:gap-10 px-4">
           <div className="flex flex-col items-center justify-center w-full max-w-[95vw]">
-            <h1 className="relative text-[#ffe300] text-[clamp(48px,12vw,220px)] sm:text-[80px] md:text-[120px] lg:text-[160px] xl:text-[200px] font-castle drop-shadow-2xl tracking-tight z-10 leading-none text-center">
+            <h1 className="relative text-[#ffe300] text-[clamp(48px,8vw,140px)] font-oswald drop-shadow-2xl tracking-tight z-10 leading-none text-center">
               COSPLAY
               <Image
                 src={smilGif}
@@ -122,7 +75,7 @@ export default function Home() {
        <section className="bg-black text-white py-12 sm:py-16 md:py-24 px-4 sm:px-6 md:px-10 lg:px-20">
   {/* Header */}
   <div className="text-center max-w-5xl mx-auto mb-8 sm:mb-12 md:mb-16">
-    <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-castle tracking-wider mb-4 sm:mb-6 leading-none">
+    <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-oswald tracking-wide mb-4 sm:mb-6 leading-none">
       Step Into the MADVERSE
     </h2>
     <p className="text-gray-300 leading-relaxed text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl px-2 sm:px-4 md:px-6 lg:px-10">
@@ -154,7 +107,7 @@ showdown where the audience decides who rules the MADVERSE.   </p>
       <section className="py-8 sm:py-10 bg-black md:py-12 w-full md:w-10/12 px-4 sm:px-6 md:px-8 lg:px-0 mx-auto">
           {/* Creators Header */}
           <div className="text-center mb-6 sm:mb-8 md:mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl xl:text-8xl font-lg uppercase tracking-wide font-castle text-[#ffe300] mb-2 sm:mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl uppercase tracking-wide font-oswald text-[#ffe300] mb-2 sm:mb-4">
               EVENT FORMAT
             </h2>
           
@@ -169,7 +122,7 @@ showdown where the audience decides who rules the MADVERSE.   </p>
               >
                 <div className="flex flex-col items-center justify-center p-4 sm:p-6 md:p-8 pb-4 sm:pb-6">
                   <h3
-                    className={`${item.textColor} text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-5xl font-extrabold uppercase tracking-wider font-castle mb-2 sm:mb-3 md:mb-4`}
+                    className={`${item.textColor} text-base sm:text-lg md:text-xl lg:text-2xl font-extrabold uppercase tracking-wide font-oswald mb-2 sm:mb-3 md:mb-4`}
                   >
                     {item.title}
                   </h3>
@@ -206,7 +159,7 @@ showdown where the audience decides who rules the MADVERSE.   </p>
       <CosplayNewsletter />
        <section className="bg-black text-white py-10 sm:py-12 md:py-16 lg:py-20 px-4 sm:px-6 md:px-8 lg:px-20">
         <div className="max-w-7xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-castle text-[#ffe300] mb-6 sm:mb-8 md:mb-12 text-center">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-oswald text-[#ffe300] mb-6 sm:mb-8 md:mb-12 text-center">
             Rules & Guidelines
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">

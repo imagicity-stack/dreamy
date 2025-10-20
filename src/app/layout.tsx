@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Galindo } from "next/font/google";
+import { Geist, Geist_Mono, Oswald } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 
@@ -13,10 +13,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const galindo = Galindo({
-  variable: "--font-galindo",
+const oswald = Oswald({
+  variable: "--font-oswald",
   subsets: ["latin"],
-  weight: "400",
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -32,7 +32,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${galindo.variable} antialiased font-tt-commons`}
+        className={`${geistSans.variable} ${geistMono.variable} ${oswald.variable} antialiased font-tt-commons`}
       >
         <Header/>
 
