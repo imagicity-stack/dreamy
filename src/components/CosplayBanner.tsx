@@ -1,3 +1,5 @@
+"use client";
+
 export default function CosplayBanner() {
   const messages = [
     "COSPLAY ARENA",
