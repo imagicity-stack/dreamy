@@ -14,6 +14,10 @@ body {
     -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 /* Utility class to use the Quicksand font in components */
 .font-quicksand {
   font-family: var(--font-quicksand), "TT Commons Pro", system-ui,

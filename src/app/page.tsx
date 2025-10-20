@@ -93,7 +93,7 @@ export default function Home() {
   return (
     <div className="w-full">
   
-        <div className="w-full h-[50vh] md:h-[80vh] bg-blue-500 relative">
+        <div id="tickets" className="w-full h-[50vh] md:h-[80vh] bg-blue-500 relative">
         <video
           src="/hero.mp4"
           autoPlay
@@ -134,7 +134,10 @@ export default function Home() {
       </div>
       <ScrollingBanner/>
        <AboutSection />
-      <section id="involvewithus" className="bg-[#7300ff] text-white py-12 md:py-20 flex justify-center items-center flex-col px-4">
+      <section
+        id="involvewithus"
+        className="bg-[#7300ff] text-white py-12 md:py-20 flex justify-center items-center flex-col px-4 scroll-mt-24"
+      >
         <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl uppercase mb-6 md:mb-10 font-oswald tracking-wide text-[#9dffff]">
           INVOLVE WITH US
         </h2>
@@ -211,7 +214,10 @@ export default function Home() {
           </div>
 
           {/* Creator Cards */}
-          <div id="creators" className="flex flex-col md:flex-row justify-center items-stretch gap-8 md:gap-12 max-w-5xl mx-auto">
+          <div
+            id="creators"
+            className="flex flex-col md:flex-row justify-center items-stretch gap-8 md:gap-12 max-w-5xl mx-auto scroll-mt-24"
+          >
             {highlights.map((item, index) => (
               <div
                 key={index}

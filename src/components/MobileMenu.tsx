@@ -2,6 +2,14 @@
 import Link from "next/link";
 import { useState } from "react";
 
+const navLinks = [
+  { href: "/#aboutus", label: "ABOUT" },
+  { href: "/#involvewithus", label: "INVOLVE WITH US" },
+  { href: "/#creators", label: "CREATORS" },
+  { href: "/#contactus", label: "CONTACT US" },
+  { href: "/cosplay", label: "COSPLAY" },
+];
+
 export default function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -53,46 +61,21 @@ export default function MobileMenu() {
       >
         <div className="flex flex-col h-full pt-20 p-6">
           <nav className="flex flex-col space-y-6">
-            <Link
-              href="#aboutus"
-              className="text-white font-quicksand font-semibold text-xl hover:text-gray-200 transition"
-              onClick={() => setIsOpen(false)}
-            >
-              ABOUT
-            </Link>
-            <Link
-              href="#involvewithus"
-              className="text-white font-quicksand font-semibold text-xl hover:text-gray-200 transition"
-              onClick={() => setIsOpen(false)}
-            >
-              INVOLVE WITH US
-            </Link>
-            <Link
-              href="#creators"
-              className="text-white font-quicksand font-semibold text-xl hover:text-gray-200 transition"
-              onClick={() => setIsOpen(false)}
-            >
-              CREATORS
-            </Link>
-            <Link
-              href="#contactus"
-              className="text-white font-quicksand font-semibold text-xl hover:text-gray-200 transition"
-              onClick={() => setIsOpen(false)}
-            >
-              CONTACT US
-            </Link>
-            <Link
-              href="/cosplay"
-              className="text-white font-quicksand font-semibold text-xl hover:text-gray-200 transition"
-              onClick={() => setIsOpen(false)}
-            >
-              COSPLAY
-            </Link>
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="text-white font-quicksand font-semibold text-xl hover:text-gray-200 transition"
+                onClick={() => setIsOpen(false)}
+              >
+                {link.label}
+              </Link>
+            ))}
           </nav>
 
           <div className="mt-auto mb-8">
             <Link
-              href="#tickets"
+              href="/#tickets"
               className="bg-[#ffe300] text-black px-6 py-3 font-bold text-lg rounded block text-center"
               onClick={() => setIsOpen(false)}
             >

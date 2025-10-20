@@ -3,6 +3,13 @@ import Link from "next/link";
 import Image from "next/image";
 import MobileMenu from './MobileMenu';
 
+const navLinks = [
+  { href: "/#aboutus", label: "ABOUT" },
+  { href: "/#involvewithus", label: "INVOLVE WITH US" },
+  { href: "/#creators", label: "CREATORS" },
+  { href: "/#contactus", label: "CONTACT US" },
+  { href: "/cosplay", label: "COSPLAY" },
+];
 
 const Header = () => {
   return (
@@ -14,11 +21,11 @@ const Header = () => {
             </Link>
           </div>
         <div className="hidden lg:flex gap-12 font-quicksand font-semibold text-[1.3rem]">
-          <Link href="#aboutus">ABOUT</Link>
-          <Link href="#involvewithus">INVOLVE WITH US</Link>
-          <Link href="#creators">CREATORS</Link>
-          <Link href="#contactus">CONTACT US</Link>
-          <Link href="/cosplay">COSPLAY</Link>
+          {navLinks.map((link) => (
+            <Link key={link.href} href={link.href} prefetch>
+              {link.label}
+            </Link>
+          ))}
         </div>
         {/* Mobile menu */}
         <MobileMenu />
