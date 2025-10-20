@@ -12,7 +12,10 @@ const OurPartners = () => {
   ];
 
   return (
-    <section className="bg-black text-white py-12 md:py-20 px-4 md:px-8 lg:px-20 border-t-2 border-[#ffe300]">
+    <section
+      id="partners"
+      className="bg-black text-white py-12 md:py-20 px-4 md:px-8 lg:px-20 border-t-2 border-[#ffe300] scroll-mt-24"
+    >
       <div className="max-w-7xl mx-auto">
         {/* Title */}
         <div className="text-center mb-12 md:mb-16">

@@ -27,7 +27,10 @@ export default function AboutSection() {
   ];
 
   return (
-    <section id="aboutus" className="bg-[#ff7a00] py-12 md:py-20">
+    <section
+      id="aboutus"
+      className="bg-[#ff7a00] py-12 md:py-20 scroll-mt-24"
+    >
       <div className="max-w-[1500px] mx-auto px-4 md:px-6 lg:px-12">
         {/* Top Section */}
         <div className="grid grid-cols-1 lg:grid-cols-2 overflow-hidden rounded-2xl mb-6 md:mb-8">
