@@ -16,7 +16,7 @@ export default function Footer() {
         {/* Top Section */}
         <div className="flex flex-col lg:flex-row justify-between w-full items-center mb-8 md:mb-10 gap-6 lg:gap-4">
           {/* Logo */}
-          <div className="text-white text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tighter font-tt-commons select-none order-1">
+          <div className="text-white text-2xl md:text-3xl lg:text-4xl font-extrabold tracking-tighter font-quicksand select-none order-1">
           <Image src="/MADOOZA.png" alt="DREAMHACK" width={150} height={40} />
           </div>
 

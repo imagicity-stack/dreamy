@@ -120,7 +120,7 @@ export default function Home() {
           
           {/* Text and Button */}
           <div className="text-center flex flex-col items-center gap-2 sm:gap-3 md:gap-4 -mt-4 sm:-mt-6 md:-mt-8 lg:-mt-10">
-            <p className="text-[#9dffff] font-extrabold font-tt-commons text-xs sm:text-sm md:text-base lg:text-xl xl:text-2xl 2xl:text-3xl text-center relative z-20 px-4">
+            <p className="text-[#9dffff] font-extrabold font-quicksand text-xs sm:text-sm md:text-base lg:text-xl xl:text-2xl 2xl:text-3xl text-center relative z-20 px-4">
               THE SOUND OF PURE MADNESS
             </p>
             <button 
@@ -205,7 +205,7 @@ export default function Home() {
             <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold uppercase tracking-wide font-oswald text-[#ffe300] mb-4">
               FEATURED CREATORS
             </h2>
-            <p className="text-white text-base sm:text-lg md:text-xl font-bold font-tt-commons">
+            <p className="text-white text-base sm:text-lg md:text-xl font-bold font-quicksand">
               Coming Soon
             </p>
           </div>

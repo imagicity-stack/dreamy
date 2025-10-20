@@ -63,7 +63,7 @@ export default function Home() {
               />
             </h1>
           </div>
-          <p className="text-[#9dffff] font-extrabold font-tt-commons text-[clamp(11px,3vw,32px)] sm:text-base md:text-xl lg:text-2xl xl:text-3xl -mt-2 sm:-mt-4 md:-mt-8 lg:-mt-16 text-center px-4 max-w-full">
+          <p className="text-[#9dffff] font-extrabold font-quicksand text-[clamp(11px,3vw,32px)] sm:text-base md:text-xl lg:text-2xl xl:text-3xl -mt-2 sm:-mt-4 md:-mt-8 lg:-mt-16 text-center px-4 max-w-full">
             THE SOUND OF PURE MADNESS
           </p>
           <div className="w-5 h-8 sm:w-6 sm:h-10 md:w-9 md:h-14 border-2 md:border-4 border-white rounded-full flex justify-center items-end p-1 md:p-2 mt-1 sm:mt-2">
