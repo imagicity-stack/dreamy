@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import smilGif from "../../public/Winky Smile.gif";
 import { useState } from "react";
 import Footer from "@/components/Footer";
 import ScrollingBanner from "@/components/ScrollingBanner";
@@ -9,53 +8,46 @@ import AboutSection from "@/components/AboutSection";
 import OurPartners from "@/components/OurPartners";
 import ContactUs from "@/components/ContactUs";
 
-const festivals = [
+const involvementOptions = [
   {
     name: "Bring Your Stall",
-   
-    desc: "Bring your brand, food, or art to life. Set up your stall and be part of Hazaribagh’s biggest youth carnival.",
-    color: "bg-red-500",
+    desc: "Showcase food, art, games, or merch in a high-energy bazaar built for creators.",
+    panelClass: "bg-red-500 text-white",
+    imageBgClass: "bg-yellow-300",
     logo: "/D2.png",
-    text: "white",
-      CTA: "Apply Now",
-    color2: "yellow-300",
+    href: "/stall",
   },
   {
     name: "Cosplay Event",
-    desc: "Step into your favorite character and own the stage. Be part of Hazaribagh’s first ever cosplay celebration.",
-    color: "bg-orange-500",
+    desc: "Step into character and own Jharkhand’s wildest fandom stage at MADOOZA.",
+    panelClass: "bg-orange-500 text-white",
+    imageBgClass: "bg-[#A1FFFD]",
     logo: "/D3.png",
-    text: "white",
-    CTA: "Apply Now",
-    color2: "[#A1FFFD]",
+    href: "/cosplay",
   },
   {
-    name: "PERFORMERS",
-    desc: "Show your talent — dance, sing, rap, paint, or perform live. This is your spotlight.",
-    color: "bg-[#A1FFFD]",
+    name: "Performers",
+    desc: "From bands and DJs to poets and dancers, light up the lineup with your act.",
+    panelClass: "bg-[#A1FFFD] text-black",
+    imageBgClass: "bg-pink-600",
     logo: "/D5.png",
-    CTA: "Apply Now",
-    text: "black",
-    color2: "pink-600",
+    href: "/performer",
   },
   {
-    name: "VOLUNTEERS",
-    desc: "Join the crew that’s making this madness possible. Let’s build Madooza together.",
-    color: "bg-blue-500",
+    name: "Volunteers",
+    desc: "Join the crew, earn experience, and see the madness from behind the scenes.",
+    panelClass: "bg-blue-500 text-white",
+    imageBgClass: "bg-yellow-300",
     logo: "/D1.png",
-    CTA: "Join Now",
-    text: "white",
-    color2: "yellow-300",
+    href: "/volunteer",
   },
   {
-    name: "WANT TO SPOONSOR",
-    date: "May 16 – 18, 2025",
-    desc: "Each sub section will have a basic form (take reference from the existing site) and before applying a check box- I have read the terms and conditions.",
-    color: "bg-green-400",
+    name: "Sponsors",
+    desc: "Partner with MADOOZA to amplify your brand across Jharkhand’s youth movement.",
+    panelClass: "bg-green-400 text-black",
+    imageBgClass: "bg-blue-600",
     logo: "/D4.png",
-    text: "black",
-    CTA: "Contact Us",
-    color2: "blue-600",
+    href: "/sponsor",
   },
 ];
 
@@ -76,33 +68,12 @@ const highlights = [
   },
 ];
 
-const products = [
-  { name: "Food Stalls & Local Favorites", color: "bg-blue-600", img: "/beanie.png" },
-  { name: "Live Music & DJ", color: "bg-green-400", img: "/overshirt.png" },
-  { name: "Cosplay Parade", color: "bg-pink-500", img: "/shortsleeves.png" },
-  { name: "Student Exhibitions", color: "bg-purple-700", img: "/jersey.png" },
-  { name: "Art Installations", color: "bg-cyan-300", img: "/hoodie.png" },
-  { name: "Fun Games & Activities", color: "bg-yellow-400", img: "/rugby.png" },
-];
-
 export default function Home() {
-  const [active, setActive] = useState("SHANGHAI");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalSection, setModalSection] = useState("");
+  const [active, setActive] = useState(involvementOptions[0].name);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
 
   const currentFestival =
-    festivals.find((f) => f.name === active) ?? festivals[0];
-
-  const openModal = (sectionName: string) => {
-    setModalSection(sectionName);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setModalSection("");
-  };
+    involvementOptions.find((f) => f.name === active) ?? involvementOptions[0];
 
   const openTicketModal = () => {
     setIsTicketModalOpen(true);
@@ -110,13 +81,6 @@ export default function Home() {
 
   const closeTicketModal = () => {
     setIsTicketModalOpen(false);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission logic here
-    alert(`Form submitted for ${modalSection}`);
-    closeModal();
   };
 
   const handleTicketSubmit = (e: React.FormEvent) => {
@@ -129,7 +93,7 @@ export default function Home() {
   return (
     <div className="w-full">
   
-        <div className="w-full h-[50vh] md:h-[80vh] bg-blue-500 relative">
+        <div id="tickets" className="w-full h-[50vh] md:h-[80vh] bg-blue-500 relative">
         <video
           src="/hero.mp4"
           autoPlay
@@ -156,7 +120,7 @@ export default function Home() {
           
           {/* Text and Button */}
           <div className="text-center flex flex-col items-center gap-2 sm:gap-3 md:gap-4 -mt-4 sm:-mt-6 md:-mt-8 lg:-mt-10">
-            <p className="text-[#9dffff] font-extrabold font-tt-commons text-xs sm:text-sm md:text-base lg:text-xl xl:text-2xl 2xl:text-3xl text-center relative z-20 px-4">
+            <p className="text-[#9dffff] font-extrabold font-quicksand text-xs sm:text-sm md:text-base lg:text-xl xl:text-2xl 2xl:text-3xl text-center relative z-20 px-4">
               THE SOUND OF PURE MADNESS
             </p>
             <button 
@@ -170,8 +134,11 @@ export default function Home() {
       </div>
       <ScrollingBanner/>
        <AboutSection />
-      <section id="involvewithus" className="bg-[#7300ff] text-white py-12 md:py-20 flex justify-center items-center flex-col px-4">
-        <h2 className="text-center text-4xl md:text-6xl lg:text-9xl font-lg uppercase mb-8 md:mb-12 font-castle tracking-wider text-[#9dffff]">
+      <section
+        id="involvewithus"
+        className="bg-[#7300ff] text-white py-12 md:py-20 flex justify-center items-center flex-col px-4 scroll-mt-24"
+      >
+        <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl uppercase mb-6 md:mb-10 font-oswald tracking-wide text-[#9dffff]">
           INVOLVE WITH US
         </h2>
 
@@ -179,15 +146,15 @@ export default function Home() {
         <div className="flex justify-center w-full">
           <div className="w-full md:w-10/12 overflow-x-auto">
             <div className="flex gap-1 md:gap-2 min-w-max md:min-w-0">
-              {festivals.map((festival) => (
+              {involvementOptions.map((festival) => (
                 <button
                   key={festival.name}
                   onClick={() => setActive(festival.name)}
-                  className={`flex items-center justify-center gap-1 md:gap-3 flex-1 px-2 md:px-4 py-2 md:py-3 font-md cursor-pointer font-castle tracking-wider text-lg sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl uppercase transition-all text-blue-700 whitespace-nowrap ${
+                  className={`flex items-center justify-center gap-1 md:gap-3 flex-1 px-2 md:px-4 py-2 md:py-3 cursor-pointer font-oswald tracking-wide text-sm sm:text-base md:text-lg lg:text-xl uppercase transition-all text-blue-700 whitespace-nowrap ${
                     active === festival.name
-                      ? "bg-[#A1FFFD] "
+                      ? "bg-[#A1FFFD]"
                       : "bg-[#FFD600] hover:bg-[#A1FFFD]"
-                  }.`}
+                  }`}
                 >
                   <span className="text-center">{festival.name}</span>
                 </button>
@@ -198,43 +165,32 @@ export default function Home() {
 
         {/* Active Festival Content */}
         <div className="flex justify-center mt-6 md:mt-10 w-full">
-          <div className="w-full md:w-10/12 flex flex-col lg:flex-row items-stretch overflow-hidden h-auto lg:h-[550px]">
+          <div className="w-full md:w-10/12 flex flex-col lg:flex-row items-stretch h-auto lg:min-h-[440px]">
             {/* Left Info */}
             <div
-              className={`${currentFestival.color} text-${currentFestival.text} p-8 md:p-12 lg:p-20 lg:w-1/2 h-auto lg:h-full flex-1 flex flex-col justify-center`}
+              className={`${currentFestival.panelClass} p-8 md:p-12 lg:p-20 lg:w-1/2 h-auto lg:h-full flex-1 flex flex-col justify-center`}
             >
               <h3
-                className={`font-md mb-4 uppercase font-castle text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl tracking-wide ${
-                  currentFestival.name === "HYDERABAD"
-                    ? "!text-pink-600"
-                    : currentFestival.name === "SHANGHAI"
-                    ? "text-blue-600"
-                    : ""
-                }`}
+                className="mb-4 uppercase font-oswald text-xl sm:text-2xl md:text-3xl lg:text-4xl tracking-wide"
               >
                 {currentFestival.name}
               </h3>
-              <p className="text-base md:text-lg lg:text-xl font-semibold mb-4 md:mb-6 opacity-90">
-                {currentFestival.date}
-              </p>
-              <div className="h-auto lg:h-40 overflow-y-auto">
-                <p className="text-sm md:text-base lg:text-lg leading-relaxed">
+              <div className="h-auto lg:max-h-64 overflow-y-auto">
+                <p className="text-sm md:text-base leading-relaxed">
                   {currentFestival.desc}
                 </p>
               </div>
-              {currentFestival.CTA && (
-                <button 
-                  onClick={() => openModal(currentFestival.name)}
-                  className="mt-4 cursor-pointer bg-[#ffe300] text-black text-3xl font-castle px-4 py-2 rounded-md hover:bg-[#ffd000] transition-all"
-                >
-                  {currentFestival.CTA}
-                </button>
-              )}
+              <Link
+                href={currentFestival.href}
+                className="mt-4 inline-flex w-fit cursor-pointer bg-[#ffe300] text-black text-sm sm:text-base md:text-lg font-oswald px-5 py-2 rounded-md hover:bg-[#ffd000] transition-all uppercase"
+              >
+                Learn More
+              </Link>
             </div>
 
             {/* Right Image */}
             <div
-              className={`bg-${currentFestival.color2} lg:w-1/2 w-full flex justify-center items-center p-6 md:p-8 lg:p-10 flex-1 min-h-[300px] lg:min-h-0`}
+              className={`${currentFestival.imageBgClass} lg:w-1/2 w-full flex justify-center items-center p-6 md:p-8 lg:p-10 flex-1 min-h-[280px]`}
             >
               <Image
                 src={currentFestival.logo}
@@ -249,16 +205,19 @@ export default function Home() {
         <section className="py-8 md:py-12 w-full md:w-10/12 px-4 md:px-0">
           {/* Creators Header */}
           <div className="text-center mb-8 md:mb-12">
-            <h2 className="text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-extrabold uppercase tracking-wide font-castle text-[#ffe300] mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold uppercase tracking-wide font-oswald text-[#ffe300] mb-4">
               FEATURED CREATORS
             </h2>
-            <p className="text-white text-xl md:text-3xl font-bold font-tt-commons">
+            <p className="text-white text-base sm:text-lg md:text-xl font-bold font-quicksand">
               Coming Soon
             </p>
           </div>
 
           {/* Creator Cards */}
-          <div id="creators" className="flex flex-col md:flex-row justify-center items-stretch gap-8 md:gap-12 max-w-5xl mx-auto">
+          <div
+            id="creators"
+            className="flex flex-col md:flex-row justify-center items-stretch gap-8 md:gap-12 max-w-5xl mx-auto scroll-mt-24"
+          >
             {highlights.map((item, index) => (
               <div
                 key={index}
@@ -266,11 +225,11 @@ export default function Home() {
               >
                 <div className="flex flex-col items-center justify-center p-8 pb-6">
                   <h3
-                    className={`${item.textColor} text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold uppercase tracking-wider font-castle mb-4`}
+                    className={`${item.textColor} text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold uppercase tracking-wide font-oswald mb-3`}
                   >
                     {item.title}
                   </h3>
-                  <p className={`${item.textColor} text-2xl md:text-3xl font-bold opacity-90`}>
+                  <p className={`${item.textColor} text-base sm:text-lg md:text-xl font-bold opacity-90`}>
                     {item.subtitle}
                   </p>
                 </div>
@@ -289,217 +248,10 @@ export default function Home() {
           </div>
         </section>
       </section>
-      <section className="bg-black text-white py-12 md:py-24 px-4 md:px-8 lg:px-20">
-        {/* Combined Grid - Responsive layout */}
-        <section className="bg-black text-white py-16 md:py-24 px-6 sm:px-10 lg:px-20">
-  {/* Header */}
-  <div id="festivals" className="text-center max-w-5xl mx-auto mb-16">
-    <h2 className="text-5xl sm:text-7xl md:text-[10rem] font-castle tracking-wider font-lg mb-6 leading-none">
-      FESTIVALS AT MADOOZA
-    </h2>
-    <p className="text-gray-300 leading-relaxed font-sans text-base sm:text-lg md:text-2xl px-4 sm:px-10">
-Join the ultimate celebration at Madooza Feast on local food favorites, dance to Live Music & DJs, and watch the spectacular Cosplay Parade. Discover incredible Student Exhibitions and amazing Art Installations, plus endless Fun Games & Activities!
-
-Madooza: Food, Music, Art, Fun    </p>
-  </div>
-
-  {/* Product Grid */}
-  <div
-    className="
-      grid
-      gap-4 sm:gap-6
-      grid-cols-2 sm:grid-cols-3 lg:grid-cols-4
-      auto-rows-[200px] sm:auto-rows-[250px] md:auto-rows-[300px]
-    "
-  >
-    {/* Main Collection Image - Takes 2x2 space on large screens */}
-    <div
-      className="
-        relative bg-gray-800 rounded-lg overflow-hidden
-        col-span-2 row-span-2
-        sm:col-span-2 sm:row-span-2
-        lg:col-span-2 lg:row-span-2
-      "
-    >
-      <Image
-        src="/collection.jpg"
-        alt="Pixel Grind Collection"
-        width={1200}
-        height={800}
-        className="w-full h-full object-cover"
-      />
-    
-    </div>
-
-    {/* Product Items */}
-    {products.slice(0, 10).map((product, index) => (
-      <div
-        key={product.name}
-        className={`
-          ${product.color}
-          rounded-lg flex flex-col items-center justify-center
-          group p-2 sm:p-4
-          transition-transform duration-300 hover:scale-[1.03]
-          ${index === 0 ? "lg:col-start-3" : ""}
-        `}
-      >
-        <Image
-          src={product.img}
-          alt={product.name}
-          width={400}
-          height={400}
-          className="mb-2 sm:mb-4 group-hover:animate-pulse object-contain max-h-[150px] sm:max-h-[200px]"
-        />
-        <p className=" font-castle px-2 py-1 text-xl sm:text-lg md:text-4xl font-medium text-center">
-          {product.name}
-        </p>
-      </div>
-    ))}
-  </div>
-</section>
-
-
-        {/* CTA Button */}
-        <div className="flex justify-center">
-          <Link
-            href="#"
-            className="bg-lime-400 text-black px-4 md:px-6 py-2 md:py-3 rounded-sm font-semibold text-sm md:text-base hover:bg-lime-300 transition"
-          >
-            BUY NOW ↗
-          </Link>
-        </div>
-      </section>
-     
       <ScrollingBanner />
       <ContactUs />
       <OurPartners />
       <Footer />
-
-      {/* Modal Form */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4">
-          <div className="bg-black max-w-2xl w-full shadow-2xl border-2 border-[#ffe300] relative max-h-[95vh] overflow-y-auto">
-            {/* Corner Image */}
-            <div className="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 z-10 pointer-events-none">
-              <Image
-                src={smilGif}
-                alt="Decoration"
-                fill
-                className="object-contain"
-              />
-            </div>
-
-            {/* Modal Header */}
-            <div className="bg-gradient-to-r from-[#7300ff] to-[#ff1a00] p-4 sm:p-6 md:p-8 relative">
-              <button
-                onClick={closeModal}
-                className="absolute top-2 right-2 sm:top-4 sm:right-4 text-white text-2xl sm:text-3xl hover:text-[#ffe300] transition-all z-20"
-              >
-                ×
-              </button>
-              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-castle text-white uppercase pr-8">
-                {modalSection}
-              </h2>
-              <p className="text-white/90 mt-2 text-sm sm:text-base">
-                Fill in the details below to get involved
-              </p>
-            </div>
-
-            {/* Modal Body */}
-            <form onSubmit={handleSubmit} className="p-4 sm:p-6 md:p-8">
-              <div className="space-y-4 font-sans sm:space-y-6">
-                {/* Name Field */}
-                <div>
-                  <label className="block text-[#ffe300] font-semibold mb-2 text-sm sm:text-base" htmlFor="name">
-                    Full Name 
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    required
-                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all"
-                    placeholder="Enter your full name"
-                  />
-                </div>
-
-                {/* Email Field */}
-                <div>
-                  <label className="block text-[#ffe300] font-semibold mb-2 text-sm sm:text-base" htmlFor="email">
-                    Email Address 
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    required
-                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all"
-                    placeholder="your.email@example.com"
-                  />
-                </div>
-
-                {/* Phone Field */}
-                <div>
-                  <label className="block text-[#ffe300] font-semibold mb-2 text-sm sm:text-base" htmlFor="phone">
-                    Phone Number 
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    required
-                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all"
-                    placeholder="+91 XXXXXXXXXX"
-                  />
-                </div>
-
-                {/* Message Field */}
-                <div>
-                  <label className="block text-[#ffe300] font-semibold mb-2 text-sm sm:text-base" htmlFor="message">
-                    Message / Additional Details
-                  </label>
-                  <textarea
-                    id="message"
-                    rows={4}
-                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all resize-none"
-                    placeholder="Tell us more about your interest..."
-                  ></textarea>
-                </div>
-
-                {/* Terms Checkbox */}
-                <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    id="terms"
-                    required
-                    className="mt-1 w-5 h-5 accent-[#ffe300] cursor-pointer"
-                  />
-                  <label htmlFor="terms" className="text-sm text-gray-300 cursor-pointer">
-                    I have read and agree to the{" "}
-                    <a href="/privacy-policy" className="text-[#ffe300] hover:underline">
-                      terms and conditions
-                    </a>
-                  </label>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
-                <button
-                  type="submit"
-                  className="flex-1 bg-[#ffe300] text-black font-castle text-base sm:text-lg md:text-5xl py-2 sm:py-3 hover:bg-[#ffd000] transition-all uppercase"
-                >
-                  Show Interest
-                </button>
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="sm:w-auto px-6 py-2 sm:py-3 border-2 border-[#ffe300] text-white text-sm sm:text-base font-semibold hover:bg-[#ffe300] hover:text-black transition-all"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* Ticket Modal */}
       {isTicketModalOpen && (
@@ -526,7 +278,7 @@ Madooza: Food, Music, Art, Fun    </p>
             <form onSubmit={handleTicketSubmit} className="relative z-10 font-sans">
               {/* Header */}
               <div className="bg-gradient-to-r from-[#ff1a00] to-[#7300ff] p-3 sm:p-4 md:p-6 mb-4 sm:mb-6">
-                <h2 className="text-[#ffe300] font-castle text-4xl sm:text-2xl md:text-4xl lg:text-5xl text-center uppercase">
+                <h2 className="text-[#ffe300] font-oswald text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-center uppercase">
                   Get Your Tickets
                 </h2>
                 <p className="text-white text-xs sm:text-sm md:text-base text-center mt-2">
@@ -621,7 +373,7 @@ Madooza: Food, Music, Art, Fun    </p>
                   />
                   <label htmlFor="ticket-terms" className="text-sm text-gray-300 cursor-pointer">
                     I have read and agree to the{" "}
-                    <Link href="/privacy-policy" className="text-[#ffe300] hover:underline">
+                    <Link href="/terms-and-conditions" className="text-[#ffe300] hover:underline">
                       terms and conditions
                     </Link>
                   </label>
@@ -632,7 +384,7 @@ Madooza: Food, Music, Art, Fun    </p>
               <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 px-2 sm:px-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-[#ffe300] text-black font-castle text-3xl sm:text-2xl md:text-3xl lg:text-4xl py-2 sm:py-3 hover:bg-[#ffd000] transition-all uppercase hover:scale-105"
+                  className="flex-1 bg-[#ffe300] text-black font-oswald text-sm sm:text-base md:text-lg py-2 sm:py-3 hover:bg-[#ffd000] transition-all uppercase hover:scale-105"
                 >
                   Request Tickets
                 </button>
