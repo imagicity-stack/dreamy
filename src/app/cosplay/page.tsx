@@ -218,18 +218,12 @@ export default function CosplayPage() {
           <p className="text-sm sm:text-base md:text-lg text-gray-200 font-quicksand leading-relaxed">
             Lock in your slot for Jharkhand’s wildest cosplay throwdown. Secure your registration online and arrive fully ready to rule the stage.
           </p>
-          <div className="mt-8 flex flex-col items-center gap-3">
+          <div className="mt-8 flex flex-col items-center">
             <button
               onClick={openModal}
               className="inline-flex items-center justify-center rounded-md bg-[#ffe300] px-6 py-3 font-oswald text-lg uppercase tracking-wide text-black transition hover:bg-[#ffd000]"
             >
               Apply Now
-            </button>
-            <button
-              onClick={openModal}
-              className="inline-flex items-center justify-center rounded-md border border-[#ffe300] px-6 py-3 font-oswald text-base uppercase tracking-wide text-[#ffe300] transition hover:bg-[#ffe300]/10"
-            >
-              Open Registration Form
             </button>
           </div>
         </div>
