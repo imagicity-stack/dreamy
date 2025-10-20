@@ -7,8 +7,8 @@ const navLinks = [
   { href: "/#aboutus", label: "ABOUT" },
   { href: "/#involvewithus", label: "INVOLVE WITH US" },
   { href: "/#creators", label: "CREATORS" },
+  { href: "/#partners", label: "PARTNERS" },
   { href: "/#contactus", label: "CONTACT US" },
-  { href: "/cosplay", label: "COSPLAY" },
 ];
 
 const Header = () => {
