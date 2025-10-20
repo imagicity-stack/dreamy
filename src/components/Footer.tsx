@@ -142,9 +142,9 @@ export default function Footer() {
         <div className="border-t border-white pt-8 md:pt-10 w-full">
           <ul className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 list-none p-0 m-0">
             {[
-              { name: "Terms of service", link: "/terms" },
-              { name: "Privacy Notice", link: "/privacy" },
-              { name: "Cookie Policy", link: "/cookie" },
+              { name: "Privacy Policy", link: "/privacy-policy" },
+              { name: "Terms and Conditions", link: "/terms-and-conditions" },
+              { name: "Cancellation & Refund Policy", link: "/cancellation-refund-policy" },
             ].map((item) => (
               <li key={item.name}>
                 <Link

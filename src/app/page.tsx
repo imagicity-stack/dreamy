@@ -367,7 +367,7 @@ export default function Home() {
                   />
                   <label htmlFor="ticket-terms" className="text-sm text-gray-300 cursor-pointer">
                     I have read and agree to the{" "}
-                    <Link href="/privacy-policy" className="text-[#ffe300] hover:underline">
+                    <Link href="/terms-and-conditions" className="text-[#ffe300] hover:underline">
                       terms and conditions
                     </Link>
                   </label>

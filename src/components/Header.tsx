@@ -19,7 +19,6 @@ const Header = () => {
           <Link href="#creators">CREATORS</Link>
           <Link href="#contactus">CONTACT US</Link>
           <Link href="/cosplay">COSPLAY</Link>
-          <Link href="/privacy-policy" className='underline'>PRIVACY POLICY</Link>
         </div>
         {/* Mobile menu */}
         <MobileMenu />
