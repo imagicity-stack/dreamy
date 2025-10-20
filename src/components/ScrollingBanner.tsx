@@ -1,34 +1,27 @@
+const items = ["COSPLAY", "MUSIC", "DANCE", "STALLS", "FOOD"];
+
 export default function ScrollingBanner() {
   return (
-    <div className="bg-[#03ff93] py-3 md:py-4 overflow-hidden whitespace-nowrap relative">
-      {/* Scrolling content */}
-      <div className="animate-scroll inline-flex items-center gap-4 md:gap-8">
-        {/* Repeat the pattern multiple times for seamless scrolling */}
-        {Array.from({ length: 20 }).map((_, index) => (
+    <div className="bg-[#03ff93] py-3 md:py-4 overflow-hidden relative">
+      <div className="marquee inline-flex whitespace-nowrap">
+        {[0, 1].map((loop) => (
           <div
-            key={index}
-            className="inline-flex items-center gap-4 md:gap-8 flex-shrink-0 justify-center"
+            key={loop}
+            className="flex items-center gap-6 md:gap-10 flex-shrink-0 px-4"
+            aria-hidden={loop === 1}
           >
-            <span className="text-blue-700 font-black text-xl sm:text-2xl md:text-3xl uppercase tracking-wide">
-          COSPLAY
-            </span>
-            <div className="w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center">
-              <span className="text-blue-700 text-4xl md:text-6xl">☺</span>
-            </div>
-            <span className="text-blue-700 font-black text-xl sm:text-2xl md:text-3xl uppercase tracking-wide">
-              MUSIC
-            </span>
-            <div className="w-6 h-6 md:w-8 md:h-8 rounded-full flex items-center justify-center">
-              <span className="text-blue-700 text-4xl md:text-6xl">☺</span>
-            </div>
-            <span className="text-blue-700 font-black text-xl sm:text-2xl md:text-3xl uppercase tracking-wide">
-              DANCE
-            </span>
+            {items.map((item) => (
+              <span
+                key={`${loop}-${item}`}
+                className="text-blue-700 font-black text-xl sm:text-2xl md:text-3xl uppercase tracking-[0.3em]"
+              >
+                {item}
+              </span>
+            ))}
           </div>
         ))}
       </div>
 
-      {/* CSS for animation */}
       <style jsx>{`
         @keyframes scroll {
           0% {
@@ -39,8 +32,9 @@ export default function ScrollingBanner() {
           }
         }
 
-        .animate-scroll {
+        .marquee {
           animation: scroll 30s linear infinite;
+          width: max-content;
         }
       `}</style>
     </div>

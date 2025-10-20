@@ -4,9 +4,6 @@ import Image from "next/image";
 import MobileMenu from './MobileMenu';
 
 
-import ticket from '../../public/ticket.png';
-
-
 const Header = () => {
   return (
     <>
@@ -20,7 +17,6 @@ const Header = () => {
           <Link href="#aboutus">ABOUT</Link>
           <Link href="#involvewithus">INVOLVE WITH US</Link>
           <Link href="#creators">CREATORS</Link>
-          <Link href="#festivals">FESTIVALS</Link>
           <Link href="#contactus">CONTACT US</Link>
           <Link href="/cosplay">COSPLAY</Link>
           <Link href="/privacy-policy" className='underline'>PRIVACY POLICY</Link>
@@ -28,33 +24,7 @@ const Header = () => {
         {/* Mobile menu */}
         <MobileMenu />
       </div>
-      <div className="flex justify-between py-4 px-4 md:px-10 items-center bg-[#141414] text-white sticky top-0 w-full z-40">
-              <h1 className="text-lg md:text-2xl font-medium">
-                The Sound of Pure Madness.
-              </h1>
-              <div className="hidden lg:flex gap-12 font-tt-commons font-semibold text-[1.3rem] justify-center items-center">
-                <div className="flex justify-center items-center gap-2">
-                  <Image
-                    src={ticket}
-                    alt="Ticket"
-                    width={ticket.width / 14}
-                    className="rotate-45"
-                  />
-                  Hazaribagh
-                </div>
-             
-                <Link href="#tickets" className="bg-[#ffe300] text-black px-7 font-bold py-1">
-                  TICKETS
-                </Link>
-              </div>
-              {/* Mobile CTA */}
-              <div className="lg:hidden">
-                <Link href="#tickets" className="bg-[#ffe300] text-black px-4 py-1 text-sm font-bold">
-                  TICKETS
-                </Link>
-              </div>
-            </div>
-          
+
     </>
   );
 };
