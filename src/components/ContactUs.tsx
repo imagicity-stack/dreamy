@@ -2,7 +2,10 @@ import Image from "next/image";
 
 export default function ContactUs() {
   return (
-    <section id="contactus" className="bg-black py-12 md:py-20 relative px-4">
+    <section
+      id="contactus"
+      className="bg-black py-12 md:py-20 relative px-4 scroll-mt-24"
+    >
       {/* Main Container */}
       <div className="max-w-[1500px] mx-auto grid grid-cols-1 lg:grid-cols-2 items-stretch relative z-10 rounded-2xl overflow-hidden">
         {/* Left Section - Image */}
