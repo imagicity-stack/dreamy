@@ -1,7 +1,6 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import smilGif from "../../public/Winky Smile.gif";
 import { useState } from "react";
 import Footer from "@/components/Footer";
 import ScrollingBanner from "@/components/ScrollingBanner";
@@ -9,53 +8,46 @@ import AboutSection from "@/components/AboutSection";
 import OurPartners from "@/components/OurPartners";
 import ContactUs from "@/components/ContactUs";
 
-const festivals = [
+const involvementOptions = [
   {
     name: "Bring Your Stall",
-   
-    desc: "Bring your brand, food, or art to life. Set up your stall and be part of Hazaribagh’s biggest youth carnival.",
-    color: "bg-red-500",
+    desc: "Showcase food, art, games, or merch in a high-energy bazaar built for creators.",
+    panelClass: "bg-red-500 text-white",
+    imageBgClass: "bg-yellow-300",
     logo: "/D2.png",
-    text: "white",
-      CTA: "Apply Now",
-    color2: "yellow-300",
+    href: "/stall",
   },
   {
     name: "Cosplay Event",
-    desc: "Step into your favorite character and own the stage. Be part of Hazaribagh’s first ever cosplay celebration.",
-    color: "bg-orange-500",
+    desc: "Step into character and own Jharkhand’s wildest fandom stage at MADOOZA.",
+    panelClass: "bg-orange-500 text-white",
+    imageBgClass: "bg-[#A1FFFD]",
     logo: "/D3.png",
-    text: "white",
-    CTA: "Apply Now",
-    color2: "[#A1FFFD]",
+    href: "/cosplay",
   },
   {
-    name: "PERFORMERS",
-    desc: "Show your talent — dance, sing, rap, paint, or perform live. This is your spotlight.",
-    color: "bg-[#A1FFFD]",
+    name: "Performers",
+    desc: "From bands and DJs to poets and dancers, light up the lineup with your act.",
+    panelClass: "bg-[#A1FFFD] text-black",
+    imageBgClass: "bg-pink-600",
     logo: "/D5.png",
-    CTA: "Apply Now",
-    text: "black",
-    color2: "pink-600",
+    href: "/performer",
   },
   {
-    name: "VOLUNTEERS",
-    desc: "Join the crew that’s making this madness possible. Let’s build Madooza together.",
-    color: "bg-blue-500",
+    name: "Volunteers",
+    desc: "Join the crew, earn experience, and see the madness from behind the scenes.",
+    panelClass: "bg-blue-500 text-white",
+    imageBgClass: "bg-yellow-300",
     logo: "/D1.png",
-    CTA: "Join Now",
-    text: "white",
-    color2: "yellow-300",
+    href: "/volunteer",
   },
   {
-    name: "WANT TO SPOONSOR",
-    date: "May 16 – 18, 2025",
-    desc: "Each sub section will have a basic form (take reference from the existing site) and before applying a check box- I have read the terms and conditions.",
-    color: "bg-green-400",
+    name: "Sponsors",
+    desc: "Partner with MADOOZA to amplify your brand across Jharkhand’s youth movement.",
+    panelClass: "bg-green-400 text-black",
+    imageBgClass: "bg-blue-600",
     logo: "/D4.png",
-    text: "black",
-    CTA: "Contact Us",
-    color2: "blue-600",
+    href: "/sponsor",
   },
 ];
 
@@ -77,23 +69,11 @@ const highlights = [
 ];
 
 export default function Home() {
-  const [active, setActive] = useState("SHANGHAI");
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalSection, setModalSection] = useState("");
+  const [active, setActive] = useState(involvementOptions[0].name);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
 
   const currentFestival =
-    festivals.find((f) => f.name === active) ?? festivals[0];
-
-  const openModal = (sectionName: string) => {
-    setModalSection(sectionName);
-    setIsModalOpen(true);
-  };
-
-  const closeModal = () => {
-    setIsModalOpen(false);
-    setModalSection("");
-  };
+    involvementOptions.find((f) => f.name === active) ?? involvementOptions[0];
 
   const openTicketModal = () => {
     setIsTicketModalOpen(true);
@@ -101,13 +81,6 @@ export default function Home() {
 
   const closeTicketModal = () => {
     setIsTicketModalOpen(false);
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle form submission logic here
-    alert(`Form submitted for ${modalSection}`);
-    closeModal();
   };
 
   const handleTicketSubmit = (e: React.FormEvent) => {
@@ -170,15 +143,15 @@ export default function Home() {
         <div className="flex justify-center w-full">
           <div className="w-full md:w-10/12 overflow-x-auto">
             <div className="flex gap-1 md:gap-2 min-w-max md:min-w-0">
-              {festivals.map((festival) => (
+              {involvementOptions.map((festival) => (
                 <button
                   key={festival.name}
                   onClick={() => setActive(festival.name)}
                   className={`flex items-center justify-center gap-1 md:gap-3 flex-1 px-2 md:px-4 py-2 md:py-3 cursor-pointer font-oswald tracking-wide text-sm sm:text-base md:text-lg lg:text-xl uppercase transition-all text-blue-700 whitespace-nowrap ${
                     active === festival.name
-                      ? "bg-[#A1FFFD] "
+                      ? "bg-[#A1FFFD]"
                       : "bg-[#FFD600] hover:bg-[#A1FFFD]"
-                  }.`}
+                  }`}
                 >
                   <span className="text-center">{festival.name}</span>
                 </button>
@@ -192,40 +165,29 @@ export default function Home() {
           <div className="w-full md:w-10/12 flex flex-col lg:flex-row items-stretch h-auto lg:min-h-[440px]">
             {/* Left Info */}
             <div
-              className={`${currentFestival.color} text-${currentFestival.text} p-8 md:p-12 lg:p-20 lg:w-1/2 h-auto lg:h-full flex-1 flex flex-col justify-center`}
+              className={`${currentFestival.panelClass} p-8 md:p-12 lg:p-20 lg:w-1/2 h-auto lg:h-full flex-1 flex flex-col justify-center`}
             >
               <h3
-                className={`mb-4 uppercase font-oswald text-xl sm:text-2xl md:text-3xl lg:text-4xl tracking-wide ${
-                  currentFestival.name === "HYDERABAD"
-                    ? "!text-pink-600"
-                    : currentFestival.name === "SHANGHAI"
-                    ? "text-blue-600"
-                    : ""
-                }`}
+                className="mb-4 uppercase font-oswald text-xl sm:text-2xl md:text-3xl lg:text-4xl tracking-wide"
               >
                 {currentFestival.name}
               </h3>
-              <p className="text-xs sm:text-sm md:text-base font-semibold mb-3 md:mb-5 opacity-90">
-                {currentFestival.date}
-              </p>
               <div className="h-auto lg:max-h-64 overflow-y-auto">
                 <p className="text-sm md:text-base leading-relaxed">
                   {currentFestival.desc}
                 </p>
               </div>
-              {currentFestival.CTA && (
-                <button
-                  onClick={() => openModal(currentFestival.name)}
-                  className="mt-4 cursor-pointer bg-[#ffe300] text-black text-sm sm:text-base md:text-lg font-oswald px-4 py-2 rounded-md hover:bg-[#ffd000] transition-all"
-                >
-                  {currentFestival.CTA}
-                </button>
-              )}
+              <Link
+                href={currentFestival.href}
+                className="mt-4 inline-flex w-fit cursor-pointer bg-[#ffe300] text-black text-sm sm:text-base md:text-lg font-oswald px-5 py-2 rounded-md hover:bg-[#ffd000] transition-all uppercase"
+              >
+                Learn More
+              </Link>
             </div>
 
             {/* Right Image */}
             <div
-              className={`bg-${currentFestival.color2} lg:w-1/2 w-full flex justify-center items-center p-6 md:p-8 lg:p-10 flex-1 min-h-[280px]`}
+              className={`${currentFestival.imageBgClass} lg:w-1/2 w-full flex justify-center items-center p-6 md:p-8 lg:p-10 flex-1 min-h-[280px]`}
             >
               <Image
                 src={currentFestival.logo}
@@ -284,132 +246,6 @@ export default function Home() {
       <ContactUs />
       <OurPartners />
       <Footer />
-
-      {/* Modal Form */}
-      {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4">
-          <div className="bg-black max-w-2xl w-full shadow-2xl border-2 border-[#ffe300] relative max-h-[95vh] overflow-y-auto">
-            {/* Corner Image */}
-            <div className="absolute top-0 right-0 w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 lg:w-40 lg:h-40 z-10 pointer-events-none">
-              <Image
-                src={smilGif}
-                alt="Decoration"
-                fill
-                className="object-contain"
-              />
-            </div>
-
-            {/* Modal Header */}
-            <div className="bg-gradient-to-r from-[#7300ff] to-[#ff1a00] p-4 sm:p-6 md:p-8 relative">
-              <button
-                onClick={closeModal}
-                className="absolute top-2 right-2 sm:top-4 sm:right-4 text-white text-2xl sm:text-3xl hover:text-[#ffe300] transition-all z-20"
-              >
-                ×
-              </button>
-              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-oswald text-white uppercase pr-8">
-                {modalSection}
-              </h2>
-              <p className="text-white/90 mt-2 text-sm sm:text-base">
-                Fill in the details below to get involved
-              </p>
-            </div>
-
-            {/* Modal Body */}
-            <form onSubmit={handleSubmit} className="p-4 sm:p-6 md:p-8">
-              <div className="space-y-4 font-sans sm:space-y-6">
-                {/* Name Field */}
-                <div>
-                  <label className="block text-[#ffe300] font-semibold mb-2 text-sm sm:text-base" htmlFor="name">
-                    Full Name 
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    required
-                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all"
-                    placeholder="Enter your full name"
-                  />
-                </div>
-
-                {/* Email Field */}
-                <div>
-                  <label className="block text-[#ffe300] font-semibold mb-2 text-sm sm:text-base" htmlFor="email">
-                    Email Address 
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    required
-                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all"
-                    placeholder="your.email@example.com"
-                  />
-                </div>
-
-                {/* Phone Field */}
-                <div>
-                  <label className="block text-[#ffe300] font-semibold mb-2 text-sm sm:text-base" htmlFor="phone">
-                    Phone Number 
-                  </label>
-                  <input
-                    type="tel"
-                    id="phone"
-                    required
-                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all"
-                    placeholder="+91 XXXXXXXXXX"
-                  />
-                </div>
-
-                {/* Message Field */}
-                <div>
-                  <label className="block text-[#ffe300] font-semibold mb-2 text-sm sm:text-base" htmlFor="message">
-                    Message / Additional Details
-                  </label>
-                  <textarea
-                    id="message"
-                    rows={4}
-                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all resize-none"
-                    placeholder="Tell us more about your interest..."
-                  ></textarea>
-                </div>
-
-                {/* Terms Checkbox */}
-                <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    id="terms"
-                    required
-                    className="mt-1 w-5 h-5 accent-[#ffe300] cursor-pointer"
-                  />
-                  <label htmlFor="terms" className="text-sm text-gray-300 cursor-pointer">
-                    I have read and agree to the{" "}
-                    <a href="/privacy-policy" className="text-[#ffe300] hover:underline">
-                      terms and conditions
-                    </a>
-                  </label>
-                </div>
-              </div>
-
-              {/* Submit Button */}
-              <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
-                <button
-                  type="submit"
-                  className="flex-1 bg-[#ffe300] text-black font-oswald text-sm sm:text-base md:text-lg py-2 sm:py-3 hover:bg-[#ffd000] transition-all uppercase"
-                >
-                  Show Interest
-                </button>
-                <button
-                  type="button"
-                  onClick={closeModal}
-                  className="sm:w-auto px-6 py-2 sm:py-3 border-2 border-[#ffe300] text-white text-sm sm:text-base font-semibold hover:bg-[#ffe300] hover:text-black transition-all"
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
 
       {/* Ticket Modal */}
       {isTicketModalOpen && (
