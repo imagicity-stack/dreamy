@@ -1,3 +1,8 @@
+"use client";
+
+import { FormEvent, useState } from "react";
+import { X } from "lucide-react";
+
 import ContactUs from "@/components/ContactUs";
 import Footer from "@/components/Footer";
 import ScrollingBanner from "@/components/ScrollingBanner";
@@ -26,17 +31,23 @@ const prizes = [
   {
     title: "🥇 1st Place – The Mad Legend",
     description: "₹3000 + Amazon gift voucher + certificate + feature reel",
-    accent: "from-[#ffe300] to-[#ff1a00] text-black",
+    cardClass: "bg-[#1d0f2f]",
+    titleClass: "text-[#ffe300]",
+    descriptionClass: "text-[#ffe9a0]",
   },
   {
     title: "🥈 2nd Place – The Mad Icon",
     description: "₹2000 + certificate + feature reel",
-    accent: "from-[#9dffff] to-[#7300ff] text-black",
+    cardClass: "bg-[#0f1f33]",
+    titleClass: "text-[#9dffff]",
+    descriptionClass: "text-[#c6fdff]",
   },
   {
     title: "🥉 3rd Place – Crowd Favorite",
     description: "₹500 + food coupon + certificate",
-    accent: "from-[#ff1a00] to-[#7300ff] text-white",
+    cardClass: "bg-[#291326]",
+    titleClass: "text-[#ffd6a8]",
+    descriptionClass: "text-[#ffe7cc]",
   },
 ];
 
@@ -63,6 +74,23 @@ const highlights = [
 ];
 
 export default function CosplayPage() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+
+  const openModal = () => {
+    setSubmitted(false);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+  };
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setSubmitted(true);
+  };
+
   return (
     <div className="bg-black text-white">
       <section className="relative overflow-hidden bg-gradient-to-br from-[#7300ff] via-[#ff1a00] to-[#ffe300] text-black py-16 sm:py-20 md:py-24">
@@ -75,14 +103,7 @@ export default function CosplayPage() {
             🎭 Cosplay Arena – Step Into the MADVERSE
           </h1>
           <p className="mt-6 text-base sm:text-lg md:text-xl text-gray-100 leading-relaxed font-quicksand">
-            Welcome to the wildest corner of MADOOZA — the Cosplay Arena, where imagination takes the stage and reality calls in sick.
-            For the first time in Hazaribagh, heroes, villains, and absolute mad-minds will walk together in one grand celebration of fandom,
-            art, and chaos. Whether you&apos;re a die-hard anime fan, a Bollywood icon in disguise, or just someone with a crazy idea and cardboard armor — this is your moment.
-          </p>
-          <p className="mt-4 text-base sm:text-lg md:text-xl text-gray-100 leading-relaxed font-quicksand">
-            The Cosplay Arena isn&apos;t just a dress-up segment; it&apos;s a full-scale experience. Participants will roam the MADOOZA grounds in character,
-            interact with the crowd, strike poses at our neon photo booths, and finally battle it out on stage during the MAD PARADE — the ultimate cosplay showdown
-            where the audience decides who rules the MADVERSE.
+            Welcome to MADOOZA’s Cosplay Arena — where fun gets crazy and everyone becomes a hero or villain. Dress up, walk around, click photos, and join the MAD PARADE — the big cosplay battle where the crowd picks the winner!
           </p>
         </div>
       </section>
@@ -124,10 +145,12 @@ export default function CosplayPage() {
               {prizes.map((prize) => (
                 <div
                   key={prize.title}
-                  className={`bg-gradient-to-r ${prize.accent} rounded-xl border border-white/10 p-4 sm:p-6 shadow-lg`}
+                  className={`rounded-xl border border-white/10 p-4 sm:p-6 shadow-lg ${prize.cardClass}`}
                 >
-                  <h3 className="text-xl sm:text-2xl font-oswald uppercase mb-2">{prize.title}</h3>
-                  <p className="text-sm sm:text-base font-quicksand leading-relaxed">
+                  <h3 className={`text-xl sm:text-2xl font-oswald uppercase mb-2 ${prize.titleClass}`}>
+                    {prize.title}
+                  </h3>
+                  <p className={`text-sm sm:text-base font-quicksand leading-relaxed ${prize.descriptionClass}`}>
                     {prize.description}
                   </p>
                 </div>
@@ -186,6 +209,131 @@ export default function CosplayPage() {
           </div>
         </div>
       </section>
+
+      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-[#080510]">
+        <div className="max-w-3xl mx-auto text-center">
+          <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-4">
+            Ready to Join the MAD Parade?
+          </h2>
+          <p className="text-sm sm:text-base md:text-lg text-gray-200 font-quicksand leading-relaxed">
+            Lock in your slot for Jharkhand’s wildest cosplay throwdown. Secure your registration online and arrive fully ready to rule the stage.
+          </p>
+          <div className="mt-8 flex flex-col items-center gap-3">
+            <button
+              onClick={openModal}
+              className="inline-flex items-center justify-center rounded-md bg-[#ffe300] px-6 py-3 font-oswald text-lg uppercase tracking-wide text-black transition hover:bg-[#ffd000]"
+            >
+              Apply Now
+            </button>
+            <button
+              onClick={openModal}
+              className="inline-flex items-center justify-center rounded-md border border-[#ffe300] px-6 py-3 font-oswald text-base uppercase tracking-wide text-[#ffe300] transition hover:bg-[#ffe300]/10"
+            >
+              Open Registration Form
+            </button>
+          </div>
+        </div>
+      </section>
+
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-black/80" onClick={closeModal} />
+          <div className="relative z-10 w-full max-w-xl rounded-2xl border border-white/10 bg-[#11011b] p-6 sm:p-8">
+            <button
+              onClick={closeModal}
+              className="absolute right-4 top-4 text-gray-400 hover:text-white"
+              aria-label="Close registration form"
+            >
+              <X className="h-5 w-5" />
+            </button>
+            <h3 className="text-2xl font-oswald uppercase text-[#ffe300]">Cosplay Registration</h3>
+            <p className="mt-2 text-sm sm:text-base text-gray-300 font-quicksand">
+              Complete the form and secure your spot with a quick payment. We’ll email you confirmation and event-day cues.
+            </p>
+            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="cosplay-name">
+                    Full Name
+                  </label>
+                  <input
+                    id="cosplay-name"
+                    name="name"
+                    type="text"
+                    required
+                    className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
+                    placeholder="Enter your name"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="cosplay-character">
+                    Character Name
+                  </label>
+                  <input
+                    id="cosplay-character"
+                    name="character"
+                    type="text"
+                    required
+                    className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
+                    placeholder="Who are you cosplaying?"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="cosplay-email">
+                    Email ID
+                  </label>
+                  <input
+                    id="cosplay-email"
+                    name="email"
+                    type="email"
+                    required
+                    className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
+                    placeholder="your.email@example.com"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="cosplay-phone">
+                    Phone Number
+                  </label>
+                  <input
+                    id="cosplay-phone"
+                    name="phone"
+                    type="tel"
+                    required
+                    className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
+                    placeholder="+91 XXXXXXXXXX"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="cosplay-notes">
+                  Additional Notes
+                </label>
+                <textarea
+                  id="cosplay-notes"
+                  name="notes"
+                  rows={3}
+                  className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
+                  placeholder="Share performance cues or prop details"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full rounded-md bg-[#ffe300] px-4 py-3 font-oswald text-lg uppercase tracking-wide text-black transition hover:bg-[#ffd000]"
+              >
+                Pay ₹299 &amp; Register
+              </button>
+              {submitted && (
+                <p className="rounded-md border border-green-400/40 bg-green-500/10 px-4 py-3 text-sm text-green-200">
+                  Your cosplay slot is secured! We’ll send payment instructions and confirmation shortly.
+                </p>
+              )}
+            </form>
+          </div>
+        </div>
+      )}
 
       <ScrollingBanner />
       <ContactUs />
