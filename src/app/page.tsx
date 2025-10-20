@@ -76,15 +76,6 @@ const highlights = [
   },
 ];
 
-const products = [
-  { name: "Food Stalls & Local Favorites", color: "bg-blue-600", img: "/beanie.png" },
-  { name: "Live Music & DJ", color: "bg-green-400", img: "/overshirt.png" },
-  { name: "Cosplay Parade", color: "bg-pink-500", img: "/shortsleeves.png" },
-  { name: "Student Exhibitions", color: "bg-purple-700", img: "/jersey.png" },
-  { name: "Art Installations", color: "bg-cyan-300", img: "/hoodie.png" },
-  { name: "Fun Games & Activities", color: "bg-yellow-400", img: "/rugby.png" },
-];
-
 export default function Home() {
   const [active, setActive] = useState("SHANGHAI");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -171,7 +162,7 @@ export default function Home() {
       <ScrollingBanner/>
        <AboutSection />
       <section id="involvewithus" className="bg-[#7300ff] text-white py-12 md:py-20 flex justify-center items-center flex-col px-4">
-        <h2 className="text-center text-4xl md:text-6xl lg:text-9xl font-lg uppercase mb-8 md:mb-12 font-castle tracking-wider text-[#9dffff]">
+        <h2 className="text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-lg uppercase mb-8 md:mb-12 font-castle tracking-wider text-[#9dffff]">
           INVOLVE WITH US
         </h2>
 
@@ -183,7 +174,7 @@ export default function Home() {
                 <button
                   key={festival.name}
                   onClick={() => setActive(festival.name)}
-                  className={`flex items-center justify-center gap-1 md:gap-3 flex-1 px-2 md:px-4 py-2 md:py-3 font-md cursor-pointer font-castle tracking-wider text-lg sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl uppercase transition-all text-blue-700 whitespace-nowrap ${
+                  className={`flex items-center justify-center gap-1 md:gap-3 flex-1 px-2 md:px-4 py-2 md:py-3 font-md cursor-pointer font-castle tracking-wider text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl uppercase transition-all text-blue-700 whitespace-nowrap ${
                     active === festival.name
                       ? "bg-[#A1FFFD] "
                       : "bg-[#FFD600] hover:bg-[#A1FFFD]"
@@ -198,13 +189,13 @@ export default function Home() {
 
         {/* Active Festival Content */}
         <div className="flex justify-center mt-6 md:mt-10 w-full">
-          <div className="w-full md:w-10/12 flex flex-col lg:flex-row items-stretch overflow-hidden h-auto lg:h-[550px]">
+          <div className="w-full md:w-10/12 flex flex-col lg:flex-row items-stretch h-auto lg:min-h-[480px]">
             {/* Left Info */}
             <div
               className={`${currentFestival.color} text-${currentFestival.text} p-8 md:p-12 lg:p-20 lg:w-1/2 h-auto lg:h-full flex-1 flex flex-col justify-center`}
             >
               <h3
-                className={`font-md mb-4 uppercase font-castle text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl tracking-wide ${
+                className={`font-md mb-4 uppercase font-castle text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl tracking-wide ${
                   currentFestival.name === "HYDERABAD"
                     ? "!text-pink-600"
                     : currentFestival.name === "SHANGHAI"
@@ -214,7 +205,7 @@ export default function Home() {
               >
                 {currentFestival.name}
               </h3>
-              <p className="text-base md:text-lg lg:text-xl font-semibold mb-4 md:mb-6 opacity-90">
+              <p className="text-sm md:text-base lg:text-lg font-semibold mb-4 md:mb-6 opacity-90">
                 {currentFestival.date}
               </p>
               <div className="h-auto lg:h-40 overflow-y-auto">
@@ -223,9 +214,9 @@ export default function Home() {
                 </p>
               </div>
               {currentFestival.CTA && (
-                <button 
+                <button
                   onClick={() => openModal(currentFestival.name)}
-                  className="mt-4 cursor-pointer bg-[#ffe300] text-black text-3xl font-castle px-4 py-2 rounded-md hover:bg-[#ffd000] transition-all"
+                  className="mt-4 cursor-pointer bg-[#ffe300] text-black text-lg md:text-xl font-castle px-4 py-2 rounded-md hover:bg-[#ffd000] transition-all"
                 >
                   {currentFestival.CTA}
                 </button>
@@ -234,7 +225,7 @@ export default function Home() {
 
             {/* Right Image */}
             <div
-              className={`bg-${currentFestival.color2} lg:w-1/2 w-full flex justify-center items-center p-6 md:p-8 lg:p-10 flex-1 min-h-[300px] lg:min-h-0`}
+              className={`bg-${currentFestival.color2} lg:w-1/2 w-full flex justify-center items-center p-6 md:p-8 lg:p-10 flex-1 min-h-[280px]`}
             >
               <Image
                 src={currentFestival.logo}
@@ -289,87 +280,6 @@ export default function Home() {
           </div>
         </section>
       </section>
-      <section className="bg-black text-white py-12 md:py-24 px-4 md:px-8 lg:px-20">
-        {/* Combined Grid - Responsive layout */}
-        <section className="bg-black text-white py-16 md:py-24 px-6 sm:px-10 lg:px-20">
-  {/* Header */}
-  <div id="festivals" className="text-center max-w-5xl mx-auto mb-16">
-    <h2 className="text-5xl sm:text-7xl md:text-[10rem] font-castle tracking-wider font-lg mb-6 leading-none">
-      FESTIVALS AT MADOOZA
-    </h2>
-    <p className="text-gray-300 leading-relaxed font-sans text-base sm:text-lg md:text-2xl px-4 sm:px-10">
-Join the ultimate celebration at Madooza Feast on local food favorites, dance to Live Music & DJs, and watch the spectacular Cosplay Parade. Discover incredible Student Exhibitions and amazing Art Installations, plus endless Fun Games & Activities!
-
-Madooza: Food, Music, Art, Fun    </p>
-  </div>
-
-  {/* Product Grid */}
-  <div
-    className="
-      grid
-      gap-4 sm:gap-6
-      grid-cols-2 sm:grid-cols-3 lg:grid-cols-4
-      auto-rows-[200px] sm:auto-rows-[250px] md:auto-rows-[300px]
-    "
-  >
-    {/* Main Collection Image - Takes 2x2 space on large screens */}
-    <div
-      className="
-        relative bg-gray-800 rounded-lg overflow-hidden
-        col-span-2 row-span-2
-        sm:col-span-2 sm:row-span-2
-        lg:col-span-2 lg:row-span-2
-      "
-    >
-      <Image
-        src="/collection.jpg"
-        alt="Pixel Grind Collection"
-        width={1200}
-        height={800}
-        className="w-full h-full object-cover"
-      />
-    
-    </div>
-
-    {/* Product Items */}
-    {products.slice(0, 10).map((product, index) => (
-      <div
-        key={product.name}
-        className={`
-          ${product.color}
-          rounded-lg flex flex-col items-center justify-center
-          group p-2 sm:p-4
-          transition-transform duration-300 hover:scale-[1.03]
-          ${index === 0 ? "lg:col-start-3" : ""}
-        `}
-      >
-        <Image
-          src={product.img}
-          alt={product.name}
-          width={400}
-          height={400}
-          className="mb-2 sm:mb-4 group-hover:animate-pulse object-contain max-h-[150px] sm:max-h-[200px]"
-        />
-        <p className=" font-castle px-2 py-1 text-xl sm:text-lg md:text-4xl font-medium text-center">
-          {product.name}
-        </p>
-      </div>
-    ))}
-  </div>
-</section>
-
-
-        {/* CTA Button */}
-        <div className="flex justify-center">
-          <Link
-            href="#"
-            className="bg-lime-400 text-black px-4 md:px-6 py-2 md:py-3 rounded-sm font-semibold text-sm md:text-base hover:bg-lime-300 transition"
-          >
-            BUY NOW ↗
-          </Link>
-        </div>
-      </section>
-     
       <ScrollingBanner />
       <ContactUs />
       <OurPartners />

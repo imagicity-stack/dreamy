@@ -92,7 +92,7 @@ export default function Home() {
         </video>
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none flex-col gap-4 sm:gap-6 md:gap-8 lg:gap-10 px-4">
           <div className="flex flex-col items-center justify-center w-full max-w-[95vw]">
-            <h1 className="relative text-[#ffe300] text-[clamp(70px,18vw,380px)] sm:text-[120px] md:text-[180px] lg:text-[280px] xl:text-[380px] font-castle drop-shadow-2xl tracking-tight z-10 leading-none text-center">
+            <h1 className="relative text-[#ffe300] text-[clamp(48px,12vw,220px)] sm:text-[80px] md:text-[120px] lg:text-[160px] xl:text-[200px] font-castle drop-shadow-2xl tracking-tight z-10 leading-none text-center">
               COSPLAY
               <Image
                 src={smilGif}
