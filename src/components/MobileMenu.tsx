@@ -75,13 +75,6 @@ export default function MobileMenu() {
               CREATORS
             </Link>
             <Link
-              href="#festivals"
-              className="text-white font-tt-commons font-semibold text-xl hover:text-gray-200 transition"
-              onClick={() => setIsOpen(false)}
-            >
-              FESTIVALS
-            </Link>
-            <Link
               href="#contactus"
               className="text-white font-tt-commons font-semibold text-xl hover:text-gray-200 transition"
               onClick={() => setIsOpen(false)}
