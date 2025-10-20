@@ -162,7 +162,7 @@ export default function Home() {
       <ScrollingBanner/>
        <AboutSection />
       <section id="involvewithus" className="bg-[#7300ff] text-white py-12 md:py-20 flex justify-center items-center flex-col px-4">
-        <h2 className="text-center text-4xl md:text-6xl lg:text-9xl font-lg uppercase mb-8 md:mb-12 font-castle tracking-wider text-[#9dffff]">
+        <h2 className="text-center text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-lg uppercase mb-8 md:mb-12 font-castle tracking-wider text-[#9dffff]">
           INVOLVE WITH US
         </h2>
 
@@ -174,7 +174,7 @@ export default function Home() {
                 <button
                   key={festival.name}
                   onClick={() => setActive(festival.name)}
-                  className={`flex items-center justify-center gap-1 md:gap-3 flex-1 px-2 md:px-4 py-2 md:py-3 font-md cursor-pointer font-castle tracking-wider text-lg sm:text-lg md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-5xl uppercase transition-all text-blue-700 whitespace-nowrap ${
+                  className={`flex items-center justify-center gap-1 md:gap-3 flex-1 px-2 md:px-4 py-2 md:py-3 font-md cursor-pointer font-castle tracking-wider text-base sm:text-lg md:text-xl lg:text-2xl xl:text-3xl uppercase transition-all text-blue-700 whitespace-nowrap ${
                     active === festival.name
                       ? "bg-[#A1FFFD] "
                       : "bg-[#FFD600] hover:bg-[#A1FFFD]"
@@ -189,13 +189,13 @@ export default function Home() {
 
         {/* Active Festival Content */}
         <div className="flex justify-center mt-6 md:mt-10 w-full">
-          <div className="w-full md:w-10/12 flex flex-col lg:flex-row items-stretch overflow-hidden h-auto lg:h-[550px]">
+          <div className="w-full md:w-10/12 flex flex-col lg:flex-row items-stretch h-auto lg:min-h-[480px]">
             {/* Left Info */}
             <div
               className={`${currentFestival.color} text-${currentFestival.text} p-8 md:p-12 lg:p-20 lg:w-1/2 h-auto lg:h-full flex-1 flex flex-col justify-center`}
             >
               <h3
-                className={`font-md mb-4 uppercase font-castle text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl tracking-wide ${
+                className={`font-md mb-4 uppercase font-castle text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl tracking-wide ${
                   currentFestival.name === "HYDERABAD"
                     ? "!text-pink-600"
                     : currentFestival.name === "SHANGHAI"
@@ -205,7 +205,7 @@ export default function Home() {
               >
                 {currentFestival.name}
               </h3>
-              <p className="text-base md:text-lg lg:text-xl font-semibold mb-4 md:mb-6 opacity-90">
+              <p className="text-sm md:text-base lg:text-lg font-semibold mb-4 md:mb-6 opacity-90">
                 {currentFestival.date}
               </p>
               <div className="h-auto lg:h-40 overflow-y-auto">
@@ -214,9 +214,9 @@ export default function Home() {
                 </p>
               </div>
               {currentFestival.CTA && (
-                <button 
+                <button
                   onClick={() => openModal(currentFestival.name)}
-                  className="mt-4 cursor-pointer bg-[#ffe300] text-black text-3xl font-castle px-4 py-2 rounded-md hover:bg-[#ffd000] transition-all"
+                  className="mt-4 cursor-pointer bg-[#ffe300] text-black text-lg md:text-xl font-castle px-4 py-2 rounded-md hover:bg-[#ffd000] transition-all"
                 >
                   {currentFestival.CTA}
                 </button>
@@ -225,7 +225,7 @@ export default function Home() {
 
             {/* Right Image */}
             <div
-              className={`bg-${currentFestival.color2} lg:w-1/2 w-full flex justify-center items-center p-6 md:p-8 lg:p-10 flex-1 min-h-[300px] lg:min-h-0`}
+              className={`bg-${currentFestival.color2} lg:w-1/2 w-full flex justify-center items-center p-6 md:p-8 lg:p-10 flex-1 min-h-[280px]`}
             >
               <Image
                 src={currentFestival.logo}
