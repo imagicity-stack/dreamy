@@ -106,10 +106,18 @@
   font-display: swap;
 }
 
-:root {
-  --font-castle: "Castle Press", serif;
+/* Heading font */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-oswald), var(--font-tt-commons), sans-serif;
 }
 
+.font-oswald,
 .font-castle {
-  font-family: var(--font-castle);
+  font-family: var(--font-oswald), var(--font-tt-commons), sans-serif;
+  font-weight: 600;
 }
