@@ -9,72 +9,15 @@
   font-display: swap;
 }
 
-:root {
-  /* CSS variable that components can use: var(--font-tt-commons) */
-  --font-tt-commons: "TT Commons Pro", system-ui, -apple-system, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial;
+body {
+  font-family: var(--font-quicksand), "TT Commons Pro", system-ui,
+    -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
-/* Utility class to use the local font in case components prefer className */
-.font-tt-commons {
-  font-family: var(--font-tt-commons);
-}
-
-/* Bold weight for TT Commons Pro */
-@font-face {
-  font-family: "TT Commons Pro";
-  src: url("/tt_commons_pro_bold.otf") format("opentype");
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-:root {
-  --font-tt-commons-bold: "TT Commons Pro", system-ui, -apple-system, "Segoe UI",
-    Roboto, "Helvetica Neue", Arial;
-}
-
-.font-tt-commons-bold {
-  font-family: var(--font-tt-commons-bold);
-  font-weight: 700;
-}
-
-/* Medium weight for TT Commons Pro (500) */
-@font-face {
-  font-family: "TT Commons Pro";
-  src: url("/tt_commons_pro_medium.otf") format("opentype");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-:root {
-  --font-tt-commons-medium: "TT Commons Pro", system-ui, -apple-system,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial;
-}
-
-.font-tt-commons-medium {
-  font-family: var(--font-tt-commons-medium);
-  font-weight: 500;
-}
-
-/* Extra-bold weight for TT Commons Pro (800) */
-@font-face {
-  font-family: "TT Commons Pro";
-  src: url("/tt_commons_pro_extrabold.otf") format("opentype");
-  font-weight: 800;
-  font-style: normal;
-  font-display: swap;
-}
-
-:root {
-  --font-tt-commons-extrabold: "TT Commons Pro", system-ui, -apple-system,
-    "Segoe UI", Roboto, "Helvetica Neue", Arial;
-}
-
-.font-tt-commons-extrabold {
-  font-family: var(--font-tt-commons-extrabold);
-  font-weight: 800;
+/* Utility class to use the Quicksand font in components */
+.font-quicksand {
+  font-family: var(--font-quicksand), "TT Commons Pro", system-ui,
+    -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
 /* Site Sans Serif font (woff/woff2) placed in /public as 'Sans Serif Normal.*' */
@@ -106,10 +49,18 @@
   font-display: swap;
 }
 
-:root {
-  --font-castle: "Castle Press", serif;
+/* Heading font */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-oswald), var(--font-quicksand), sans-serif;
 }
 
+.font-oswald,
 .font-castle {
-  font-family: var(--font-castle);
+  font-family: var(--font-oswald), var(--font-quicksand), sans-serif;
+  font-weight: 600;
 }

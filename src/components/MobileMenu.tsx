@@ -55,42 +55,35 @@ export default function MobileMenu() {
           <nav className="flex flex-col space-y-6">
             <Link
               href="#aboutus"
-              className="text-white font-tt-commons font-semibold text-xl hover:text-gray-200 transition"
+              className="text-white font-quicksand font-semibold text-xl hover:text-gray-200 transition"
               onClick={() => setIsOpen(false)}
             >
               ABOUT
             </Link>
             <Link
               href="#involvewithus"
-              className="text-white font-tt-commons font-semibold text-xl hover:text-gray-200 transition"
+              className="text-white font-quicksand font-semibold text-xl hover:text-gray-200 transition"
               onClick={() => setIsOpen(false)}
             >
               INVOLVE WITH US
             </Link>
             <Link
               href="#creators"
-              className="text-white font-tt-commons font-semibold text-xl hover:text-gray-200 transition"
+              className="text-white font-quicksand font-semibold text-xl hover:text-gray-200 transition"
               onClick={() => setIsOpen(false)}
             >
               CREATORS
             </Link>
             <Link
-              href="#festivals"
-              className="text-white font-tt-commons font-semibold text-xl hover:text-gray-200 transition"
-              onClick={() => setIsOpen(false)}
-            >
-              FESTIVALS
-            </Link>
-            <Link
               href="#contactus"
-              className="text-white font-tt-commons font-semibold text-xl hover:text-gray-200 transition"
+              className="text-white font-quicksand font-semibold text-xl hover:text-gray-200 transition"
               onClick={() => setIsOpen(false)}
             >
               CONTACT US
             </Link>
             <Link
               href="/cosplay"
-              className="text-white font-tt-commons font-semibold text-xl hover:text-gray-200 transition"
+              className="text-white font-quicksand font-semibold text-xl hover:text-gray-200 transition"
               onClick={() => setIsOpen(false)}
             >
               COSPLAY
