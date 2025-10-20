@@ -1,3 +1,5 @@
+"use client";
+
 const items = ["COSPLAY", "MUSIC", "DANCE", "STALLS", "FOOD"];
 
 export default function ScrollingBanner() {
