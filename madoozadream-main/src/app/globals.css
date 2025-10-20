@@ -1,0 +1,115 @@
+@import "tailwindcss";
+
+/* Local font: TT Commons Pro Regular placed in /public */
+@font-face {
+  font-family: "TT Commons Pro";
+  src: url("/tt_commons_pro_regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* CSS variable that components can use: var(--font-tt-commons) */
+  --font-tt-commons: "TT Commons Pro", system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial;
+}
+
+/* Utility class to use the local font in case components prefer className */
+.font-tt-commons {
+  font-family: var(--font-tt-commons);
+}
+
+/* Bold weight for TT Commons Pro */
+@font-face {
+  font-family: "TT Commons Pro";
+  src: url("/tt_commons_pro_bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-tt-commons-bold: "TT Commons Pro", system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial;
+}
+
+.font-tt-commons-bold {
+  font-family: var(--font-tt-commons-bold);
+  font-weight: 700;
+}
+
+/* Medium weight for TT Commons Pro (500) */
+@font-face {
+  font-family: "TT Commons Pro";
+  src: url("/tt_commons_pro_medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-tt-commons-medium: "TT Commons Pro", system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+.font-tt-commons-medium {
+  font-family: var(--font-tt-commons-medium);
+  font-weight: 500;
+}
+
+/* Extra-bold weight for TT Commons Pro (800) */
+@font-face {
+  font-family: "TT Commons Pro";
+  src: url("/tt_commons_pro_extrabold.otf") format("opentype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-tt-commons-extrabold: "TT Commons Pro", system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+.font-tt-commons-extrabold {
+  font-family: var(--font-tt-commons-extrabold);
+  font-weight: 800;
+}
+
+/* Site Sans Serif font (woff/woff2) placed in /public as 'Sans Serif Normal.*' */
+@font-face {
+  font-family: "Site Sans";
+  /* encode spaces in filenames to avoid parsing issues */
+  src: url("/Sans%20Serif%20Normal.woff2") format("woff2"),
+    url("/Sans%20Serif%20Normal.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-site-sans: "Site Sans", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
+}
+
+.font-site-sans {
+  font-family: var(--font-site-sans);
+}
+
+/* Castle press font */
+@font-face {
+  font-family: "Castle Press";
+  src: url("/castlepressno2.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --font-castle: "Castle Press", serif;
+}
+
+.font-castle {
+  font-family: var(--font-castle);
+}
