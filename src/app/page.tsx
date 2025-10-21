@@ -14,7 +14,7 @@ const involvementOptions = [
     desc: "Showcase food, art, games, or merch in a high-energy bazaar built for creators.",
     panelClass: "bg-red-500 text-white",
     imageBgClass: "bg-yellow-300",
-    logo: "/D2.png",
+    logo: "/involve/stall.jpg",
     href: "/stall",
   },
   {
@@ -22,7 +22,7 @@ const involvementOptions = [
     desc: "Step into character and own Jharkhand’s wildest fandom stage at MADOOZA.",
     panelClass: "bg-orange-500 text-white",
     imageBgClass: "bg-[#A1FFFD]",
-    logo: "/D3.png",
+    logo: "/involve/cosplay.jpg",
     href: "/cosplay",
   },
   {
@@ -30,7 +30,7 @@ const involvementOptions = [
     desc: "From bands and DJs to poets and dancers, light up the lineup with your act.",
     panelClass: "bg-[#A1FFFD] text-black",
     imageBgClass: "bg-pink-600",
-    logo: "/D5.png",
+    logo: "/involve/Perfomers.jpg",
     href: "/performer",
   },
   {
@@ -38,7 +38,7 @@ const involvementOptions = [
     desc: "Join the crew, earn experience, and see the madness from behind the scenes.",
     panelClass: "bg-blue-500 text-white",
     imageBgClass: "bg-yellow-300",
-    logo: "/D1.png",
+    logo: "/involve/volunteer.jpg",
     href: "/volunteer",
   },
   {
@@ -46,7 +46,7 @@ const involvementOptions = [
     desc: "Partner with MADOOZA to amplify your brand across Jharkhand’s youth movement.",
     panelClass: "bg-green-400 text-black",
     imageBgClass: "bg-blue-600",
-    logo: "/D4.png",
+    logo: "/involve/sponsorship.png",
     href: "/sponsor",
   },
 ];
@@ -94,17 +94,16 @@ export default function Home() {
     <div className="w-full">
   
         <div id="tickets" className="w-full h-[50vh] md:h-[80vh] bg-blue-500 relative">
-        <video
-          src="/hero.mp4"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
+        <Image
+          src="/hero.png"
+          
+          alt="MADOOZA Hero Video"
+          width={1920}
+          height={1080}
+         
           className="w-full h-full object-cover"
         >
-          Your browser does not support the video tag.
-        </video>
+        </Image>
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-3 sm:gap-4 md:gap-6 lg:gap-8 px-4">
           {/* Logo */}
           <div className="relative w-[70%] sm:w-[60%] md:w-[50%] lg:w-[45%] xl:w-[40%] max-w-[600px]">
@@ -120,7 +119,7 @@ export default function Home() {
           
           {/* Text and Button */}
           <div className="text-center flex flex-col items-center gap-2 sm:gap-3 md:gap-4 -mt-4 sm:-mt-6 md:-mt-8 lg:-mt-10">
-            <p className="text-[#9dffff] font-extrabold font-quicksand text-xs sm:text-sm md:text-base lg:text-xl xl:text-2xl 2xl:text-3xl text-center relative z-20 px-4">
+            <p className="text-black font-extrabold font-quicksand text-xs sm:text-sm md:text-base lg:text-xl xl:text-2xl 2xl:text-3xl text-center relative z-20 px-4">
               THE SOUND OF PURE MADNESS
             </p>
             <button 
@@ -326,7 +325,7 @@ export default function Home() {
                     id="ticket-phone"
                     required
                     className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all"
-                    placeholder="+91 XXXXXXXXXX"
+                    placeholder="+91 9122289578"
                   />
                 </div>
 

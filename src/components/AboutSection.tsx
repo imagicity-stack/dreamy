@@ -1,6 +1,29 @@
 import Image from "next/image";
 
 export default function AboutSection() {
+  const images = [
+    {
+      src: "/involve/perfomers.jpg",
+      alt: "Man with Microphone",
+      gradient: "from-red-600 to-red-800",
+    },
+    {
+      src: "/involve/volunteer.jpg",
+      alt: "Cosplayer",
+      gradient: "from-purple-600 to-purple-800",
+    },
+    {
+      src: "/involve/sponsorship.png",
+      alt: "Group Celebration",
+      gradient: "from-pink-600 to-red-600",
+    },
+    {
+      src: "/involve/cosplay.jpg",
+      alt: "DJ Performing",
+      gradient: "from-purple-600 to-blue-600",
+    },
+    { src: "/involve/stall.jpg", alt: "gun", gradient: "from-purple-600 to-blue-600" },
+  ];
 
   return (
     <section
@@ -13,11 +36,11 @@ export default function AboutSection() {
           {/* Left Image */}
           <div className="relative order-2 lg:order-1">
             <Image
-              src="/twogirls.png" // replace with your own
+              src="/aboutUs.jpg" // replace with your own
               alt="Gaming Friends"
-              width={800}
-              height={600}
-              className="w-full h-full object-cover min-h-[300px] lg:min-h-0"
+              width={500}
+              height={200}
+              className="w-full h-full object-cover min-h-[200px] lg:min-h-0"
             />
           </div>
 
@@ -45,6 +68,7 @@ export default function AboutSection() {
               The sound of pure madness
             </p>
 
+           
           </div>
         </div>
 

@@ -1,16 +1,73 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import {useRouter} from "next/navigation"
 import ContactUs from "@/components/ContactUs";
 import Footer from "@/components/Footer";
 import ScrollingBanner from "@/components/ScrollingBanner";
 
 export default function VolunteerPage() {
+  const router = useRouter();
   const [submitted, setSubmitted] = useState(false);
+  const [loading,setLoading] = useState(false)
+  const [error,setError] = useState("")
+  const [submitStatus, setSubmitStatus] = useState<null | 'success' | 'error'>(null)
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+ const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitted(true);
+    const form = event.currentTarget;
+    
+    setLoading(true);
+    setError("");
+    setSubmitStatus(null);
+
+    const formData = new FormData(form);
+    const data = {
+      name: formData.get("name"),
+      age: formData.get("age"),
+      institution: formData.get("institution"),
+      role: formData.get("role"),
+      phone: formData.get("phone"),
+      email: formData.get("email"),
+      note: formData.get("note"),
+      timestamp: new Date().toLocaleString("en-IN"),
+    };
+
+    try {
+      // Assumes your API endpoint for volunteers is /api/volunteers
+      const response = await fetch("/api/volunteer", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      console.log("Form submission result:", result);
+
+      if (result.success) {
+        setSubmitStatus('success');
+        setSubmitted(true);
+        form.reset();
+        
+        // Optional: Redirect after a few seconds
+        setTimeout(() => {
+          router.push("/");
+        }, 3000);
+
+      } else {
+        setSubmitStatus('error');
+        setError(result.message || "An unexpected error occurred. Please try again.");
+      }
+
+    } catch (err) {
+      console.error("Error submitting form:", err);
+      setSubmitStatus('error');
+      setError("There was an error submitting the form. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -163,16 +220,23 @@ export default function VolunteerPage() {
                 />
               </div>
 
-              <button
+             <button
                 type="submit"
-                className="w-full rounded-md bg-[#ffe300] px-4 py-3 font-oswald text-lg text-black uppercase tracking-wide hover:bg-[#ffd000] transition"
+                disabled={loading}
+                className="w-full rounded-md bg-[#ffe300] px-4 py-3 font-oswald text-lg text-black uppercase tracking-wide hover:bg-[#ffd000] transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Apply Now
+                {loading ? "Submitting..." : "Apply Now"}
               </button>
 
-              {submitted && (
+             {submitStatus === 'success' && (
                 <p className="rounded-md bg-green-500/10 border border-green-400/40 text-green-200 px-4 py-3 text-sm sm:text-base">
                   Thanks for signing up! We&apos;ll reach out with the next steps and briefing schedule.
+                </p>
+              )}
+
+              {submitStatus === 'error' && (
+                <p className="rounded-md bg-red-500/10 border border-red-400/40 text-red-200 px-4 py-3 text-sm sm:text-base">
+                  {error}
                 </p>
               )}
             </form>
