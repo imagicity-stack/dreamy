@@ -1,16 +1,74 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import ContactUs from "@/components/ContactUs";
 import Footer from "@/components/Footer";
 import ScrollingBanner from "@/components/ScrollingBanner";
 
 export default function PerformerPage() {
+  const router = useRouter();
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [submitStatus, setSubmitStatus] = useState<null | 'success' | 'error'>(null);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitted(true);
+        const form = event.currentTarget;
+
+    setLoading(true);
+    setError("");
+    setSubmitStatus(null);
+
+    const formData = new FormData(form);
+
+    const equipment = formData.getAll("equipment");
+
+    const data = {
+      name: formData.get("name"),
+      category: formData.get("category"),
+      duration: formData.get("duration"),
+      phone: formData.get("phone"),
+      email: formData.get("email"),
+      equipment: equipment.join(", ") || "None",
+      sample: formData.get("sample") || "Not provided",
+      timestamp: new Date().toLocaleString("en-IN"),
+    };
+
+    try {
+      const response = await fetch("/api/performers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+      console.log("Form submission result:", result);
+
+      if (result.success) {
+        setSubmitStatus('success');
+        setSubmitted(true);
+        form.reset();
+        
+        // Redirect after 2 seconds
+        setTimeout(() => {
+          router.push("/");
+        }, 2000);
+      } else {
+        setSubmitStatus('error');
+        form.reset()
+      }
+
+    } catch (err) {
+      console.error("Error submitting form:", err);
+      setSubmitStatus('error');
+      setError("There was an error submitting the form. Please try again later.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -165,14 +223,21 @@ export default function PerformerPage() {
 
               <button
                 type="submit"
-                className="w-full rounded-md bg-[#ffe300] px-4 py-3 font-oswald text-lg text-black uppercase tracking-wide hover:bg-[#ffd000] transition"
+                disabled={loading}
+                className="w-full rounded-md bg-[#ffe300] px-4 py-3 font-oswald text-lg text-black uppercase tracking-wide hover:bg-[#ffd000] transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Submit Performance Entry
+                {loading ? "Submitting..." : "Submit Performance Entry"}
               </button>
 
-              {submitted && (
+              {submitStatus === 'success' && (
                 <p className="rounded-md bg-green-500/10 border border-green-400/40 text-green-200 px-4 py-3 text-sm sm:text-base">
-                  Thanks! We&apos;ve received your performance entry. Our team will reach out within 5 days.
+                  Thanks! We&apos;ve received your performance entry. Our team will reach out within 5 days. Redirecting...
+                </p>
+              )}
+
+              {submitStatus === 'error' && (
+                <p className="rounded-md bg-red-500/10 border border-red-400/40 text-red-200 px-4 py-3 text-sm sm:text-base">
+                  {error}
                 </p>
               )}
             </form>

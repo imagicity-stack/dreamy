@@ -4,26 +4,26 @@ import Link from "next/link";
 export default function AboutSection() {
   const images = [
     {
-      src: "/biceps.png",
+      src: "/involve/perfomers.jpg",
       alt: "Man with Microphone",
       gradient: "from-red-600 to-red-800",
     },
     {
-      src: "/cosplayer.png",
+      src: "/involve/volunteer.jpg",
       alt: "Cosplayer",
       gradient: "from-purple-600 to-purple-800",
     },
     {
-      src: "/selfie.png",
+      src: "/involve/sponsorship.png",
       alt: "Group Celebration",
       gradient: "from-pink-600 to-red-600",
     },
     {
-      src: "/dj.png",
+      src: "/involve/cosplay.jpg",
       alt: "DJ Performing",
       gradient: "from-purple-600 to-blue-600",
     },
-    { src: "/gunner.png", alt: "gun", gradient: "from-purple-600 to-blue-600" },
+    { src: "/involve/stall.jpg", alt: "gun", gradient: "from-purple-600 to-blue-600" },
   ];
 
   return (
@@ -37,11 +37,11 @@ export default function AboutSection() {
           {/* Left Image */}
           <div className="relative order-2 lg:order-1">
             <Image
-              src="/twogirls.png" // replace with your own
+              src="/aboutUs.jpg" // replace with your own
               alt="Gaming Friends"
-              width={800}
-              height={600}
-              className="w-full h-full object-cover min-h-[300px] lg:min-h-0"
+              width={500}
+              height={200}
+              className="w-full h-full object-cover min-h-[200px] lg:min-h-0"
             />
           </div>
 
@@ -69,12 +69,7 @@ export default function AboutSection() {
               The sound of pure madness
             </p>
 
-            <Link
-              href="/about"
-              className="inline-block bg-black text-white font-bold text-sm md:text-base px-4 md:px-6 py-2 md:py-3 rounded-sm hover:bg-gray-900 transition"
-            >
-              MORE ABOUT MADOOZA →
-            </Link>
+           
           </div>
         </div>
 
