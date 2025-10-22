@@ -4,13 +4,109 @@ import { FormEvent, useState } from "react";
 import ContactUs from "@/components/ContactUs";
 import Footer from "@/components/Footer";
 import ScrollingBanner from "@/components/ScrollingBanner";
+import {
+  createPaymentOrder,
+  loadRazorpayScript,
+  RazorpayOptions,
+  RazorpaySuccessResponse,
+} from "@/lib/razorpay";
 
 export default function StallPage() {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [paymentId, setPaymentId] = useState<string | null>(null);
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitted(true);
+    const form = event.currentTarget;
+
+    setSubmitted(false);
+    setError("");
+    setPaymentId(null);
+    setLoading(true);
+
+    const formData = new FormData(form);
+    const getValue = (key: string) => formData.get(key)?.toString().trim() ?? "";
+
+    const stallDetails = {
+      name: getValue("name"),
+      brand: getValue("brand"),
+      productType: getValue("productType"),
+      phone: getValue("phone"),
+      email: getValue("email"),
+      power: getValue("power"),
+      notes: getValue("notes"),
+      timestamp: new Date().toISOString(),
+    };
+
+    try {
+      const orderConfig = await createPaymentOrder("stall", {
+        amount: 2500,
+        formData: stallDetails,
+        customer: {
+          name: stallDetails.name,
+          email: stallDetails.email,
+          contact: stallDetails.phone,
+        },
+      });
+
+      const scriptLoaded = await loadRazorpayScript();
+
+      if (!scriptLoaded || typeof window === "undefined" || !window.Razorpay) {
+        throw new Error("Unable to load payment gateway. Please refresh and try again.");
+      }
+
+      let paymentCompleted = false;
+
+      const options: RazorpayOptions = {
+        key: orderConfig.razorpayKeyId,
+        amount: orderConfig.amount,
+        currency: orderConfig.currency,
+        name: "Madooza",
+        description: "Stall Registration",
+        order_id: orderConfig.orderId,
+        prefill: {
+          name: stallDetails.name,
+          email: stallDetails.email,
+          contact: stallDetails.phone,
+        },
+        notes: {
+          formType: "stall",
+          brand: stallDetails.brand,
+          productType: stallDetails.productType,
+          powerRequirement: stallDetails.power,
+        },
+        handler: (response: RazorpaySuccessResponse) => {
+          paymentCompleted = true;
+          setPaymentId(response.razorpay_payment_id ?? null);
+          setSubmitted(true);
+          setError("");
+          form.reset();
+        },
+        modal: {
+          ondismiss: () => {
+            if (!paymentCompleted) {
+              setError("Payment popup closed before completion. Please try again to confirm your booking.");
+            }
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+
+      razorpay.on("payment.failed", () => {
+        paymentCompleted = false;
+        setError("Payment failed. Please try again.");
+      });
+
+      razorpay.open();
+    } catch (err) {
+      console.error("Error processing stall registration:", err);
+      setError(err instanceof Error ? err.message : "Unexpected error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -168,14 +264,24 @@ export default function StallPage() {
 
               <button
                 type="submit"
-                className="w-full rounded-md bg-[#ffe300] px-4 py-3 font-oswald text-lg text-black uppercase tracking-wide hover:bg-[#ffd000] transition"
+                disabled={loading}
+                className="w-full rounded-md bg-[#ffe300] px-4 py-3 font-oswald text-lg text-black uppercase tracking-wide hover:bg-[#ffd000] transition disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Pay ₹2500 &amp; Register
+                {loading ? "Processing Payment..." : "Pay ₹2500 & Register"}
               </button>
+
+              {error && (
+                <p className="rounded-md border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm sm:text-base text-red-200">
+                  {error}
+                </p>
+              )}
 
               {submitted && (
                 <p className="rounded-md bg-green-500/10 border border-green-400/40 text-green-200 px-4 py-3 text-sm sm:text-base">
                   Your stall has been successfully registered. You will receive setup details by email.
+                  {paymentId && (
+                    <span className="block text-xs text-green-100/80 mt-2">Payment reference: {paymentId}</span>
+                  )}
                 </p>
               )}
             </form>
