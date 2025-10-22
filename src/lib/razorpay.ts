@@ -1,6 +1,10 @@
 const RAZORPAY_SCRIPT_ID = "razorpay-checkout-js";
 const RAZORPAY_SCRIPT_SRC = "https://checkout.razorpay.com/v1/checkout.js";
-const PAYMENT_API_BASE_URL = "https://madooza-back-production.up.railway.app";
+const DEFAULT_PAYMENT_API_BASE_URL = "https://madooza-back-production.up.railway.app";
+const PAYMENT_PROXY_BASE_PATH = "/api/payment/orders";
+
+const PAYMENT_API_BASE_URL =
+  process.env.NEXT_PUBLIC_PAYMENT_API_BASE_URL ?? DEFAULT_PAYMENT_API_BASE_URL;
 
 export interface RazorpayOptions {
   key: string;
@@ -94,17 +98,32 @@ function normalizeCurrency(currency: unknown, fallback = "INR"): string {
   return fallback;
 }
 
+function getPaymentEndpoint(formType: string): string {
+  if (typeof window === "undefined") {
+    return `${PAYMENT_API_BASE_URL}/api/orders/${formType}`;
+  }
+
+  return `${PAYMENT_PROXY_BASE_PATH}/${formType}`;
+}
+
 export async function createPaymentOrder(
   formType: string,
   payload: CreatePaymentOrderPayload
 ): Promise<PaymentOrderConfig> {
-  const response = await fetch(`${PAYMENT_API_BASE_URL}/api/orders/${formType}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(payload),
-  });
+  let response: Response;
+
+  try {
+    response = await fetch(getPaymentEndpoint(formType), {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      cache: "no-store",
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    throw new Error("Unable to reach payment service. Please check your connection and try again.");
+  }
 
   let data: Record<string, unknown> | null = null;
 
