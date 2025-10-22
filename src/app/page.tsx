@@ -2,6 +2,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
+import {
+  createPaymentOrder,
+  loadRazorpayScript,
+  RazorpayOptions,
+  RazorpaySuccessResponse,
+} from "@/lib/razorpay";
 import Footer from "@/components/Footer";
 import ScrollingBanner from "@/components/ScrollingBanner";
 import AboutSection from "@/components/AboutSection";
@@ -71,23 +77,116 @@ const highlights = [
 export default function Home() {
   const [active, setActive] = useState(involvementOptions[0].name);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+  const [ticketSubmitted, setTicketSubmitted] = useState(false);
+  const [ticketLoading, setTicketLoading] = useState(false);
+  const [ticketError, setTicketError] = useState("");
+  const [ticketPaymentId, setTicketPaymentId] = useState<string | null>(null);
 
   const currentFestival =
     involvementOptions.find((f) => f.name === active) ?? involvementOptions[0];
 
   const openTicketModal = () => {
+    setTicketSubmitted(false);
+    setTicketError("");
+    setTicketPaymentId(null);
+    setTicketLoading(false);
     setIsTicketModalOpen(true);
   };
 
   const closeTicketModal = () => {
+    setTicketLoading(false);
+    setTicketError("");
+    setTicketPaymentId(null);
+    setTicketSubmitted(false);
     setIsTicketModalOpen(false);
   };
 
-  const handleTicketSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle ticket form submission logic here
-    alert("Ticket request submitted! We'll contact you shortly.");
-    closeTicketModal();
+  const handleTicketSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+
+    setTicketSubmitted(false);
+    setTicketError("");
+    setTicketPaymentId(null);
+    setTicketLoading(true);
+
+    const formData = new FormData(form);
+    const getValue = (key: string) => formData.get(key)?.toString().trim() ?? "";
+
+    const ticketDetails = {
+      name: getValue("name"),
+      email: getValue("email"),
+      phone: getValue("phone"),
+      quantity: getValue("quantity"),
+      notes: getValue("notes"),
+      timestamp: new Date().toISOString(),
+    };
+
+    try {
+      const orderConfig = await createPaymentOrder("ticket", {
+        amount: 30,
+        formData: ticketDetails,
+        customer: {
+          name: ticketDetails.name,
+          email: ticketDetails.email,
+          contact: ticketDetails.phone,
+        },
+      });
+
+      const scriptLoaded = await loadRazorpayScript();
+
+      if (!scriptLoaded || typeof window === "undefined" || !window.Razorpay) {
+        throw new Error("Unable to load payment gateway. Please refresh and try again.");
+      }
+
+      let paymentCompleted = false;
+
+      const options: RazorpayOptions = {
+        key: orderConfig.razorpayKeyId,
+        amount: orderConfig.amount,
+        currency: orderConfig.currency,
+        name: "Madooza",
+        description: "Ticket Purchase",
+        order_id: orderConfig.orderId,
+        prefill: {
+          name: ticketDetails.name,
+          email: ticketDetails.email,
+          contact: ticketDetails.phone,
+        },
+        notes: {
+          formType: "ticket",
+          quantity: ticketDetails.quantity,
+        },
+        handler: (response: RazorpaySuccessResponse) => {
+          paymentCompleted = true;
+          setTicketPaymentId(response.razorpay_payment_id ?? null);
+          setTicketSubmitted(true);
+          setTicketError("");
+          form.reset();
+        },
+        modal: {
+          ondismiss: () => {
+            if (!paymentCompleted) {
+              setTicketError("Payment popup closed before completion. Please try again to confirm your tickets.");
+            }
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+
+      razorpay.on("payment.failed", () => {
+        paymentCompleted = false;
+        setTicketError("Payment failed. Please try again.");
+      });
+
+      razorpay.open();
+    } catch (err) {
+      console.error("Error processing ticket purchase:", err);
+      setTicketError(err instanceof Error ? err.message : "Unexpected error. Please try again.");
+    } finally {
+      setTicketLoading(false);
+    }
   };
 
   return (
@@ -285,6 +384,23 @@ export default function Home() {
                 </p>
               </div>
 
+              {ticketError && (
+                <p className="mx-2 sm:mx-4 mb-3 sm:mb-4 rounded-md border border-red-400/40 bg-red-500/10 px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-red-200">
+                  {ticketError}
+                </p>
+              )}
+
+              {ticketSubmitted && (
+                <p className="mx-2 sm:mx-4 mb-3 sm:mb-4 rounded-md border border-green-400/40 bg-green-500/10 px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm text-green-200">
+                  Your ticket purchase was successful! We&apos;ll email your entry details shortly.
+                  {ticketPaymentId && (
+                    <span className="block text-[10px] sm:text-xs text-green-100/70 mt-1 sm:mt-2">
+                      Payment reference: {ticketPaymentId}
+                    </span>
+                  )}
+                </p>
+              )}
+
               {/* Form Fields */}
               <div className="space-y-3 sm:space-y-4 px-2 sm:px-4">
                 {/* Name Field */}
@@ -295,6 +411,7 @@ export default function Home() {
                   <input
                     type="text"
                     id="ticket-name"
+                    name="name"
                     required
                     className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all"
                     placeholder="Enter your full name"
@@ -309,6 +426,7 @@ export default function Home() {
                   <input
                     type="email"
                     id="ticket-email"
+                    name="email"
                     required
                     className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all"
                     placeholder="your.email@example.com"
@@ -323,6 +441,7 @@ export default function Home() {
                   <input
                     type="tel"
                     id="ticket-phone"
+                    name="phone"
                     required
                     className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all"
                     placeholder="+91 9122289578"
@@ -336,7 +455,9 @@ export default function Home() {
                   </label>
                   <select
                     id="ticket-quantity"
+                    name="quantity"
                     required
+                    defaultValue=""
                     className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all cursor-pointer"
                   >
                     <option value="">Select quantity</option>
@@ -356,6 +477,7 @@ export default function Home() {
                   </label>
                   <textarea
                     id="ticket-message"
+                    name="notes"
                     rows={3}
                     className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all resize-none"
                     placeholder="Any special requirements or questions..."
@@ -383,9 +505,10 @@ export default function Home() {
               <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 px-2 sm:px-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-[#ffe300] text-black font-oswald text-sm sm:text-base md:text-lg py-2 sm:py-3 hover:bg-[#ffd000] transition-all uppercase hover:scale-105"
+                  disabled={ticketLoading}
+                  className="flex-1 bg-[#ffe300] text-black font-oswald text-sm sm:text-base md:text-lg py-2 sm:py-3 hover:bg-[#ffd000] transition-all uppercase hover:scale-105 disabled:cursor-not-allowed disabled:opacity-60"
                 >
-                  Request Tickets
+                  {ticketLoading ? "Processing Payment..." : "Pay ₹30 & Get Tickets"}
                 </button>
                 <button
                   type="button"

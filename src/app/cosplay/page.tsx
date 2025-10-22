@@ -6,6 +6,12 @@ import { X } from "lucide-react";
 import ContactUs from "@/components/ContactUs";
 import Footer from "@/components/Footer";
 import ScrollingBanner from "@/components/ScrollingBanner";
+import {
+  createPaymentOrder,
+  loadRazorpayScript,
+  RazorpayOptions,
+  RazorpaySuccessResponse,
+} from "@/lib/razorpay";
 
 const eventFormat = [
   {
@@ -76,19 +82,112 @@ const highlights = [
 export default function CosplayPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [paymentId, setPaymentId] = useState<string | null>(null);
 
   const openModal = () => {
     setSubmitted(false);
+    setError("");
+    setPaymentId(null);
+    setLoading(false);
     setIsModalOpen(true);
   };
 
   const closeModal = () => {
+    setLoading(false);
+    setError("");
+    setPaymentId(null);
+    setSubmitted(false);
     setIsModalOpen(false);
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setSubmitted(true);
+    const form = event.currentTarget;
+
+    setSubmitted(false);
+    setError("");
+    setPaymentId(null);
+    setLoading(true);
+
+    const formData = new FormData(form);
+    const getValue = (key: string) => formData.get(key)?.toString().trim() ?? "";
+
+    const cosplayDetails = {
+      name: getValue("name"),
+      character: getValue("character"),
+      email: getValue("email"),
+      phone: getValue("phone"),
+      notes: getValue("notes"),
+      timestamp: new Date().toISOString(),
+    };
+
+    try {
+      const orderConfig = await createPaymentOrder("cosplay", {
+        amount: 299,
+        formData: cosplayDetails,
+        customer: {
+          name: cosplayDetails.name,
+          email: cosplayDetails.email,
+          contact: cosplayDetails.phone,
+        },
+      });
+
+      const scriptLoaded = await loadRazorpayScript();
+
+      if (!scriptLoaded || typeof window === "undefined" || !window.Razorpay) {
+        throw new Error("Unable to load payment gateway. Please refresh and try again.");
+      }
+
+      let paymentCompleted = false;
+
+      const options: RazorpayOptions = {
+        key: orderConfig.razorpayKeyId,
+        amount: orderConfig.amount,
+        currency: orderConfig.currency,
+        name: "Madooza",
+        description: "Cosplay Registration",
+        order_id: orderConfig.orderId,
+        prefill: {
+          name: cosplayDetails.name,
+          email: cosplayDetails.email,
+          contact: cosplayDetails.phone,
+        },
+        notes: {
+          formType: "cosplay",
+          character: cosplayDetails.character,
+        },
+        handler: (response: RazorpaySuccessResponse) => {
+          paymentCompleted = true;
+          setPaymentId(response.razorpay_payment_id ?? null);
+          setSubmitted(true);
+          setError("");
+          form.reset();
+        },
+        modal: {
+          ondismiss: () => {
+            if (!paymentCompleted) {
+              setError("Payment popup closed before completion. Please try again to confirm your registration.");
+            }
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+
+      razorpay.on("payment.failed", () => {
+        paymentCompleted = false;
+        setError("Payment failed. Please try again.");
+      });
+
+      razorpay.open();
+    } catch (err) {
+      console.error("Error processing cosplay registration:", err);
+      setError(err instanceof Error ? err.message : "Unexpected error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -315,13 +414,22 @@ export default function CosplayPage() {
               </div>
               <button
                 type="submit"
-                className="w-full rounded-md bg-[#ffe300] px-4 py-3 font-oswald text-lg uppercase tracking-wide text-black transition hover:bg-[#ffd000]"
+                disabled={loading}
+                className="w-full rounded-md bg-[#ffe300] px-4 py-3 font-oswald text-lg uppercase tracking-wide text-black transition hover:bg-[#ffd000] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                Pay ₹299 &amp; Register
+                {loading ? "Processing Payment..." : "Pay ₹299 & Register"}
               </button>
+              {error && (
+                <p className="rounded-md border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                  {error}
+                </p>
+              )}
               {submitted && (
                 <p className="rounded-md border border-green-400/40 bg-green-500/10 px-4 py-3 text-sm text-green-200">
                   Your cosplay slot is secured! We’ll send payment instructions and confirmation shortly.
+                  {paymentId && (
+                    <span className="mt-2 block text-xs text-green-100/80">Payment reference: {paymentId}</span>
+                  )}
                 </p>
               )}
             </form>
