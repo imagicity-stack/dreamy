@@ -1,12 +1,18 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import Footer from "@/components/Footer";
 import ScrollingBanner from "@/components/ScrollingBanner";
 import AboutSection from "@/components/AboutSection";
 import OurPartners from "@/components/OurPartners";
 import ContactUs from "@/components/ContactUs";
+import {
+  createPaymentOrder,
+  loadRazorpayScript,
+  RazorpayOptions,
+  RazorpaySuccessResponse,
+} from "@/lib/razorpay";
 
 const involvementOptions = [
   {
@@ -71,6 +77,7 @@ const highlights = [
 export default function Home() {
   const [active, setActive] = useState(involvementOptions[0].name);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+  const [ticketProcessing, setTicketProcessing] = useState(false);
 
   const currentFestival =
     involvementOptions.find((f) => f.name === active) ?? involvementOptions[0];
@@ -81,13 +88,91 @@ export default function Home() {
 
   const closeTicketModal = () => {
     setIsTicketModalOpen(false);
+    setTicketProcessing(false);
   };
 
-  const handleTicketSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Handle ticket form submission logic here
-    alert("Ticket request submitted! We'll contact you shortly.");
-    closeTicketModal();
+  const handleTicketSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const form = event.currentTarget;
+
+    if (ticketProcessing) {
+      return;
+    }
+
+    setTicketProcessing(true);
+
+    const formData = new FormData(form);
+    const getValue = (key: string) => formData.get(key)?.toString().trim() ?? "";
+
+    const ticketDetails = {
+      name: getValue("name"),
+      email: getValue("email"),
+      phone: getValue("phone"),
+      quantity: getValue("quantity"),
+      message: getValue("message"),
+      termsAccepted: formData.get("terms") === "accepted",
+      timestamp: new Date().toISOString(),
+    };
+
+    try {
+      const orderConfig = await createPaymentOrder("ticket", 30, ticketDetails);
+
+      const scriptLoaded = await loadRazorpayScript();
+
+      if (!scriptLoaded || typeof window === "undefined" || !window.Razorpay) {
+        throw new Error("Unable to load payment gateway. Please refresh and try again.");
+      }
+
+      let paymentCompleted = false;
+
+      const options: RazorpayOptions = {
+        key: orderConfig.razorpayKeyId,
+        amount: orderConfig.amount,
+        currency: orderConfig.currency,
+        name: "Madooza",
+        description: "Ticket Purchase",
+        order_id: orderConfig.orderId,
+        prefill: {
+          name: ticketDetails.name,
+          email: ticketDetails.email,
+          contact: ticketDetails.phone,
+        },
+        notes: {
+          formType: "ticket",
+          quantity: ticketDetails.quantity,
+        },
+        handler: (response: RazorpaySuccessResponse) => {
+          paymentCompleted = true;
+          form.reset();
+          closeTicketModal();
+          const reference = response.razorpay_payment_id
+            ? ` Reference: ${response.razorpay_payment_id}`
+            : "";
+          alert(`Payment successful! Your ticket request has been received.${reference}`);
+        },
+        modal: {
+          ondismiss: () => {
+            if (!paymentCompleted) {
+              alert("Payment popup closed before completion. Please try again.");
+            }
+          },
+        },
+      };
+
+      const razorpay = new window.Razorpay(options);
+
+      razorpay.on("payment.failed", () => {
+        paymentCompleted = false;
+        alert("Payment failed. Please try again.");
+      });
+
+      razorpay.open();
+    } catch (err) {
+      console.error("Error processing ticket purchase:", err);
+      alert(err instanceof Error ? err.message : "Unexpected error. Please try again.");
+    } finally {
+      setTicketProcessing(false);
+    }
   };
 
   return (
@@ -295,6 +380,7 @@ export default function Home() {
                   <input
                     type="text"
                     id="ticket-name"
+                    name="name"
                     required
                     className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all"
                     placeholder="Enter your full name"
@@ -309,6 +395,7 @@ export default function Home() {
                   <input
                     type="email"
                     id="ticket-email"
+                    name="email"
                     required
                     className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all"
                     placeholder="your.email@example.com"
@@ -323,6 +410,7 @@ export default function Home() {
                   <input
                     type="tel"
                     id="ticket-phone"
+                    name="phone"
                     required
                     className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all"
                     placeholder="+91 9122289578"
@@ -336,6 +424,7 @@ export default function Home() {
                   </label>
                   <select
                     id="ticket-quantity"
+                    name="quantity"
                     required
                     className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all cursor-pointer"
                   >
@@ -356,6 +445,7 @@ export default function Home() {
                   </label>
                   <textarea
                     id="ticket-message"
+                    name="message"
                     rows={3}
                     className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all resize-none"
                     placeholder="Any special requirements or questions..."
@@ -367,6 +457,8 @@ export default function Home() {
                   <input
                     type="checkbox"
                     id="ticket-terms"
+                    name="terms"
+                    value="accepted"
                     required
                     className="mt-1 w-5 h-5 accent-[#ffe300] cursor-pointer"
                   />
@@ -383,9 +475,10 @@ export default function Home() {
               <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 px-2 sm:px-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-[#ffe300] text-black font-oswald text-sm sm:text-base md:text-lg py-2 sm:py-3 hover:bg-[#ffd000] transition-all uppercase hover:scale-105"
+                  disabled={ticketProcessing}
+                  className="flex-1 bg-[#ffe300] text-black font-oswald text-sm sm:text-base md:text-lg py-2 sm:py-3 hover:bg-[#ffd000] transition-all uppercase hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Request Tickets
+                  {ticketProcessing ? "Processing Payment..." : "Request Tickets"}
                 </button>
                 <button
                   type="button"
