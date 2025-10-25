@@ -77,6 +77,7 @@ const highlights = [
 export default function Home() {
   const [active, setActive] = useState(involvementOptions[0].name);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
+  const [ticketProcessing, setTicketProcessing] = useState(false);
 
   const currentFestival =
     involvementOptions.find((f) => f.name === active) ?? involvementOptions[0];
@@ -87,11 +88,18 @@ export default function Home() {
 
   const closeTicketModal = () => {
     setIsTicketModalOpen(false);
+    setTicketProcessing(false);
   };
 
   const handleTicketSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
+
+    if (ticketProcessing) {
+      return;
+    }
+
+    setTicketProcessing(true);
 
     const formData = new FormData(form);
     const getValue = (key: string) => formData.get(key)?.toString().trim() ?? "";
@@ -137,11 +145,10 @@ export default function Home() {
           paymentCompleted = true;
           form.reset();
           closeTicketModal();
-          alert(
-            response.razorpay_payment_id
-              ? `Payment successful! Reference: ${response.razorpay_payment_id}`
-              : "Payment successful!"
-          );
+          const reference = response.razorpay_payment_id
+            ? ` Reference: ${response.razorpay_payment_id}`
+            : "";
+          alert(`Payment successful! Your ticket request has been received.${reference}`);
         },
         modal: {
           ondismiss: () => {
@@ -163,6 +170,8 @@ export default function Home() {
     } catch (err) {
       console.error("Error processing ticket purchase:", err);
       alert(err instanceof Error ? err.message : "Unexpected error. Please try again.");
+    } finally {
+      setTicketProcessing(false);
     }
   };
 
@@ -466,9 +475,10 @@ export default function Home() {
               <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 px-2 sm:px-4">
                 <button
                   type="submit"
-                  className="flex-1 bg-[#ffe300] text-black font-oswald text-sm sm:text-base md:text-lg py-2 sm:py-3 hover:bg-[#ffd000] transition-all uppercase hover:scale-105"
+                  disabled={ticketProcessing}
+                  className="flex-1 bg-[#ffe300] text-black font-oswald text-sm sm:text-base md:text-lg py-2 sm:py-3 hover:bg-[#ffd000] transition-all uppercase hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed"
                 >
-                  Request Tickets
+                  {ticketProcessing ? "Processing Payment..." : "Request Tickets"}
                 </button>
                 <button
                   type="button"
