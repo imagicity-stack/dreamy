@@ -1,6 +1,6 @@
 const RAZORPAY_SCRIPT_ID = "razorpay-checkout-js";
 const RAZORPAY_SCRIPT_SRC = "https://checkout.razorpay.com/v1/checkout.js";
-const PAYMENT_API_BASE_URL = "https://madooza-back-production.up.railway.app";
+const PAYMENT_API_BASE_URL = "https://madooza-back.onrender.com";
 
 export interface RazorpayOptions {
   key: string;
@@ -74,12 +74,6 @@ export async function loadRazorpayScript(): Promise<boolean> {
   });
 }
 
-export interface CreatePaymentOrderPayload {
-  amount: number;
-  formData: Record<string, unknown>;
-  [key: string]: unknown;
-}
-
 export interface PaymentOrderConfig {
   orderId: string;
   razorpayKeyId: string;
@@ -96,14 +90,18 @@ function normalizeCurrency(currency: unknown, fallback = "INR"): string {
 
 export async function createPaymentOrder(
   formType: string,
-  payload: CreatePaymentOrderPayload
+  amount: number,
+  formData: Record<string, unknown>
 ): Promise<PaymentOrderConfig> {
   const response = await fetch(`${PAYMENT_API_BASE_URL}/api/orders/${formType}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      amount,
+      formData,
+    }),
   });
 
   let data: Record<string, unknown> | null = null;
@@ -139,9 +137,9 @@ export async function createPaymentOrder(
   const rawAmount =
     (typeof (data as { amount?: number })?.amount === "number" && (data as { amount?: number }).amount) ||
     (typeof (data as { order?: { amount?: number } })?.order?.amount === "number" && (data as { order?: { amount?: number } }).order?.amount) ||
-    payload.amount;
+    amount;
 
-  const amount = Number.isFinite(rawAmount) ? rawAmount : payload.amount;
+  const normalizedAmount = Number.isFinite(rawAmount) ? rawAmount : amount;
   const currency = normalizeCurrency((data as { currency?: string })?.currency ?? (data as { order?: { currency?: string } })?.order?.currency);
 
   if (!orderId || !razorpayKeyId) {
@@ -151,7 +149,7 @@ export async function createPaymentOrder(
   return {
     orderId,
     razorpayKeyId,
-    amount,
+    amount: normalizedAmount,
     currency,
   };
 }

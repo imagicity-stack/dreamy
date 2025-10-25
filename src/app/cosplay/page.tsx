@@ -124,15 +124,7 @@ export default function CosplayPage() {
     };
 
     try {
-      const orderConfig = await createPaymentOrder("cosplay", {
-        amount: 299,
-        formData: cosplayDetails,
-        customer: {
-          name: cosplayDetails.name,
-          email: cosplayDetails.email,
-          contact: cosplayDetails.phone,
-        },
-      });
+      const orderConfig = await createPaymentOrder("cosplay", 299, cosplayDetails);
 
       const scriptLoaded = await loadRazorpayScript();
 
