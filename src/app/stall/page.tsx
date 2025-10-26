@@ -68,6 +68,13 @@ export default function StallPage() {
           brand: stallDetails.brand,
           productType: stallDetails.productType,
           powerRequirement: stallDetails.power,
+          displayName: "Madooza Stall Setup",
+        },
+        config: {
+          branding: {
+            brand_name: "Madooza Stall Setup",
+            company_name: "Madooza Stall Setup",
+          },
         },
         handler: (response: RazorpaySuccessResponse) => {
           paymentCompleted = true;

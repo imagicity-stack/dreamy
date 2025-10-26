@@ -149,6 +149,13 @@ export default function CosplayPage() {
         notes: {
           formType: "cosplay",
           character: cosplayDetails.character,
+          displayName: "Madooza Cosplay",
+        },
+        config: {
+          branding: {
+            brand_name: "Madooza Cosplay",
+            company_name: "Madooza Cosplay",
+          },
         },
         handler: (response: RazorpaySuccessResponse) => {
           paymentCompleted = true;

@@ -21,6 +21,9 @@ export interface RazorpayOptions {
   modal?: {
     ondismiss?: () => void;
   };
+  image?: string;
+  theme?: Record<string, unknown>;
+  config?: Record<string, unknown>;
 }
 
 export interface RazorpayInstance {

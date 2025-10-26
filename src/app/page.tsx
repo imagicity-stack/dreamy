@@ -74,6 +74,18 @@ const highlights = [
   },
 ];
 
+const TICKET_UNIT_PRICE = 30;
+
+const resolveTicketQuantity = (value: string): number => {
+  const parsed = Number.parseInt(value, 10);
+
+  if (Number.isFinite(parsed) && parsed > 0) {
+    return Math.min(parsed, 5);
+  }
+
+  return 1;
+};
+
 export default function Home() {
   const [active, setActive] = useState(involvementOptions[0].name);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
@@ -104,18 +116,24 @@ export default function Home() {
     const formData = new FormData(form);
     const getValue = (key: string) => formData.get(key)?.toString().trim() ?? "";
 
+    const quantityValue = getValue("quantity");
+    const quantity = resolveTicketQuantity(quantityValue);
+    const totalAmount = quantity * TICKET_UNIT_PRICE;
+
     const ticketDetails = {
       name: getValue("name"),
       email: getValue("email"),
       phone: getValue("phone"),
-      quantity: getValue("quantity"),
+      quantity: quantity.toString(),
+      totalAmount,
       message: getValue("message"),
       termsAccepted: formData.get("terms") === "accepted",
       timestamp: new Date().toISOString(),
+      unitPrice: TICKET_UNIT_PRICE,
     };
 
     try {
-      const orderConfig = await createPaymentOrder("ticket", 30, ticketDetails);
+      const orderConfig = await createPaymentOrder("ticket", totalAmount, ticketDetails);
 
       const scriptLoaded = await loadRazorpayScript();
 
@@ -139,7 +157,16 @@ export default function Home() {
         },
         notes: {
           formType: "ticket",
-          quantity: ticketDetails.quantity,
+          quantity: quantity.toString(),
+          unitPrice: TICKET_UNIT_PRICE.toString(),
+          totalAmount: totalAmount.toString(),
+          displayName: "Madooza Event Pass",
+        },
+        config: {
+          branding: {
+            brand_name: "Madooza Event Pass",
+            company_name: "Madooza Event Pass",
+          },
         },
         handler: (response: RazorpaySuccessResponse) => {
           paymentCompleted = true;
@@ -148,7 +175,13 @@ export default function Home() {
           const reference = response.razorpay_payment_id
             ? ` Reference: ${response.razorpay_payment_id}`
             : "";
-          alert(`Payment successful! Your ticket request has been received.${reference}`);
+          alert(
+            `Payment successful! Your ${
+              quantity === 1
+                ? "event pass is confirmed."
+                : `${quantity} event passes are confirmed.`
+            }${reference}`,
+          );
         },
         modal: {
           ondismiss: () => {
@@ -434,7 +467,6 @@ export default function Home() {
                     <option value="3">3 Tickets</option>
                     <option value="4">4 Tickets</option>
                     <option value="5">5 Tickets</option>
-                    <option value="5+">5+ Tickets (Group Booking)</option>
                   </select>
                 </div>
 
