@@ -1,6 +1,8 @@
 const RAZORPAY_SCRIPT_ID = "razorpay-checkout-js";
 const RAZORPAY_SCRIPT_SRC = "https://checkout.razorpay.com/v1/checkout.js";
-const PAYMENT_API_BASE_URL = "https://madooza-back-production.up.railway.app";
+const PAYMENT_API_BASE_URL = "https://madooza-back.onrender.com";
+const FALLBACK_RAZORPAY_KEY_ID =
+  process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? "rzp_live_RXcMT65q6e27Ut";
 
 export interface RazorpayOptions {
   key: string;
@@ -74,12 +76,6 @@ export async function loadRazorpayScript(): Promise<boolean> {
   });
 }
 
-export interface CreatePaymentOrderPayload {
-  amount: number;
-  formData: Record<string, unknown>;
-  [key: string]: unknown;
-}
-
 export interface PaymentOrderConfig {
   orderId: string;
   razorpayKeyId: string;
@@ -96,14 +92,18 @@ function normalizeCurrency(currency: unknown, fallback = "INR"): string {
 
 export async function createPaymentOrder(
   formType: string,
-  payload: CreatePaymentOrderPayload
+  amount: number,
+  formData: Record<string, unknown>
 ): Promise<PaymentOrderConfig> {
   const response = await fetch(`${PAYMENT_API_BASE_URL}/api/orders/${formType}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify(payload),
+    body: JSON.stringify({
+      amount,
+      formData,
+    }),
   });
 
   let data: Record<string, unknown> | null = null;
@@ -134,15 +134,31 @@ export async function createPaymentOrder(
     (typeof (data as { keyId?: string })?.keyId === "string" && (data as { keyId?: string }).keyId) ||
     (typeof (data as { key?: string })?.key === "string" && (data as { key?: string }).key) ||
     (typeof (data as { razorpay_key_id?: string })?.razorpay_key_id === "string" && (data as { razorpay_key_id?: string }).razorpay_key_id) ||
-    "";
+    FALLBACK_RAZORPAY_KEY_ID;
+
+  const extractAmount = (value: unknown): number | null => {
+    if (typeof value === "number" && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === "string") {
+      const parsed = Number.parseInt(value, 10);
+      return Number.isFinite(parsed) ? parsed : null;
+    }
+
+    return null;
+  };
 
   const rawAmount =
-    (typeof (data as { amount?: number })?.amount === "number" && (data as { amount?: number }).amount) ||
-    (typeof (data as { order?: { amount?: number } })?.order?.amount === "number" && (data as { order?: { amount?: number } }).order?.amount) ||
-    payload.amount;
+    extractAmount((data as { amount?: unknown })?.amount) ??
+    extractAmount((data as { order?: { amount?: unknown } })?.order?.amount) ??
+    amount;
 
-  const amount = Number.isFinite(rawAmount) ? rawAmount : payload.amount;
-  const currency = normalizeCurrency((data as { currency?: string })?.currency ?? (data as { order?: { currency?: string } })?.order?.currency);
+  const normalizedAmount = Number.isFinite(rawAmount) ? rawAmount : amount;
+  const currency = normalizeCurrency(
+    (data as { currency?: string })?.currency ??
+      (data as { order?: { currency?: string } })?.order?.currency,
+  );
 
   if (!orderId || !razorpayKeyId) {
     throw new Error("Invalid payment configuration returned from server.");
@@ -151,7 +167,7 @@ export async function createPaymentOrder(
   return {
     orderId,
     razorpayKeyId,
-    amount,
+    amount: normalizedAmount,
     currency,
   };
 }
