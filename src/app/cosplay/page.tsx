@@ -138,7 +138,7 @@ export default function CosplayPage() {
         key: orderConfig.razorpayKeyId,
         amount: orderConfig.amount,
         currency: orderConfig.currency,
-        name: "Madooza",
+        name: "Madooza Cosplay",
         description: "Cosplay Registration",
         order_id: orderConfig.orderId,
         prefill: {

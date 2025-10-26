@@ -129,7 +129,7 @@ export default function Home() {
         key: orderConfig.razorpayKeyId,
         amount: orderConfig.amount,
         currency: orderConfig.currency,
-        name: "Madooza",
+        name: "Madooza Event Pass",
         description: "Ticket Purchase",
         order_id: orderConfig.orderId,
         prefill: {

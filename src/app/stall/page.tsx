@@ -55,7 +55,7 @@ export default function StallPage() {
         key: orderConfig.razorpayKeyId,
         amount: orderConfig.amount,
         currency: orderConfig.currency,
-        name: "Madooza",
+        name: "Madooza Stall Setup",
         description: "Stall Registration",
         order_id: orderConfig.orderId,
         prefill: {
