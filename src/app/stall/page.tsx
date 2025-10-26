@@ -41,15 +41,7 @@ export default function StallPage() {
     };
 
     try {
-      const orderConfig = await createPaymentOrder("stall", {
-        amount: 2500,
-        formData: stallDetails,
-        customer: {
-          name: stallDetails.name,
-          email: stallDetails.email,
-          contact: stallDetails.phone,
-        },
-      });
+      const orderConfig = await createPaymentOrder("stall", 2500, stallDetails);
 
       const scriptLoaded = await loadRazorpayScript();
 
@@ -63,7 +55,7 @@ export default function StallPage() {
         key: orderConfig.razorpayKeyId,
         amount: orderConfig.amount,
         currency: orderConfig.currency,
-        name: "Madooza",
+        name: "Madooza Stall Setup",
         description: "Stall Registration",
         order_id: orderConfig.orderId,
         prefill: {
@@ -76,6 +68,13 @@ export default function StallPage() {
           brand: stallDetails.brand,
           productType: stallDetails.productType,
           powerRequirement: stallDetails.power,
+          displayName: "Madooza Stall Setup",
+        },
+        config: {
+          branding: {
+            brand_name: "Madooza Stall Setup",
+            company_name: "Madooza Stall Setup",
+          },
         },
         handler: (response: RazorpaySuccessResponse) => {
           paymentCompleted = true;
