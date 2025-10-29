@@ -60,12 +60,12 @@ export default function MobileMenu() {
         }`}
       >
         <div className="flex flex-col h-full pt-20 p-6">
-          <nav className="flex flex-col space-y-6">
+          <nav className="flex flex-col space-y-6 font-montserrat">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-white font-quicksand font-semibold text-xl hover:text-gray-200 transition"
+                className="text-white font-bold text-xl tracking-[0.2em] uppercase hover:text-gray-200 transition"
                 onClick={() => setIsOpen(false)}
               >
                 {link.label}

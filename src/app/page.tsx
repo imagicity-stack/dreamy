@@ -74,6 +74,8 @@ const highlights = [
   },
 ];
 
+const HERO_TITLE = "HAZARIBAGH";
+
 const TICKET_UNIT_PRICE = 30;
 
 const resolveTicketQuantity = (value: string): number => {
@@ -222,25 +224,32 @@ export default function Home() {
           className="w-full h-full object-cover"
         >
         </Image>
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-3 sm:gap-4 md:gap-6 lg:gap-8 px-4">
-          {/* Logo */}
-          <div className="relative w-[70%] sm:w-[60%] md:w-[50%] lg:w-[45%] xl:w-[40%] max-w-[600px]">
-            <Image 
-              src="/logo.png" 
-              alt="MADOOZA" 
-              width={600} 
-              height={570} 
-              className="w-full h-auto"
-              priority
-            />
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-5 sm:gap-6 md:gap-8 lg:gap-10 px-4">
+          <div
+            className="hero-title font-league-gothic"
+            role="heading"
+            aria-level={1}
+            aria-label="Hazaribagh"
+          >
+            <span className="sr-only">Hazaribagh</span>
+            {HERO_TITLE.split("").map((character, index) => (
+              <span
+                key={`${character}-${index}`}
+                className="hero-letter"
+                aria-hidden="true"
+                style={{ animationDelay: `${index * 0.12}s` }}
+              >
+                {character}
+              </span>
+            ))}
           </div>
-          
+
           {/* Text and Button */}
-          <div className="text-center flex flex-col items-center gap-2 sm:gap-3 md:gap-4 -mt-4 sm:-mt-6 md:-mt-8 lg:-mt-10">
+          <div className="text-center flex flex-col items-center gap-2 sm:gap-3 md:gap-4">
             <p className="text-black font-extrabold font-quicksand text-xs sm:text-sm md:text-base lg:text-xl xl:text-2xl 2xl:text-3xl text-center relative z-20 px-4">
               THE SOUND OF PURE MADNESS
             </p>
-            <button 
+            <button
               onClick={openTicketModal}
               className="bg-[#ffe300] text-black text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-bold py-2 px-4 sm:py-2.5 sm:px-5 md:py-3 md:px-6 lg:py-3.5 lg:px-8 pointer-events-auto cursor-pointer hover:bg-[#ffd000] hover:scale-105 transition-all z-20 rounded-sm shadow-lg">
               GET TICKETS NOW
