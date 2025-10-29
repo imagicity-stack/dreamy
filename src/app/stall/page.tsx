@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+
 import ContactUs from "@/components/ContactUs";
 import Footer from "@/components/Footer";
 import ScrollingBanner from "@/components/ScrollingBanner";
@@ -10,6 +11,23 @@ import {
   RazorpayOptions,
   RazorpaySuccessResponse,
 } from "@/lib/razorpay";
+
+const stallHighlights = [
+  "10×10 ft canopy (table + chair provided)",
+  "₹2500 per stall (1-day) with ₹500 refundable deposit",
+  "Electricity access available on request (extra ₹300)",
+  "Setup Time: 7:00 AM – 9:30 AM | Event Hours: 10:00 AM – 7:00 PM",
+];
+
+const stallTips = [
+  "Bring display stands, signage, and lighting for the best impression.",
+  "Card / UPI payments encouraged for smoother transactions.",
+  "Keep a helper for peak-hour crowd management.",
+  "Clean-up checks happen post-event before deposit refunds.",
+];
+
+const formFieldClasses =
+  "w-full bg-black px-4 py-3 text-base text-white shadow-[0_0_25px_rgba(0,255,255,0.18)] focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60";
 
 export default function StallPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -110,178 +128,142 @@ export default function StallPage() {
 
   return (
     <div className="bg-black text-white">
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#7300ff] via-[#ff1a00] to-[#ffe300] text-black py-16 sm:py-20 md:py-24">
-        <div className="absolute inset-0 bg-black/30" />
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-sm sm:text-base md:text-lg uppercase tracking-[0.4em] text-[#ffe300] font-oswald mb-4">
-            Involve With Us
-          </p>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-oswald uppercase text-white drop-shadow-xl">
+      <section className="relative overflow-hidden py-16 sm:py-20 md:py-24">
+        <div className="pointer-events-none absolute -top-24 left-0 h-72 w-72 bg-[#ffe300] opacity-40 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 right-0 h-72 w-72 bg-[#ff1a1a] opacity-40 blur-3xl" />
+        <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center gap-6 px-4 text-center">
+          <span className="font-montserrat text-xs uppercase tracking-[0.6em] text-[#ffe300]">Involve With Us</span>
+          <h1 className="font-travel-sans text-3xl sm:text-4xl md:text-5xl lg:text-6xl uppercase text-white">
             Bring Your Stall to Madooza
           </h1>
-          <p className="mt-6 text-base sm:text-lg md:text-xl text-gray-100 leading-relaxed">
-            Showcase your creativity, food, art, or brand to hundreds of visitors. Madooza gives local creators a premium
-            space to display their talent and products in a vibrant, youth-driven environment.
+          <p className="max-w-3xl text-base sm:text-lg md:text-xl text-white/80">
+            Showcase your creativity, food, art, or brand to hundreds of visitors. Madooza gives local creators a premium space
+            to display their talent and products in a vibrant, youth-driven environment.
           </p>
         </div>
       </section>
 
-      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-black">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-16">
-          <div className="bg-[#11011b] border border-white/10 rounded-2xl p-6 sm:p-8 md:p-10">
-            <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-6">
-              Stall Details
-            </h2>
-            <ul className="space-y-4 text-gray-200 text-sm sm:text-base leading-relaxed">
-              <li><span className="font-semibold text-white">Stall Size:</span> 10×10 ft canopy (table + chair provided)</li>
-              <li><span className="font-semibold text-white">Cost:</span> ₹2500 per stall (1-day)</li>
-              <li>Electricity access available on request (extra ₹300).</li>
-              <li>Refundable deposit: ₹500 (cleanliness &amp; discipline).</li>
-              <li>Setup Time: 7:00 AM to 9:30 AM</li>
-              <li>Event Hours: 10:00 AM to 7:00 PM</li>
+      <section className="border-y border-[#ffe300]/30 bg-black py-16">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-4 lg:grid-cols-2">
+          <div className="flex flex-col gap-6 bg-[#ffe300] p-8 text-black shadow-[0_0_35px_rgba(255,227,0,0.25)]">
+            <h2 className="font-travel-sans text-2xl sm:text-3xl uppercase">Stall Details</h2>
+            <ul className="space-y-3 text-sm sm:text-base">
+              {stallHighlights.map((point) => (
+                <li key={point}>{point}</li>
+              ))}
             </ul>
-            <div className="mt-8 p-4 sm:p-5 bg-[#ffe300]/10 border border-[#ffe300]/40 rounded-xl text-[#ffe300] text-sm sm:text-base">
-              <p>
-                After completing the payment, you&apos;ll receive a confirmation mail with stall allocation and setup
-                instructions within 24 hours.
-              </p>
-            </div>
+            <p className="bg-black px-4 py-3 text-sm text-white">
+              After completing the payment, you&apos;ll receive a confirmation mail with stall allocation and setup instructions within 24 hours.
+            </p>
           </div>
+          <div className="flex flex-col gap-6 bg-[#ff1a1a] p-8 text-white shadow-[0_0_35px_rgba(255,26,26,0.25)]">
+            <h2 className="font-travel-sans text-2xl sm:text-3xl uppercase">Make Your Stall Stand Out</h2>
+            <ul className="space-y-3 text-sm sm:text-base text-white/80">
+              {stallTips.map((tip) => (
+                <li key={tip}>{tip}</li>
+              ))}
+            </ul>
+            <p className="text-sm text-white">
+              Our team will help you with placement, electricity, and last-minute requirements on event day.
+            </p>
+          </div>
+        </div>
+      </section>
 
-          <div className="bg-[#1a062a] border border-white/10 rounded-2xl p-6 sm:p-8 md:p-10">
-            <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-6">
-              Register Your Stall
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="stall-name">
+      <section className="border-b border-[#ffe300]/30 py-16">
+        <div className="mx-auto max-w-4xl px-4 text-center">
+          <h2 className="font-travel-sans text-3xl uppercase text-[#ffe300]">Reserve Your Stall Now</h2>
+          <p className="mt-4 text-sm sm:text-base text-white/80">
+            Fill out the form, complete the payment, and secure your stall instantly.
+          </p>
+        </div>
+      </section>
+
+      <section className="bg-black py-16">
+        <div className="mx-auto max-w-4xl px-4">
+          <div className="relative overflow-hidden rounded-none bg-black p-8 text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
+            <div className="pointer-events-none absolute -inset-6 bg-[#00f5ff]/40 blur-3xl" aria-hidden />
+            <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
                   Name
+                  <input id="stall-name" name="name" type="text" required className={formFieldClasses} placeholder="Enter your full name" />
                 </label>
-                <input
-                  id="stall-name"
-                  name="name"
-                  type="text"
-                  required
-                  className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                  placeholder="Enter your full name"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="stall-brand">
+                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
                   Brand / Stall Name
+                  <input id="stall-brand" name="brand" type="text" required className={formFieldClasses} placeholder="Enter your brand or stall name" />
                 </label>
-                <input
-                  id="stall-brand"
-                  name="brand"
-                  type="text"
-                  required
-                  className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                  placeholder="Enter your brand or stall name"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="stall-product">
+                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
                   Product Type
+                  <select id="stall-product" name="productType" required defaultValue="" className={`${formFieldClasses} cursor-pointer`}>
+                    <option value="" disabled className="bg-black text-white">
+                      Select a category
+                    </option>
+                    <option value="food" className="bg-black text-white">
+                      Food
+                    </option>
+                    <option value="merchandise" className="bg-black text-white">
+                      Merchandise
+                    </option>
+                    <option value="art" className="bg-black text-white">
+                      Art
+                    </option>
+                    <option value="games" className="bg-black text-white">
+                      Games & Experiences
+                    </option>
+                  </select>
                 </label>
-                <select
-                  id="stall-product"
-                  name="productType"
-                  required
-                  className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none cursor-pointer"
-                  defaultValue=""
-                >
-                  <option value="" disabled>
-                    Select a category
-                  </option>
-                  <option value="food">Food</option>
-                  <option value="merchandise">Merchandise</option>
-                  <option value="art">Art</option>
-                  <option value="games">Games</option>
-                  <option value="others">Others</option>
-                </select>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="stall-phone">
-                    Phone Number
-                  </label>
-                  <input
-                    id="stall-phone"
-                    name="phone"
-                    type="tel"
-                    required
-                    className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                    placeholder="+91 XXXXXXXXXX"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="stall-email">
-                    Email ID
-                  </label>
-                  <input
-                    id="stall-email"
-                    name="email"
-                    type="email"
-                    required
-                    className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                    placeholder="your.email@example.com"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="stall-power">
-                  Power Required?
+                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                  Contact Number
+                  <input id="stall-phone" name="phone" type="tel" required className={formFieldClasses} placeholder="+91 XXXXXXXXXX" />
                 </label>
-                <div className="flex gap-4 text-sm sm:text-base">
-                  <label className="inline-flex items-center gap-2">
-                    <input type="radio" name="power" value="yes" required className="accent-[#ffe300]" />
-                    Yes
-                  </label>
-                  <label className="inline-flex items-center gap-2">
-                    <input type="radio" name="power" value="no" required className="accent-[#ffe300]" />
-                    No
-                  </label>
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="stall-notes">
-                  Any Additional Notes
+                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                  Email ID
+                  <input id="stall-email" name="email" type="email" required className={formFieldClasses} placeholder="your.email@example.com" />
                 </label>
+                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                  Power Requirement
+                  <select id="stall-power" name="power" required defaultValue="" className={`${formFieldClasses} cursor-pointer`}>
+                    <option value="" disabled className="bg-black text-white">
+                      Choose an option
+                    </option>
+                    <option value="none" className="bg-black text-white">
+                      No Power Needed
+                    </option>
+                    <option value="basic" className="bg-black text-white">
+                      Basic Lighting (₹300)
+                    </option>
+                    <option value="heavy" className="bg-black text-white">
+                      High Load Equipment
+                    </option>
+                  </select>
+                </label>
+              </div>
+              <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                Additional Notes
                 <textarea
                   id="stall-notes"
                   name="notes"
-                  rows={4}
-                  className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                  placeholder="Tell us anything special about your stall"
+                  rows={3}
+                  className={`${formFieldClasses} resize-none`}
+                  placeholder="Share special requirements or products"
                 />
-              </div>
-
+              </label>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-md bg-[#ffe300] px-4 py-3 font-oswald text-lg text-black uppercase tracking-wide hover:bg-[#ffd000] transition disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full bg-[#ff1a1a] px-6 py-3 font-montserrat text-sm uppercase tracking-[0.3em] text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {loading ? "Processing Payment..." : "Pay ₹2500 & Register"}
+                {loading ? "Processing Payment..." : "Pay ₹2500 & Book Stall"}
               </button>
-
               {error && (
-                <p className="rounded-md border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm sm:text-base text-red-200">
-                  {error}
-                </p>
+                <p className="bg-[#ff1a1a]/40 px-4 py-3 text-center text-sm text-white">{error}</p>
               )}
-
               {submitted && (
-                <p className="rounded-md bg-green-500/10 border border-green-400/40 text-green-200 px-4 py-3 text-sm sm:text-base">
-                  Your stall has been successfully registered. You will receive setup details by email.
-                  {paymentId && (
-                    <span className="block text-xs text-green-100/80 mt-2">Payment reference: {paymentId}</span>
-                  )}
-                </p>
+                <div className="space-y-1 bg-[#00f5ff]/20 px-4 py-3 text-center text-sm text-white">
+                  <p>Your stall is confirmed! We will share setup instructions within 24 hours.</p>
+                  {paymentId && <span className="block text-xs">Payment reference: {paymentId}</span>}
+                </div>
               )}
             </form>
           </div>

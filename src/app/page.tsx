@@ -388,150 +388,133 @@ export default function Home() {
 
       {/* Ticket Modal */}
       {isTicketModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-2 sm:p-4">
-          <div className="relative bg-black border-4 border-[#ffe300] w-full max-w-2xl max-h-[95vh] overflow-y-auto p-2 sm:p-4">
-            {/* Corner Decoration Image */}
-            <Image
-              src="/comic.png"
-              alt="decoration"
-              width={160}
-              height={160}
-              className="absolute top-0 left-0 w-20 sm:w-24 md:w-32 lg:w-40 h-20 sm:h-24 md:h-32 lg:h-40 opacity-50 pointer-events-none z-0"
-            />
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="relative w-full max-w-2xl max-h-[95vh] overflow-y-auto rounded-none bg-black text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
+            <div className="pointer-events-none absolute -inset-6 opacity-40 blur-3xl bg-[#00f5ff]" aria-hidden />
 
-            {/* Close Button */}
             <button
               onClick={closeTicketModal}
-              className="absolute top-2 sm:top-4 right-2 sm:right-4 text-white hover:text-[#ffe300] text-2xl sm:text-3xl z-10 transition-colors"
+              className="absolute top-4 right-4 text-white text-2xl transition-transform hover:scale-110"
+              aria-label="Close ticket form"
             >
               ✕
             </button>
 
-            {/* Form Content */}
-            <form onSubmit={handleTicketSubmit} className="relative z-10 font-sans">
-              {/* Header */}
-              <div className="bg-gradient-to-r from-[#ff1a00] to-[#7300ff] p-3 sm:p-4 md:p-6 mb-4 sm:mb-6">
-                <h2 className="text-[#ffe300] font-oswald text-2xl sm:text-3xl md:text-4xl lg:text-5xl text-center uppercase">
-                  Get Your Tickets
+            <form onSubmit={handleTicketSubmit} className="relative z-10 space-y-6 px-6 py-8 sm:px-10">
+              <div className="text-center">
+                <p className="font-montserrat text-sm tracking-[0.4em] text-[#00f5ff]">Tickets</p>
+                <h2 className="mt-3 text-3xl sm:text-4xl font-travel-sans uppercase text-white">
+                  Get Your Passes
                 </h2>
-                <p className="text-white text-xs sm:text-sm md:text-base text-center mt-2">
-                  Fill in your details and we&apos;ll get back to you with ticket information
+                <p className="mt-3 text-sm sm:text-base text-white/70">
+                  Drop your details below and we&apos;ll confirm your tickets instantly once the payment succeeds.
                 </p>
               </div>
 
-              {/* Form Fields */}
-              <div className="space-y-3 sm:space-y-4 px-2 sm:px-4">
-                {/* Name Field */}
-                <div>
-                  <label className="block text-[#ffe300] font-semibold mb-2 text-sm sm:text-base" htmlFor="ticket-name">
-                    Full Name *
-                  </label>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <label className="flex flex-col gap-2 text-sm uppercase tracking-wide">
+                  Full Name *
                   <input
                     type="text"
                     id="ticket-name"
                     name="name"
                     required
-                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all"
+                    className="w-full bg-black px-4 py-3 text-base text-white shadow-[0_0_25px_rgba(0,255,255,0.18)] focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60"
                     placeholder="Enter your full name"
                   />
-                </div>
-
-                {/* Email Field */}
-                <div>
-                  <label className="block text-[#ffe300] font-semibold mb-2 text-sm sm:text-base" htmlFor="ticket-email">
-                    Email Address *
-                  </label>
+                </label>
+                <label className="flex flex-col gap-2 text-sm uppercase tracking-wide">
+                  Email Address *
                   <input
                     type="email"
                     id="ticket-email"
                     name="email"
                     required
-                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all"
+                    className="w-full bg-black px-4 py-3 text-base text-white shadow-[0_0_25px_rgba(0,255,255,0.18)] focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60"
                     placeholder="your.email@example.com"
                   />
-                </div>
-
-                {/* Phone Field */}
-                <div>
-                  <label className="block text-[#ffe300] font-semibold mb-2 text-sm sm:text-base" htmlFor="ticket-phone">
-                    Phone Number *
-                  </label>
+                </label>
+                <label className="flex flex-col gap-2 text-sm uppercase tracking-wide">
+                  Phone Number *
                   <input
                     type="tel"
                     id="ticket-phone"
                     name="phone"
                     required
-                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all"
+                    className="w-full bg-black px-4 py-3 text-base text-white shadow-[0_0_25px_rgba(0,255,255,0.18)] focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60"
                     placeholder="+91 9122289578"
                   />
-                </div>
-
-                {/* Number of Tickets */}
-                <div>
-                  <label className="block text-[#ffe300] font-semibold mb-2 text-sm sm:text-base" htmlFor="ticket-quantity">
-                    Number of Tickets *
-                  </label>
+                </label>
+                <label className="flex flex-col gap-2 text-sm uppercase tracking-wide">
+                  Number of Tickets *
                   <select
                     id="ticket-quantity"
                     name="quantity"
                     required
-                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all cursor-pointer"
+                    className="w-full bg-black px-4 py-3 text-base text-white shadow-[0_0_25px_rgba(0,255,255,0.18)] focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black cursor-pointer"
                   >
-                    <option value="">Select quantity</option>
-                    <option value="1">1 Ticket</option>
-                    <option value="2">2 Tickets</option>
-                    <option value="3">3 Tickets</option>
-                    <option value="4">4 Tickets</option>
-                    <option value="5">5 Tickets</option>
+                    <option value="" className="bg-black text-white">
+                      Select quantity
+                    </option>
+                    <option value="1" className="bg-black text-white">
+                      1 Ticket
+                    </option>
+                    <option value="2" className="bg-black text-white">
+                      2 Tickets
+                    </option>
+                    <option value="3" className="bg-black text-white">
+                      3 Tickets
+                    </option>
+                    <option value="4" className="bg-black text-white">
+                      4 Tickets
+                    </option>
+                    <option value="5" className="bg-black text-white">
+                      5 Tickets
+                    </option>
                   </select>
-                </div>
-
-                {/* Special Requests */}
-                <div>
-                  <label className="block text-[#ffe300] font-semibold mb-2 text-sm sm:text-base" htmlFor="ticket-message">
-                    Special Requests / Questions (Optional)
-                  </label>
-                  <textarea
-                    id="ticket-message"
-                    name="message"
-                    rows={3}
-                    className="w-full px-3 py-2 sm:px-4 sm:py-3 border-2 border-[#7300ff] bg-black/50 text-white text-sm sm:text-base focus:border-[#ffe300] focus:outline-none transition-all resize-none"
-                    placeholder="Any special requirements or questions..."
-                  ></textarea>
-                </div>
-
-                {/* Terms Checkbox */}
-                <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    id="ticket-terms"
-                    name="terms"
-                    value="accepted"
-                    required
-                    className="mt-1 w-5 h-5 accent-[#ffe300] cursor-pointer"
-                  />
-                  <label htmlFor="ticket-terms" className="text-sm text-gray-300 cursor-pointer">
-                    I have read and agree to the{" "}
-                    <Link href="/terms-and-conditions" className="text-[#ffe300] hover:underline">
-                      terms and conditions
-                    </Link>
-                  </label>
-                </div>
+                </label>
               </div>
 
-              {/* Submit Button */}
-              <div className="mt-6 sm:mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4 px-2 sm:px-4">
+              <label className="flex flex-col gap-2 text-sm uppercase tracking-wide">
+                Special Requests / Questions (Optional)
+                <textarea
+                  id="ticket-message"
+                  name="message"
+                  rows={4}
+                  className="w-full resize-none bg-black px-4 py-3 text-base text-white shadow-[0_0_25px_rgba(0,255,255,0.18)] focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60"
+                  placeholder="Let us know how we can help"
+                />
+              </label>
+
+              <label className="flex items-start gap-3 text-xs sm:text-sm text-white/80">
+                <input
+                  type="checkbox"
+                  id="ticket-terms"
+                  name="terms"
+                  value="accepted"
+                  required
+                  className="mt-1 h-5 w-5 accent-[#ff1a1a]"
+                />
+                <span>
+                  I accept the{' '}
+                  <Link href="/terms-and-conditions" className="text-[#00f5ff] underline-offset-4 hover:underline">
+                    terms and conditions
+                  </Link>
+                </span>
+              </label>
+
+              <div className="flex flex-col gap-3 sm:flex-row">
                 <button
                   type="submit"
                   disabled={ticketProcessing}
-                  className="flex-1 bg-[#ffe300] text-black font-oswald text-sm sm:text-base md:text-lg py-2 sm:py-3 hover:bg-[#ffd000] transition-all uppercase hover:scale-105 disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="flex-1 bg-[#ff1a1a] px-6 py-3 text-base font-montserrat uppercase tracking-[0.2em] text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {ticketProcessing ? "Processing Payment..." : "Request Tickets"}
                 </button>
                 <button
                   type="button"
                   onClick={closeTicketModal}
-                  className="sm:w-auto px-6 py-2 sm:py-3 border-2 border-[#ffe300] text-white text-sm sm:text-base font-semibold hover:bg-[#ffe300] hover:text-black transition-all"
+                  className="bg-black px-6 py-3 text-base font-montserrat uppercase tracking-[0.2em] text-white shadow-[0_0_20px_rgba(0,255,255,0.25)] transition-transform hover:scale-[1.02]"
                 >
                   Cancel
                 </button>

@@ -49,12 +49,30 @@ html {
 }
 
 :root {
+  --font-travel-sans: "Travel Sans", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
+}
+
+@font-face {
+  font-family: "Travel Sans";
+  src: url("/Sans%20Serif%20Normal.woff2") format("woff2"),
+    url("/Sans%20Serif%20Normal.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
   --font-site-sans: "Site Sans", system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial;
 }
 
 .font-site-sans {
   font-family: var(--font-site-sans);
+}
+
+.font-travel-sans {
+  font-family: var(--font-travel-sans);
 }
 
 /* Castle press font */
@@ -92,8 +110,9 @@ h6 {
 }
 
 .hero-letter {
-  font-family: var(--font-league-gothic), "TT Commons Pro", system-ui,
-    -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family: var(--font-travel-sans), var(--font-league-gothic),
+    "TT Commons Pro", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
   font-weight: 400;
   font-size: clamp(3.25rem, 16vw, 12rem);
   color: #ffffff;
