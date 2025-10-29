@@ -25,6 +25,8 @@ const volunteerPerks = [
 
 const formFieldClasses =
   "w-full bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-black/50";
+const formLabelClasses =
+  "flex flex-col gap-2 text-sm font-montserrat font-medium text-white";
 
 export default function VolunteerPage() {
   const router = useRouter();
@@ -143,21 +145,21 @@ export default function VolunteerPage() {
             <div className="pointer-events-none absolute -inset-6 -z-10 bg-[#00f5ff]/50 blur-3xl" aria-hidden />
             <div className="relative overflow-hidden rounded-none bg-black p-8 text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
               <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
-              <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+              <label className={formLabelClasses}>
                 Full Name
                 <input id="volunteer-name" name="name" type="text" required className={formFieldClasses} placeholder="Enter your full name" />
               </label>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                <label className={formLabelClasses}>
                   Age
                   <input id="volunteer-age" name="age" type="number" min="15" required className={formFieldClasses} placeholder="18" />
                 </label>
-                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                <label className={formLabelClasses}>
                   Institution / Organization
                   <input id="volunteer-institution" name="institution" type="text" required className={formFieldClasses} placeholder="College or organization name" />
                 </label>
               </div>
-              <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+              <label className={formLabelClasses}>
                 Preferred Role
                 <select id="volunteer-role" name="role" required defaultValue="" className={`${formFieldClasses} cursor-pointer`}>
                   <option value="" disabled className="bg-white text-black">
@@ -171,22 +173,22 @@ export default function VolunteerPage() {
                 </select>
               </label>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                <label className={formLabelClasses}>
                   Phone Number
                   <input id="volunteer-phone" name="phone" type="tel" required className={formFieldClasses} placeholder="+91 XXXXXXXXXX" />
                 </label>
-                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                <label className={formLabelClasses}>
                   Email ID
                   <input id="volunteer-email" name="email" type="email" required className={formFieldClasses} placeholder="your.email@example.com" />
                 </label>
               </div>
-              <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+              <label className={formLabelClasses}>
                 Anything we should know?
                 <textarea id="volunteer-note" name="note" rows={3} className={`${formFieldClasses} resize-none`} placeholder="Availability, past experience, or special skills" />
               </label>
-              <label className="flex items-start gap-3 text-xs font-semibold uppercase tracking-[0.2em]">
+              <label className="flex items-start gap-3 text-sm font-montserrat text-white/80">
                 <input type="checkbox" name="terms" value="accepted" required className="mt-1 h-5 w-5 accent-[#ff1a1a]" />
-                <span className="normal-case text-left text-white/80">
+                <span className="text-left">
                   I accept the{" "}
                   <Link href="/terms-and-conditions" className="text-[#00f5ff] underline-offset-4 hover:underline">
                     terms and conditions
@@ -196,7 +198,7 @@ export default function VolunteerPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#ff1a1a] px-6 py-3 font-montserrat text-sm uppercase tracking-[0.3em] text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full bg-[#ff1a1a] px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? "Submitting..." : "Apply to Volunteer"}
               </button>

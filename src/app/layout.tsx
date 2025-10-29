@@ -35,7 +35,7 @@ const quicksand = Quicksand({
 const montserrat = Montserrat({
   variable: "--font-montserrat",
   subsets: ["latin"],
-  weight: ["700", "800"],
+  weight: ["400", "500", "600", "700", "800"],
 });
 
 const leagueGothic = League_Gothic({
@@ -44,7 +44,7 @@ const leagueGothic = League_Gothic({
 });
 
 export const metadata: Metadata = {
-  title: "MADOOZA Festival 2024 | Hazaribagh's Ultimate Pop Culture Experience",
+  title: "MADOOZA Festival 2025 | Hazaribagh's Ultimate Pop Culture Experience",
   description:
     "Discover MADOOZA Festival 2024 in Hazaribagh – a high-energy celebration of cosplay, music, art, food, and creator culture.",
 };
