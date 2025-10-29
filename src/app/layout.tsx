@@ -1,5 +1,12 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Montserrat, Oswald, Quicksand } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  League_Gothic,
+  Montserrat,
+  Oswald,
+  Quicksand,
+} from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 
@@ -31,6 +38,11 @@ const montserrat = Montserrat({
   weight: ["700", "800"],
 });
 
+const leagueGothic = League_Gothic({
+  variable: "--font-league-gothic",
+  subsets: ["latin"],
+});
+
 export const metadata: Metadata = {
   title: "MADOOZA Festival 2024 | Hazaribagh's Ultimate Pop Culture Experience",
   description:
@@ -45,7 +57,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${oswald.variable} ${quicksand.variable} ${montserrat.variable} antialiased font-quicksand`}
+        className={`${geistSans.variable} ${geistMono.variable} ${oswald.variable} ${quicksand.variable} ${montserrat.variable} ${leagueGothic.variable} antialiased font-quicksand`}
       >
         <Header/>
 

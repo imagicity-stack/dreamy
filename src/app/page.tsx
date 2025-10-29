@@ -226,7 +226,7 @@ export default function Home() {
         </Image>
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-5 sm:gap-6 md:gap-8 lg:gap-10 px-4">
           <div
-            className="hero-title font-montserrat"
+            className="hero-title font-league-gothic"
             role="heading"
             aria-level={1}
             aria-label="Hazaribagh"
