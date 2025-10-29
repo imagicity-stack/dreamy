@@ -10,6 +10,12 @@ const navLinks = [
   { href: "/#contactus", label: "CONTACT US" },
 ];
 
+const legalLinks = [
+  { href: "/terms-and-conditions", label: "Terms & Conditions" },
+  { href: "/privacy-policy", label: "Privacy Policy" },
+  { href: "/cancellation-refund-policy", label: "Cancellation & Refund" },
+];
+
 export default function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -18,7 +24,7 @@ export default function MobileMenu() {
       {/* Mobile menu button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="lg:hidden text-white p-2 relative z-50"
+        className="mobile-tap relative z-50 p-2 text-white transition-transform lg:hidden"
         aria-label="Toggle mobile menu"
       >
         <svg
@@ -65,7 +71,7 @@ export default function MobileMenu() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-white font-bold text-xl tracking-[0.2em] uppercase hover:text-gray-200 transition"
+                className="mobile-tap text-xl font-bold uppercase text-white transition hover:text-gray-200"
                 onClick={() => setIsOpen(false)}
               >
                 {link.label}
@@ -73,14 +79,19 @@ export default function MobileMenu() {
             ))}
           </nav>
 
-          <div className="mt-auto mb-8">
-            <Link
-              href="/#tickets"
-              className="bg-[#ffe300] text-black px-6 py-3 font-bold text-lg rounded block text-center"
-              onClick={() => setIsOpen(false)}
-            >
-              GET TICKETS
-            </Link>
+          <div className="mt-auto border-t border-white/20 pt-8">
+            <nav className="flex flex-col space-y-3 text-sm font-montserrat">
+              {legalLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="mobile-tap text-white/80 transition hover:text-white hover:underline"
+                  onClick={() => setIsOpen(false)}
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
           </div>
         </div>
       </div>
