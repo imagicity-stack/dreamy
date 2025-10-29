@@ -65,7 +65,7 @@ export default function MobileMenu() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-white font-quicksand font-semibold text-xl hover:text-gray-200 transition"
+                className="text-white font-montserrat font-bold text-xl hover:text-gray-200 transition"
                 onClick={() => setIsOpen(false)}
               >
                 {link.label}

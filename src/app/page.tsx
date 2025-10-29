@@ -94,6 +94,8 @@ export default function Home() {
   const currentFestival =
     involvementOptions.find((f) => f.name === active) ?? involvementOptions[0];
 
+  const heroTitle = "HAZARIBAGH";
+
   const openTicketModal = () => {
     setIsTicketModalOpen(true);
   };
@@ -223,20 +225,23 @@ export default function Home() {
         >
         </Image>
         <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-3 sm:gap-4 md:gap-6 lg:gap-8 px-4">
-          {/* Logo */}
-          <div className="relative w-[70%] sm:w-[60%] md:w-[50%] lg:w-[45%] xl:w-[40%] max-w-[600px]">
-            <Image 
-              src="/logo.png" 
-              alt="MADOOZA" 
-              width={600} 
-              height={570} 
-              className="w-full h-auto"
-              priority
-            />
+          {/* Animated Title */}
+          <div className="relative flex justify-center">
+            <h1 className="hero-title font-league-gothic text-white text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl drop-shadow-[0_6px_12px_rgba(0,0,0,0.7)]">
+              {heroTitle.split("").map((char, index) => (
+                <span
+                  key={`${char}-${index}`}
+                  className="reveal-letter"
+                  style={{ animationDelay: `${index * 0.12}s` }}
+                >
+                  {char}
+                </span>
+              ))}
+            </h1>
           </div>
-          
+
           {/* Text and Button */}
-          <div className="text-center flex flex-col items-center gap-2 sm:gap-3 md:gap-4 -mt-4 sm:-mt-6 md:-mt-8 lg:-mt-10">
+          <div className="text-center flex flex-col items-center gap-2 sm:gap-3 md:gap-4 mt-4 sm:mt-6 md:mt-8 lg:mt-10">
             <p className="text-black font-extrabold font-quicksand text-xs sm:text-sm md:text-base lg:text-xl xl:text-2xl 2xl:text-3xl text-center relative z-20 px-4">
               THE SOUND OF PURE MADNESS
             </p>

@@ -20,7 +20,7 @@ const Header = () => {
               <Image src="/MADOOZA.png" alt="DREAMHACK" width={150} height={40} />
             </Link>
           </div>
-        <div className="hidden lg:flex gap-12 font-quicksand font-semibold text-[1.3rem]">
+        <div className="hidden lg:flex gap-12 font-montserrat font-bold text-[1.3rem]">
           {navLinks.map((link) => (
             <Link key={link.href} href={link.href} prefetch>
               {link.label}
