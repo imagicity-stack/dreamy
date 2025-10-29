@@ -1,0 +1,9 @@
+/* Webfont: Quaron-ObliqueOutline */@font-face {
+    font-family: 'QuaronOutline';
+    src: url('Quaron-Oblique-Outline.woff2') format('woff2'), /* Modern Browsers */
+         url('Quaron-Oblique-Outline.otf') format('opentype'); /* Safari, Android, iOS */
+             font-style: italic;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+
