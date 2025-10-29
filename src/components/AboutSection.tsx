@@ -64,7 +64,7 @@ export default function AboutSection() {
             <p className="font-semibold mb-4 md:mb-6">This is 
               MADOOZA
             </p>
-            <p className="font-extrabold text-base md:text-lg mb-6 md:mb-8">
+            <p className="font-extrabold text-base md:text-lg mb-6 md:mb-8 text-white">
               The sound of pure madness
             </p>
 

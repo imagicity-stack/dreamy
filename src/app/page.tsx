@@ -246,13 +246,20 @@ export default function Home() {
 
           {/* Text and Button */}
           <div className="text-center flex flex-col items-center gap-2 sm:gap-3 md:gap-4">
-            <p className="text-black font-extrabold font-quicksand text-xs sm:text-sm md:text-base lg:text-xl xl:text-2xl 2xl:text-3xl text-center relative z-20 px-4">
+            <p className="text-white font-extrabold font-quicksand text-xs sm:text-sm md:text-base lg:text-xl xl:text-2xl 2xl:text-3xl text-center relative z-20 px-4">
               THE SOUND OF PURE MADNESS
             </p>
             <button
               onClick={openTicketModal}
-              className="bg-[#ffe300] text-black text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-bold py-2 px-4 sm:py-2.5 sm:px-5 md:py-3 md:px-6 lg:py-3.5 lg:px-8 pointer-events-auto cursor-pointer hover:bg-[#ffd000] hover:scale-105 transition-all z-20 rounded-sm shadow-lg">
-              GET TICKETS NOW
+              className="hero-cta-button bg-[#ffe300] text-black text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-montserrat pointer-events-auto cursor-pointer z-20">
+              <Image
+                src="/ticketicon.png"
+                alt="Ticket icon"
+                width={24}
+                height={24}
+                className="w-5 h-5 md:w-6 md:h-6 object-contain"
+              />
+              <span>GET TICKETS NOW</span>
             </button>
           </div>
         </div>

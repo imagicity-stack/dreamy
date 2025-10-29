@@ -4,7 +4,7 @@ const items = ["COSPLAY", "MUSIC", "DANCE", "STALLS", "FOOD"];
 
 export default function ScrollingBanner() {
   return (
-    <div className="bg-[#03ff93] py-3 md:py-4 overflow-hidden relative">
+    <div className="bg-[#87cefa] py-3 md:py-4 overflow-hidden relative">
       <div className="marquee inline-flex whitespace-nowrap">
         {[0, 1].map((loop) => (
           <div
@@ -15,7 +15,7 @@ export default function ScrollingBanner() {
             {items.map((item) => (
               <span
                 key={`${loop}-${item}`}
-                className="text-blue-700 font-black text-xl sm:text-2xl md:text-3xl uppercase tracking-[0.3em]"
+                className="text-blue-700 font-montserrat text-xl sm:text-2xl md:text-3xl tracking-[0.3em]"
               >
                 {item}
               </span>
