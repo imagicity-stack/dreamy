@@ -1,6 +1,8 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useState } from "react";
+import type { CSSProperties } from "react";
 import { X } from "lucide-react";
 
 import ContactUs from "@/components/ContactUs";
@@ -22,38 +24,36 @@ const eventFormat = [
   {
     title: "Part 2: The MAD Parade",
     description:
-      "A high-energy stage walk where the top 10 cosplayers perform or pose live, followed by crowd voting and final judging.",
+      "A high-energy stage walk where the top cosplayers perform or pose live, followed by crowd voting and final judging.",
   },
 ];
 
 const participationDetails = [
-  "Open for students (of any school) and local youth participants.",
+  "Open for students and local youth participants.",
   "₹299 entry for externals.",
   "Costumes can be from anime, gaming, movies, pop culture, or pure imagination.",
   "Limited slots — registration on the website.",
 ];
 
+const yellowBulletStyle: CSSProperties = {
+  backgroundImage:
+    "url(\"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='6'><rect width='6' height='6' fill='%23ff1a1a'/></svg>\")",
+  backgroundRepeat: "no-repeat",
+  backgroundPosition: "0 0.45rem",
+};
+
 const prizes = [
   {
     title: "🥇 1st Place – The Mad Legend",
     description: "₹3000 + Amazon gift voucher + certificate + feature reel",
-    cardClass: "bg-[#1d0f2f]",
-    titleClass: "text-[#ffe300]",
-    descriptionClass: "text-[#ffe9a0]",
   },
   {
     title: "🥈 2nd Place – The Mad Icon",
     description: "₹2000 + certificate + feature reel",
-    cardClass: "bg-[#0f1f33]",
-    titleClass: "text-[#9dffff]",
-    descriptionClass: "text-[#c6fdff]",
   },
   {
     title: "🥉 3rd Place – Crowd Favorite",
     description: "₹500 + food coupon + certificate",
-    cardClass: "bg-[#291326]",
-    titleClass: "text-[#ffd6a8]",
-    descriptionClass: "text-[#ffe7cc]",
   },
 ];
 
@@ -78,6 +78,9 @@ const highlights = [
   "Crowd interactions, live music, and anchor-led energy.",
   "Winning entries featured on the official MADOOZA Instagram.",
 ];
+
+const formFieldClasses =
+  "w-full bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-black/50";
 
 export default function CosplayPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -120,6 +123,7 @@ export default function CosplayPage() {
       email: getValue("email"),
       phone: getValue("phone"),
       notes: getValue("notes"),
+      termsAccepted: formData.get("terms") === "accepted",
       timestamp: new Date().toISOString(),
     };
 
@@ -167,7 +171,9 @@ export default function CosplayPage() {
         modal: {
           ondismiss: () => {
             if (!paymentCompleted) {
-              setError("Payment popup closed before completion. Please try again to confirm your registration.");
+              setError(
+                "Payment popup closed before completion. Please try again to confirm your registration.",
+              );
             }
           },
         },
@@ -191,247 +197,216 @@ export default function CosplayPage() {
 
   return (
     <div className="bg-black text-white">
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#7300ff] via-[#ff1a00] to-[#ffe300] text-black py-16 sm:py-20 md:py-24">
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-sm sm:text-base md:text-lg uppercase tracking-[0.4em] text-[#ffe300] font-oswald mb-4">
+      <section className="relative overflow-hidden py-16 sm:py-20 md:py-24">
+        <div className="pointer-events-none absolute -top-24 left-0 h-64 w-64 bg-[#ff1a1a] opacity-40 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 right-0 h-72 w-72 bg-[#ffe300] opacity-40 blur-3xl" />
+        <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center gap-6 px-4 text-center">
+          <span className="font-montserrat text-xs uppercase tracking-[0.6em] text-[#ffe300]">
             Cosplay Arena
-          </p>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-oswald uppercase text-white drop-shadow-xl">
-            🎭 Cosplay Arena – Step Into the MADVERSE
+          </span>
+          <h1 className="font-travel-sans text-3xl sm:text-4xl md:text-5xl lg:text-6xl uppercase text-white">
+            Step Into the MADVERSE
           </h1>
-          <p className="mt-6 text-base sm:text-lg md:text-xl text-gray-100 leading-relaxed font-quicksand">
-            Welcome to MADOOZA’s Cosplay Arena — where fun gets crazy and everyone becomes a hero or villain. Dress up, walk around, click photos, and join the MAD PARADE — the big cosplay battle where the crowd picks the winner!
+          <p className="max-w-3xl text-base sm:text-lg md:text-xl text-white/80">
+            Welcome to MADOOZA’s Cosplay Arena — where fun gets crazy and everyone becomes a hero or villain. Dress up, walk
+            around, click photos, and join the MAD PARADE — the big cosplay battle where the crowd picks the winner!
           </p>
+          <button
+            onClick={openModal}
+            className="mt-4 inline-flex items-center justify-center bg-[#ff1a1a] px-6 py-3 font-montserrat text-sm uppercase tracking-[0.3em] text-white transition-transform hover:scale-[1.03]"
+          >
+            Register Now
+          </button>
         </div>
       </section>
 
-      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-black">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
-          <div className="bg-[#11011b] border border-white/10 rounded-2xl p-6 sm:p-8">
-            <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-4">Event Format</h2>
-            <div className="space-y-4">
+      <section className="border-y border-[#ffe300]/30 bg-black py-16">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 lg:grid-cols-2">
+          <div className="flex h-full flex-col gap-6 bg-[#ff1a1a] p-8 shadow-[0_0_35px_rgba(255,26,26,0.25)]">
+            <h2 className="font-travel-sans text-2xl sm:text-3xl uppercase text-white">Event Format</h2>
+            <div className="space-y-4 text-left">
               {eventFormat.map((item) => (
-                <div key={item.title} className="bg-white/5 border border-white/10 rounded-xl p-4 sm:p-5">
-                  <h3 className="text-lg sm:text-xl font-oswald text-white uppercase mb-2">{item.title}</h3>
-                  <p className="text-sm sm:text-base text-gray-300 font-quicksand leading-relaxed">{item.description}</p>
+                <div key={item.title} className="bg-black/40 p-4 text-white">
+                  <h3 className="font-montserrat text-sm uppercase tracking-[0.3em] text-[#ffe300]">{item.title}</h3>
+                  <p className="mt-2 text-sm sm:text-base text-white/80">{item.description}</p>
                 </div>
               ))}
             </div>
           </div>
-          <div className="bg-[#1a062a] border border-white/10 rounded-2xl p-6 sm:p-8 flex flex-col justify-between">
-            <div>
-              <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-4">Participation Details</h2>
-              <ul className="space-y-3 text-sm sm:text-base text-gray-200 font-quicksand leading-relaxed list-disc list-inside">
+          <div className="flex h-full flex-col justify-between gap-6 bg-[#ffe300] p-8 text-black shadow-[0_0_35px_rgba(255,227,0,0.25)]">
+            <div className="space-y-4">
+              <h2 className="font-travel-sans text-2xl sm:text-3xl uppercase">Participation Details</h2>
+              <ul className="space-y-3 text-left text-sm sm:text-base">
                 {participationDetails.map((detail) => (
-                  <li key={detail}>{detail}</li>
+                  <li key={detail} className="pl-6 text-black" style={yellowBulletStyle}>
+                    {detail}
+                  </li>
                 ))}
               </ul>
             </div>
-            <div className="mt-6 rounded-xl border border-[#ffe300]/30 bg-[#ffe300]/10 p-4 text-sm sm:text-base text-[#ffe300] font-quicksand leading-relaxed">
+            <div className="bg-black px-4 py-3 text-sm text-white">
               ₹299 entry covers arena access, stage participation, and certification for all registered cosplayers.
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-[#080510]">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 xl:grid-cols-[1.2fr_0.8fr] gap-10 xl:gap-16 items-start">
-          <div>
-            <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-6">Prizes &amp; Titles</h2>
-            <div className="space-y-4">
-              {prizes.map((prize) => (
-                <div
-                  key={prize.title}
-                  className={`rounded-xl border border-white/10 p-4 sm:p-6 shadow-lg ${prize.cardClass}`}
-                >
-                  <h3 className={`text-xl sm:text-2xl font-oswald uppercase mb-2 ${prize.titleClass}`}>
-                    {prize.title}
-                  </h3>
-                  <p className={`text-sm sm:text-base font-quicksand leading-relaxed ${prize.descriptionClass}`}>
-                    {prize.description}
-                  </p>
-                </div>
-              ))}
+      <section className="border-b border-[#ffe300]/30 py-16">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-12 px-4 xl:grid-cols-[1.2fr_0.8fr]">
+          <div className="space-y-6">
+            <h2 className="font-travel-sans text-2xl sm:text-3xl uppercase text-[#ffe300]">Prizes & Titles</h2>
+            <div className="grid gap-6 md:grid-cols-2">
+              {prizes.map((prize, index) => {
+                const tone = index === 1 ? "bg-[#ffe300] text-black" : index === 2 ? "bg-black border border-[#ffe300] text-white" : "bg-[#ff1a1a] text-white";
+                return (
+                  <div key={prize.title} className={`${tone} p-6 shadow-[0_0_30px_rgba(255,26,26,0.2)]`}> 
+                    <h3 className="font-montserrat text-base uppercase tracking-[0.2em]">{prize.title}</h3>
+                    <p className="mt-3 text-sm sm:text-base">
+                      {prize.description}
+                    </p>
+                  </div>
+                );
+              })}
             </div>
-            <div className="mt-6 bg-black/40 border border-[#ffe300]/40 rounded-xl p-4 sm:p-5">
-              <h3 className="text-lg sm:text-xl font-oswald text-[#ffe300] uppercase mb-3">Bonus Titles</h3>
-              <div className="flex flex-wrap gap-2 text-xs sm:text-sm font-quicksand text-black">
-                <span className="bg-[#ffe300] px-3 py-1 rounded-full uppercase tracking-wide">Best Group Cosplay</span>
-                <span className="bg-[#ff1a00] px-3 py-1 rounded-full uppercase tracking-wide text-white">Most Creative Design</span>
-                <span className="bg-[#9dffff] px-3 py-1 rounded-full uppercase tracking-wide">Judge&apos;s Choice</span>
+            <div className="grid gap-4 md:grid-cols-2">
+              <div className="bg-black p-6 shadow-[0_0_30px_rgba(255,227,0,0.2)]">
+                <h3 className="font-travel-sans text-xl uppercase text-[#ffe300]">Judging Criteria</h3>
+                <ul className="mt-4 space-y-3 text-sm sm:text-base text-white/80">
+                  {judgingCriteria.map((item) => (
+                    <li key={item.criteria} className="flex items-center justify-between">
+                      <span>{item.criteria}</span>
+                      <span className="font-montserrat text-xs uppercase tracking-[0.3em] text-[#ffe300]">{item.weight}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="bg-[#ff1a1a] p-6 text-white shadow-[0_0_30px_rgba(255,26,26,0.2)]">
+                <h3 className="font-travel-sans text-xl uppercase">Judging Panel</h3>
+                <p className="mt-3 text-sm sm:text-base text-white/80">
+                  1 creative representative from Imagicity, 1 faculty member, and 1 local artist or influencer.
+                </p>
+                <p className="mt-4 text-sm sm:text-base text-white">
+                  Audience cheers will be counted live before the final verdict.
+                </p>
               </div>
             </div>
           </div>
-
-          <div className="bg-[#11011b] border border-white/10 rounded-2xl p-6 sm:p-8">
-            <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-4">Judging Criteria</h2>
-            <div className="space-y-3">
-              {judgingCriteria.map((item) => (
-                <div
-                  key={item.criteria}
-                  className="flex items-center justify-between bg-black/40 border border-[#9dffff]/30 rounded-lg px-4 py-3"
-                >
-                  <span className="text-sm sm:text-base font-quicksand text-gray-200">{item.criteria}</span>
-                  <span className="text-lg sm:text-xl font-oswald text-[#9dffff]">{item.weight}</span>
-                </div>
-              ))}
+          <div className="flex flex-col gap-6">
+            <div className="bg-black p-6 shadow-[0_0_30px_rgba(255,227,0,0.2)]">
+              <h3 className="font-travel-sans text-xl uppercase text-[#ffe300]">Rules & Guidelines</h3>
+              <ul className="mt-4 space-y-3 text-sm sm:text-base text-white/80">
+                {rules.map((rule) => (
+                  <li key={rule}>{rule}</li>
+                ))}
+              </ul>
             </div>
-            <div className="mt-6 border-t border-white/10 pt-4">
-              <h3 className="text-lg sm:text-xl font-oswald text-[#ffe300] uppercase mb-2">Judging Panel</h3>
-              <p className="text-sm sm:text-base text-gray-300 font-quicksand leading-relaxed">
-                1 creative representative from Imagicity, 1 faculty member, and 1 local artist / influencer.
-              </p>
+            <div className="bg-[#ffe300] p-6 text-black shadow-[0_0_30px_rgba(255,227,0,0.3)]">
+              <h3 className="font-travel-sans text-xl uppercase">Arena Highlights</h3>
+              <ul className="mt-4 space-y-3 text-sm sm:text-base">
+                {highlights.map((highlight) => (
+                  <li key={highlight}>{highlight}</li>
+                ))}
+              </ul>
             </div>
           </div>
         </div>
       </section>
 
-      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-black">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1fr_1fr] gap-8 lg:gap-12">
-          <div className="bg-[#1a062a] border border-white/10 rounded-2xl p-6 sm:p-8">
-            <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-4">Rules &amp; Guidelines</h2>
-            <ul className="space-y-3 text-sm sm:text-base text-gray-200 font-quicksand leading-relaxed list-disc list-inside">
-              {rules.map((rule) => (
-                <li key={rule}>{rule}</li>
-              ))}
-            </ul>
-          </div>
-          <div className="bg-[#11011b] border border-white/10 rounded-2xl p-6 sm:p-8">
-            <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-4">Highlights</h2>
-            <ul className="space-y-3 text-sm sm:text-base text-gray-200 font-quicksand leading-relaxed list-disc list-inside">
-              {highlights.map((highlight) => (
-                <li key={highlight}>{highlight}</li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
-      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-[#080510]">
-        <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-4">
-            Ready to Join the MAD Parade?
-          </h2>
-          <p className="text-sm sm:text-base md:text-lg text-gray-200 font-quicksand leading-relaxed">
+      <section className="bg-[#ff1a1a] py-16 text-white">
+        <div className="mx-auto max-w-3xl px-4 text-center">
+          <h2 className="font-travel-sans text-3xl uppercase">Ready to Own the Parade?</h2>
+          <p className="mt-4 text-sm sm:text-base text-white/80">
             Lock in your slot for Jharkhand’s wildest cosplay throwdown. Secure your registration online and arrive fully ready to rule the stage.
           </p>
-          <div className="mt-8 flex flex-col items-center">
-            <button
-              onClick={openModal}
-              className="inline-flex items-center justify-center rounded-md bg-[#ffe300] px-6 py-3 font-oswald text-lg uppercase tracking-wide text-black transition hover:bg-[#ffd000]"
-            >
-              Apply Now
-            </button>
-          </div>
+          <button
+            onClick={openModal}
+            className="mt-6 inline-flex items-center justify-center bg-black px-6 py-3 font-montserrat text-sm uppercase tracking-[0.3em] text-white transition-transform hover:scale-[1.03]"
+          >
+            Apply Now
+          </button>
         </div>
       </section>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          <div className="absolute inset-0 bg-black/80" onClick={closeModal} />
-          <div className="relative z-10 w-full max-w-xl rounded-2xl border border-white/10 bg-[#11011b] p-6 sm:p-8">
-            <button
-              onClick={closeModal}
-              className="absolute right-4 top-4 text-gray-400 hover:text-white"
-              aria-label="Close registration form"
-            >
-              <X className="h-5 w-5" />
-            </button>
-            <h3 className="text-2xl font-oswald uppercase text-[#ffe300]">Cosplay Registration</h3>
-            <p className="mt-2 text-sm sm:text-base text-gray-300 font-quicksand">
-              Complete the form and secure your spot with a quick payment. We’ll email you confirmation and event-day cues.
-            </p>
-            <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="cosplay-name">
-                    Full Name
-                  </label>
-                  <input
-                    id="cosplay-name"
-                    name="name"
-                    type="text"
-                    required
-                    className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                    placeholder="Enter your name"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="cosplay-character">
-                    Character Name
-                  </label>
-                  <input
-                    id="cosplay-character"
-                    name="character"
-                    type="text"
-                    required
-                    className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                    placeholder="Who are you cosplaying?"
-                  />
-                </div>
-              </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="cosplay-email">
-                    Email ID
-                  </label>
-                  <input
-                    id="cosplay-email"
-                    name="email"
-                    type="email"
-                    required
-                    className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                    placeholder="your.email@example.com"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="cosplay-phone">
-                    Phone Number
-                  </label>
-                  <input
-                    id="cosplay-phone"
-                    name="phone"
-                    type="tel"
-                    required
-                    className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                    placeholder="+91 XXXXXXXXXX"
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="cosplay-notes">
-                  Additional Notes
-                </label>
-                <textarea
-                  id="cosplay-notes"
-                  name="notes"
-                  rows={3}
-                  className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                  placeholder="Share performance cues or prop details"
-                />
-              </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 py-8">
+          <div className="relative w-full max-w-xl">
+            <div className="pointer-events-none absolute -inset-6 -z-10 bg-[#00f5ff]/50 blur-3xl" aria-hidden />
+            <div className="relative overflow-hidden rounded-none bg-black text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
               <button
-                type="submit"
-                disabled={loading}
-                className="w-full rounded-md bg-[#ffe300] px-4 py-3 font-oswald text-lg uppercase tracking-wide text-black transition hover:bg-[#ffd000] disabled:cursor-not-allowed disabled:opacity-60"
+                type="button"
+                onClick={closeModal}
+                className="absolute right-4 top-4 text-white transition-transform hover:scale-110"
+                aria-label="Close cosplay form"
               >
-                {loading ? "Processing Payment..." : "Pay ₹299 & Register"}
+                <X className="h-6 w-6" />
               </button>
-              {error && (
-                <p className="rounded-md border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-                  {error}
-                </p>
-              )}
-              {submitted && (
-                <p className="rounded-md border border-green-400/40 bg-green-500/10 px-4 py-3 text-sm text-green-200">
-                  Your cosplay slot is secured! We’ll send payment instructions and confirmation shortly.
-                  {paymentId && (
-                    <span className="mt-2 block text-xs text-green-100/80">Payment reference: {paymentId}</span>
+              <div className="relative z-10 space-y-6 px-6 py-8 sm:px-10">
+                <div className="text-center">
+                  <p className="font-montserrat text-xs uppercase tracking-[0.5em] text-[#00f5ff]">Cosplay Entry</p>
+                  <h3 className="mt-3 font-travel-sans text-3xl uppercase text-white">Secure Your Slot</h3>
+                  <p className="mt-3 text-sm text-white/70">
+                    Complete the form and lock your participation with an instant payment confirmation.
+                  </p>
+                </div>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
+                      Full Name
+                      <input id="cosplay-name" name="name" type="text" required className={formFieldClasses} placeholder="Enter your name" />
+                    </label>
+                    <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
+                      Character Name
+                      <input id="cosplay-character" name="character" type="text" required className={formFieldClasses} placeholder="Who are you cosplaying?" />
+                    </label>
+                    <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
+                      Email ID
+                      <input id="cosplay-email" name="email" type="email" required className={formFieldClasses} placeholder="your.email@example.com" />
+                    </label>
+                    <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
+                      Phone Number
+                      <input id="cosplay-phone" name="phone" type="tel" required className={formFieldClasses} placeholder="+91 XXXXXXXXXX" />
+                    </label>
+                  </div>
+                  <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
+                    Additional Notes
+                    <textarea id="cosplay-notes" name="notes" rows={3} className={`${formFieldClasses} resize-none`} placeholder="Share performance cues or prop details" />
+                  </label>
+                  <label className="flex items-start gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-white">
+                    <input
+                      type="checkbox"
+                      name="terms"
+                      value="accepted"
+                      required
+                      className="mt-1 h-5 w-5 accent-[#ff1a1a]"
+                    />
+                    <span className="normal-case text-left text-white/80">
+                      I accept the{" "}
+                      <Link href="/terms-and-conditions" className="text-[#00f5ff] underline-offset-4 hover:underline">
+                        terms and conditions
+                      </Link>
+                    </span>
+                  </label>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-[#ff1a1a] px-6 py-3 font-montserrat text-sm uppercase tracking-[0.3em] text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {loading ? "Processing Payment..." : "Pay ₹299 & Register"}
+                  </button>
+                  {error && (
+                    <p className="bg-[#ff1a1a]/40 px-4 py-3 text-center text-sm text-white">
+                      {error}
+                    </p>
                   )}
-                </p>
-              )}
-            </form>
+                  {submitted && (
+                    <div className="space-y-1 bg-[#00f5ff]/20 px-4 py-3 text-center text-sm text-white">
+                      <p>Your cosplay slot is secured! We’ll send payment instructions and confirmation shortly.</p>
+                      {paymentId && <span className="block text-xs">Payment reference: {paymentId}</span>}
+                    </div>
+                  )}
+                </form>
+              </div>
+            </div>
           </div>
         </div>
       )}

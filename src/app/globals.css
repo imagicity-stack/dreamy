@@ -9,6 +9,19 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: "Quaron";
+  src: url("/quaronweb/Quaron-Regular.woff2") format("woff2"),
+    url("/quaronweb/Quaron-Regular.woff") format("woff"),
+    url("/quaronweb/quaron-regular.woff2") format("woff2"),
+    url("/quaronweb/quaron-regular.woff") format("woff"),
+    url("/quaronweb/QuaronWeb-Regular.woff2") format("woff2"),
+    url("/quaronweb/QuaronWeb-Regular.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 body {
   font-family: var(--font-quicksand), "TT Commons Pro", system-ui,
     -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
@@ -49,12 +62,42 @@ html {
 }
 
 :root {
+  --font-travel-sans: "Travel Sans", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
+  --font-quaron: "Quaron", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
+}
+
+@font-face {
+  font-family: "Travel Sans";
+  src: url("/travel-sans.woff2") format("woff2"),
+    url("/travel-sans.woff") format("woff"),
+    url("/Travel%20Sans.woff2") format("woff2"),
+    url("/Travel%20Sans.woff") format("woff"),
+    url("/TravelSans.woff2") format("woff2"),
+    url("/TravelSans.woff") format("woff"),
+    url("/Sans%20Serif%20Normal.woff2") format("woff2"),
+    url("/Sans%20Serif%20Normal.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
   --font-site-sans: "Site Sans", system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial;
 }
 
 .font-site-sans {
   font-family: var(--font-site-sans);
+}
+
+.font-travel-sans {
+  font-family: var(--font-travel-sans);
+}
+
+.font-quaron {
+  font-family: var(--font-quaron);
 }
 
 /* Castle press font */
@@ -92,15 +135,31 @@ h6 {
 }
 
 .hero-letter {
-  font-family: var(--font-league-gothic), "TT Commons Pro", system-ui,
-    -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  font-family: var(--font-quaron), var(--font-league-gothic),
+    "TT Commons Pro", system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial;
   font-weight: 400;
-  font-size: clamp(2.5rem, 10vw, 8rem);
-  color: #ffe300;
+  font-size: clamp(2.3rem, 11vw, 8.5rem);
+  line-height: 0.85;
+  color: #ffffff;
   opacity: 0;
   transform: translateY(100%);
   animation: hero-letter-reveal 0.6s ease-out forwards;
-  text-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+}
+
+.hero-cta-button {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(0.35rem, 1.2vw, 0.85rem);
+  padding: clamp(0.65rem, 2.1vw, 0.95rem) clamp(2.5rem, 6.5vw, 3.5rem);
+  border-radius: 0;
+  transition: transform 150ms ease, filter 150ms ease;
+}
+
+.hero-cta-button:hover {
+  transform: scale(1.05);
+  filter: brightness(1.05);
 }
 
 @keyframes hero-letter-reveal {
