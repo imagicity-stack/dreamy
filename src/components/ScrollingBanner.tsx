@@ -4,7 +4,7 @@ const items = ["COSPLAY", "MUSIC", "DANCE", "STALLS", "FOOD"];
 
 export default function ScrollingBanner() {
   return (
-    <div className="bg-[#00f5ff] py-4 md:py-6 overflow-hidden relative shadow-[0_0_25px_rgba(0,0,0,0.25)]">
+    <div className="bg-[#00f5ff] py-5 md:py-8 overflow-hidden relative shadow-[0_0_25px_rgba(0,0,0,0.25)]">
       <div className="marquee inline-flex whitespace-nowrap">
         {[0, 1].map((loop) => (
           <div

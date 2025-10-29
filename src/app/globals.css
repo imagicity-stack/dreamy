@@ -55,7 +55,13 @@ html {
 
 @font-face {
   font-family: "Travel Sans";
-  src: url("/Sans%20Serif%20Normal.woff2") format("woff2"),
+  src: url("/travel-sans.woff2") format("woff2"),
+    url("/travel-sans.woff") format("woff"),
+    url("/Travel%20Sans.woff2") format("woff2"),
+    url("/Travel%20Sans.woff") format("woff"),
+    url("/TravelSans.woff2") format("woff2"),
+    url("/TravelSans.woff") format("woff"),
+    url("/Sans%20Serif%20Normal.woff2") format("woff2"),
     url("/Sans%20Serif%20Normal.woff") format("woff");
   font-weight: 400;
   font-style: normal;
@@ -114,7 +120,8 @@ h6 {
     "TT Commons Pro", system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial;
   font-weight: 400;
-  font-size: clamp(3.25rem, 16vw, 12rem);
+  font-size: clamp(2.75rem, 13vw, 9.5rem);
+  line-height: 0.85;
   color: #ffffff;
   opacity: 0;
   transform: translateY(100%);
@@ -126,9 +133,8 @@ h6 {
   display: inline-flex;
   align-items: center;
   gap: clamp(0.35rem, 1.2vw, 0.85rem);
-  padding: clamp(0.6rem, 2vw, 0.9rem) clamp(2.75rem, 7vw, 4rem)
-    clamp(0.6rem, 2vw, 0.9rem) clamp(1.25rem, 4vw, 2rem);
-  clip-path: polygon(0 0, 85% 0, 100% 50%, 85% 100%, 0 100%);
+  padding: clamp(0.65rem, 2.1vw, 0.95rem) clamp(2.5rem, 6.5vw, 3.5rem);
+  border-radius: 0;
   transition: transform 150ms ease, filter 150ms ease;
 }
 

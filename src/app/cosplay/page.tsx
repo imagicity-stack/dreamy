@@ -79,7 +79,7 @@ const highlights = [
 ];
 
 const formFieldClasses =
-  "w-full bg-black px-4 py-3 text-base text-white shadow-[0_0_25px_rgba(0,255,255,0.18)] focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60";
+  "w-full bg-black px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60";
 
 export default function CosplayPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -328,7 +328,7 @@ export default function CosplayPage() {
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 py-8">
           <div className="relative w-full max-w-xl overflow-hidden rounded-none bg-black text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
-            <div className="pointer-events-none absolute -inset-6 bg-[#00f5ff]/40 blur-3xl" aria-hidden />
+            <div className="pointer-events-none absolute -inset-6 -z-10 bg-[#00f5ff]/40 blur-3xl" aria-hidden />
             <button
               onClick={closeModal}
               className="absolute right-4 top-4 text-white transition-transform hover:scale-110"

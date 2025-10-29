@@ -27,7 +27,7 @@ const stallTips = [
 ];
 
 const formFieldClasses =
-  "w-full bg-black px-4 py-3 text-base text-white shadow-[0_0_25px_rgba(0,255,255,0.18)] focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60";
+  "w-full bg-black px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60";
 
 export default function StallPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -182,7 +182,7 @@ export default function StallPage() {
       <section className="bg-black py-16">
         <div className="mx-auto max-w-4xl px-4">
           <div className="relative overflow-hidden rounded-none bg-black p-8 text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
-            <div className="pointer-events-none absolute -inset-6 bg-[#00f5ff]/40 blur-3xl" aria-hidden />
+            <div className="pointer-events-none absolute -inset-6 -z-10 bg-[#00f5ff]/40 blur-3xl" aria-hidden />
             <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">

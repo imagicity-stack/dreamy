@@ -212,61 +212,59 @@ export default function Home() {
 
   return (
     <div className="w-full">
-  
-        <div id="tickets" className="w-full h-[50vh] md:h-[80vh] bg-blue-500 relative">
+      <div id="tickets" className="w-full h-[50vh] md:h-[80vh] bg-blue-500 relative">
         <Image
           src="/hero.png"
-          
+
           alt="MADOOZA Hero Video"
           width={1920}
           height={1080}
-         
-          className="w-full h-full object-cover"
-        >
-        </Image>
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-5 sm:gap-6 md:gap-8 lg:gap-10 px-4">
-          <div
-            className="hero-title font-league-gothic"
-            role="heading"
-            aria-level={1}
-            aria-label="Hazaribagh"
-          >
-            <span className="sr-only">Hazaribagh</span>
-            {HERO_TITLE.split("").map((character, index) => (
-              <span
-                key={`${character}-${index}`}
-                className="hero-letter"
-                aria-hidden="true"
-                style={{ animationDelay: `${index * 0.12}s` }}
-              >
-                {character}
-              </span>
-            ))}
-          </div>
 
-          {/* Text and Button */}
-          <div className="text-center flex flex-col items-center gap-2 sm:gap-3 md:gap-4">
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none gap-4 sm:gap-5 md:gap-7 lg:gap-8 px-4">
+          <div className="flex flex-col items-center gap-1 sm:gap-2">
+            <div
+              className="hero-title font-league-gothic"
+              role="heading"
+              aria-level={1}
+              aria-label="Hazaribagh"
+            >
+              <span className="sr-only">Hazaribagh</span>
+              {HERO_TITLE.split("").map((character, index) => (
+                <span
+                  key={`${character}-${index}`}
+                  className="hero-letter"
+                  aria-hidden="true"
+                  style={{ animationDelay: `${index * 0.12}s` }}
+                >
+                  {character}
+                </span>
+              ))}
+            </div>
             <p className="text-white font-extrabold font-quicksand text-xs sm:text-sm md:text-base lg:text-xl xl:text-2xl 2xl:text-3xl text-center relative z-20 px-4">
               THE SOUND OF PURE MADNESS
             </p>
-            <button
-              onClick={openTicketModal}
-              className="hero-cta-button bg-[#ffe300] text-black text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-montserrat pointer-events-auto cursor-pointer z-20">
-              <Image
-                src="/ticketicon.png"
-                alt="Ticket icon"
-                width={24}
-                height={24}
-                className="w-5 h-5 md:w-6 md:h-6 object-contain"
-              />
-              <span>GET TICKETS NOW</span>
-            </button>
           </div>
+
+          <button
+            onClick={openTicketModal}
+            className="hero-cta-button bg-[#ffe300] text-black text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-montserrat pointer-events-auto cursor-pointer z-20"
+          >
+            <Image
+              src="/ticketicon.png"
+              alt="Ticket icon"
+              width={24}
+              height={24}
+              className="w-5 h-5 md:w-6 md:h-6 object-contain"
+            />
+            <span>GET TICKETS NOW</span>
+          </button>
         </div>
-         
+
       </div>
-      <ScrollingBanner/>
-       <AboutSection />
+      <ScrollingBanner />
+      <AboutSection />
       <section
         id="involvewithus"
         className="bg-[#7300ff] text-white py-12 md:py-20 flex justify-center items-center flex-col px-4 scroll-mt-24"
@@ -390,7 +388,7 @@ export default function Home() {
       {isTicketModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
           <div className="relative w-full max-w-2xl max-h-[95vh] overflow-y-auto rounded-none bg-black text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
-            <div className="pointer-events-none absolute -inset-6 opacity-40 blur-3xl bg-[#00f5ff]" aria-hidden />
+            <div className="pointer-events-none absolute -inset-6 -z-10 opacity-40 blur-3xl bg-[#00f5ff]" aria-hidden />
 
             <button
               onClick={closeTicketModal}
@@ -419,7 +417,7 @@ export default function Home() {
                     id="ticket-name"
                     name="name"
                     required
-                    className="w-full bg-black px-4 py-3 text-base text-white shadow-[0_0_25px_rgba(0,255,255,0.18)] focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60"
+                    className="w-full bg-black px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60"
                     placeholder="Enter your full name"
                   />
                 </label>
@@ -430,7 +428,7 @@ export default function Home() {
                     id="ticket-email"
                     name="email"
                     required
-                    className="w-full bg-black px-4 py-3 text-base text-white shadow-[0_0_25px_rgba(0,255,255,0.18)] focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60"
+                    className="w-full bg-black px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60"
                     placeholder="your.email@example.com"
                   />
                 </label>
@@ -441,7 +439,7 @@ export default function Home() {
                     id="ticket-phone"
                     name="phone"
                     required
-                    className="w-full bg-black px-4 py-3 text-base text-white shadow-[0_0_25px_rgba(0,255,255,0.18)] focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60"
+                    className="w-full bg-black px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60"
                     placeholder="+91 9122289578"
                   />
                 </label>
@@ -451,7 +449,7 @@ export default function Home() {
                     id="ticket-quantity"
                     name="quantity"
                     required
-                    className="w-full bg-black px-4 py-3 text-base text-white shadow-[0_0_25px_rgba(0,255,255,0.18)] focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black cursor-pointer"
+                    className="w-full bg-black px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black cursor-pointer"
                   >
                     <option value="" className="bg-black text-white">
                       Select quantity
@@ -481,7 +479,7 @@ export default function Home() {
                   id="ticket-message"
                   name="message"
                   rows={4}
-                  className="w-full resize-none bg-black px-4 py-3 text-base text-white shadow-[0_0_25px_rgba(0,255,255,0.18)] focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60"
+                  className="w-full resize-none bg-black px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60"
                   placeholder="Let us know how we can help"
                 />
               </label>
@@ -514,7 +512,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={closeTicketModal}
-                  className="bg-black px-6 py-3 text-base font-montserrat uppercase tracking-[0.2em] text-white shadow-[0_0_20px_rgba(0,255,255,0.25)] transition-transform hover:scale-[1.02]"
+                  className="bg-black px-6 py-3 text-base font-montserrat uppercase tracking-[0.2em] text-white transition-transform hover:scale-[1.02]"
                 >
                   Cancel
                 </button>
