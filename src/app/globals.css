@@ -11,12 +11,9 @@
 
 @font-face {
   font-family: "Quaron";
-  src: url("/quaronweb/Quaron-Regular.woff2") format("woff2"),
-    url("/quaronweb/Quaron-Regular.woff") format("woff"),
-    url("/quaronweb/quaron-regular.woff2") format("woff2"),
-    url("/quaronweb/quaron-regular.woff") format("woff"),
-    url("/quaronweb/QuaronWeb-Regular.woff2") format("woff2"),
-    url("/quaronweb/QuaronWeb-Regular.woff") format("woff");
+  src: url("/quaronweb/Web-TT/Quaron-Regular.woff2") format("woff2"),
+    url("/quaronweb/Web-TT/Quaron-Regular.woff") format("woff"),
+    url("/quaronweb/Web-TT/Quaron-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
@@ -145,6 +142,18 @@ h6 {
   opacity: 0;
   transform: translateY(100%);
   animation: hero-letter-reveal 0.6s ease-out forwards;
+}
+
+@media (hover: none) and (pointer: coarse) {
+  button,
+  .mobile-tap {
+    transition: transform 150ms ease;
+  }
+
+  button:active,
+  .mobile-tap:active {
+    transform: scale(0.96);
+  }
 }
 
 .hero-cta-button {

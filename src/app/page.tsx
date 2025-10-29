@@ -249,7 +249,7 @@ export default function Home() {
 
           <button
             onClick={openTicketModal}
-            className="hero-cta-button bg-[#ffe300] text-black text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-montserrat pointer-events-auto cursor-pointer z-20"
+            className="hero-cta-button mobile-tap bg-[#ffe300] text-black text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-montserrat pointer-events-auto cursor-pointer z-20"
           >
             <Image
               src="/ticketicon.png"
@@ -394,7 +394,7 @@ export default function Home() {
               <button
                 type="button"
                 onClick={closeTicketModal}
-                className="absolute top-4 right-4 text-white text-2xl transition-transform hover:scale-110"
+                className="mobile-tap absolute top-4 right-4 z-20 text-white text-2xl transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00f5ff]"
                 aria-label="Close ticket form"
               >
                 ✕
@@ -402,7 +402,7 @@ export default function Home() {
 
               <form onSubmit={handleTicketSubmit} className="relative z-10 space-y-6 px-6 py-8 sm:px-10">
               <div className="text-center">
-                <p className="font-montserrat text-sm tracking-[0.4em] text-[#00f5ff]">Tickets</p>
+                <p className="font-montserrat text-xs font-semibold text-[#00f5ff] sm:text-sm">Tickets</p>
                 <h2 className="mt-3 text-3xl sm:text-4xl font-travel-sans uppercase text-white">
                   Get Your Passes
                 </h2>
@@ -412,7 +412,7 @@ export default function Home() {
               </div>
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-2 text-sm uppercase tracking-wide">
+                <label className="flex flex-col gap-2 text-xs font-montserrat font-semibold text-white sm:text-sm">
                   Full Name *
                   <input
                     type="text"
@@ -423,7 +423,7 @@ export default function Home() {
                     placeholder="Enter your full name"
                   />
                 </label>
-                <label className="flex flex-col gap-2 text-sm uppercase tracking-wide">
+                <label className="flex flex-col gap-2 text-xs font-montserrat font-semibold text-white sm:text-sm">
                   Email Address *
                   <input
                     type="email"
@@ -434,7 +434,7 @@ export default function Home() {
                     placeholder="your.email@example.com"
                   />
                 </label>
-                <label className="flex flex-col gap-2 text-sm uppercase tracking-wide">
+                <label className="flex flex-col gap-2 text-xs font-montserrat font-semibold text-white sm:text-sm">
                   Phone Number *
                   <input
                     type="tel"
@@ -445,7 +445,7 @@ export default function Home() {
                     placeholder="+91 9122289578"
                   />
                 </label>
-                <label className="flex flex-col gap-2 text-sm uppercase tracking-wide">
+                <label className="flex flex-col gap-2 text-xs font-montserrat font-semibold text-white sm:text-sm">
                   Number of Tickets *
                   <select
                     id="ticket-quantity"
@@ -475,7 +475,7 @@ export default function Home() {
                 </label>
               </div>
 
-              <label className="flex flex-col gap-2 text-sm uppercase tracking-wide">
+              <label className="flex flex-col gap-2 text-xs font-montserrat font-semibold text-white sm:text-sm">
                 Special Requests / Questions (Optional)
                 <textarea
                   id="ticket-message"
@@ -486,7 +486,7 @@ export default function Home() {
                 />
               </label>
 
-              <label className="flex items-start gap-3 text-xs sm:text-sm text-white/80">
+              <label className="flex items-start gap-3 text-xs font-montserrat text-white/80 sm:text-sm">
                 <input
                   type="checkbox"
                   id="ticket-terms"
@@ -507,14 +507,14 @@ export default function Home() {
                 <button
                   type="submit"
                   disabled={ticketProcessing}
-                  className="flex-1 bg-[#ff1a1a] px-6 py-3 text-base font-montserrat uppercase tracking-[0.2em] text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mobile-tap flex-1 bg-[#ff1a1a] px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {ticketProcessing ? "Processing Payment..." : "Request Tickets"}
                 </button>
                 <button
                   type="button"
                   onClick={closeTicketModal}
-                  className="bg-black px-6 py-3 text-base font-montserrat uppercase tracking-[0.2em] text-white transition-transform hover:scale-[1.02]"
+                  className="mobile-tap bg-black px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02]"
                 >
                   Cancel
                 </button>
