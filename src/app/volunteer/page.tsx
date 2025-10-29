@@ -1,22 +1,40 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import {useRouter} from "next/navigation"
+import { useRouter } from "next/navigation";
+
 import ContactUs from "@/components/ContactUs";
 import Footer from "@/components/Footer";
 import ScrollingBanner from "@/components/ScrollingBanner";
 
+const volunteerRoles = [
+  "Event Operations",
+  "Hospitality & Guest Handling",
+  "Media & Content Team",
+  "Stage & Technical Crew",
+  "Crowd Management",
+];
+
+const volunteerPerks = [
+  "Certificate of appreciation and LinkedIn recommendation.",
+  "Exclusive crew tees and behind-the-scenes access.",
+  "Hands-on mentorship from the core production team.",
+  "Networking with artists, creators, and sponsors.",
+];
+
+const formFieldClasses =
+  "w-full bg-black px-4 py-3 text-base text-white shadow-[0_0_25px_rgba(0,255,255,0.18)] focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60";
+
 export default function VolunteerPage() {
   const router = useRouter();
-  const [submitted, setSubmitted] = useState(false);
-  const [loading,setLoading] = useState(false)
-  const [error,setError] = useState("")
-  const [submitStatus, setSubmitStatus] = useState<null | 'success' | 'error'>(null)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [submitStatus, setSubmitStatus] = useState<null | "success" | "error">(null);
 
- const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const form = event.currentTarget;
-    
+
     setLoading(true);
     setError("");
     setSubmitStatus(null);
@@ -34,7 +52,6 @@ export default function VolunteerPage() {
     };
 
     try {
-      // Assumes your API endpoint for volunteers is /api/volunteers
       const response = await fetch("/api/volunteer", {
         method: "POST",
         headers: {
@@ -44,26 +61,21 @@ export default function VolunteerPage() {
       });
 
       const result = await response.json();
-      console.log("Form submission result:", result);
 
       if (result.success) {
-        setSubmitStatus('success');
-        setSubmitted(true);
+        setSubmitStatus("success");
         form.reset();
-        
-        // Optional: Redirect after a few seconds
+
         setTimeout(() => {
           router.push("/");
         }, 3000);
-
       } else {
-        setSubmitStatus('error');
+        setSubmitStatus("error");
         setError(result.message || "An unexpected error occurred. Please try again.");
       }
-
     } catch (err) {
       console.error("Error submitting form:", err);
-      setSubmitStatus('error');
+      setSubmitStatus("error");
       setError("There was an error submitting the form. Please try again later.");
     } finally {
       setLoading(false);
@@ -72,172 +84,117 @@ export default function VolunteerPage() {
 
   return (
     <div className="bg-black text-white">
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#7300ff] via-[#ff1a00] to-[#ffe300] py-16 sm:py-20 md:py-24">
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-sm sm:text-base md:text-lg uppercase tracking-[0.4em] text-[#ffe300] font-oswald mb-4">
-            Involve With Us
-          </p>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-oswald uppercase text-white drop-shadow-xl">
+      <section className="relative overflow-hidden py-16 sm:py-20 md:py-24">
+        <div className="pointer-events-none absolute -top-24 right-0 h-72 w-72 bg-[#ffe300] opacity-40 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 left-0 h-72 w-72 bg-[#ff1a1a] opacity-40 blur-3xl" />
+        <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center gap-6 px-4 text-center">
+          <span className="font-montserrat text-xs uppercase tracking-[0.6em] text-[#ffe300]">Involve With Us</span>
+          <h1 className="font-travel-sans text-3xl sm:text-4xl md:text-5xl lg:text-6xl uppercase text-white">
             Join the Madness Crew
           </h1>
-          <p className="mt-6 text-base sm:text-lg md:text-xl text-gray-100 leading-relaxed">
-            Be part of the team that makes Madooza happen. Volunteers get certificates, free passes, and behind-the-scenes
-            access. Ideal for students looking for real event experience.
+          <p className="max-w-3xl text-base sm:text-lg md:text-xl text-white/80">
+            Be part of the team that makes Madooza happen. Volunteers get certificates, free passes, and behind-the-scenes access.
+            Ideal for students looking for real event experience.
           </p>
         </div>
       </section>
 
-      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-black">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-16">
-          <div className="bg-[#11011b] border border-white/10 rounded-2xl p-6 sm:p-8 md:p-10">
-            <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-6">
-              Volunteer Roles
-            </h2>
-            <ul className="space-y-4 text-gray-200 text-sm sm:text-base leading-relaxed">
-              <li>Event Operations</li>
-              <li>Hospitality &amp; Guest Handling</li>
-              <li>Media &amp; Content Team</li>
-              <li>Stage &amp; Technical Crew</li>
-              <li>Crowd Management</li>
+      <section className="border-y border-[#ffe300]/30 bg-black py-16">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-4 lg:grid-cols-2">
+          <div className="flex flex-col gap-6 bg-[#ff1a1a] p-8 text-white shadow-[0_0_35px_rgba(255,26,26,0.25)]">
+            <h2 className="font-travel-sans text-2xl sm:text-3xl uppercase">Volunteer Roles</h2>
+            <ul className="space-y-3 text-sm sm:text-base text-white/80">
+              {volunteerRoles.map((role) => (
+                <li key={role}>{role}</li>
+              ))}
             </ul>
-            <div className="mt-8 p-4 sm:p-5 bg-[#ffe300]/10 border border-[#ffe300]/40 rounded-xl text-[#ffe300] text-sm sm:text-base">
-              <p>Shortlisted volunteers will be contacted for briefing sessions.</p>
-            </div>
+            <p className="bg-black px-4 py-3 text-sm text-white">
+              Shortlisted volunteers will be contacted for briefing sessions.
+            </p>
           </div>
+          <div className="flex flex-col gap-6 bg-[#ffe300] p-8 text-black shadow-[0_0_35px_rgba(255,227,0,0.25)]">
+            <h2 className="font-travel-sans text-2xl sm:text-3xl uppercase">Why Volunteer?</h2>
+            <ul className="space-y-3 text-sm sm:text-base">
+              {volunteerPerks.map((perk) => (
+                <li key={perk}>{perk}</li>
+              ))}
+            </ul>
+            <p className="bg-black px-4 py-3 text-sm text-white">
+              Orientation will cover duties, check-in schedules, and crew protocols.
+            </p>
+          </div>
+        </div>
+      </section>
 
-          <div className="bg-[#1a062a] border border-white/10 rounded-2xl p-6 sm:p-8 md:p-10">
-            <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-6">
-              Apply to Volunteer
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="volunteer-name">
-                  Full Name
+      <section className="border-b border-[#ffe300]/30 py-16">
+        <div className="mx-auto max-w-4xl px-4 text-center">
+          <h2 className="font-travel-sans text-3xl uppercase text-[#ffe300]">Ready to Suit Up?</h2>
+          <p className="mt-4 text-sm sm:text-base text-white/80">
+            Fill in your details and choose your preferred role. We&apos;ll get in touch with next steps.
+          </p>
+        </div>
+      </section>
+
+      <section className="bg-black py-16">
+        <div className="mx-auto max-w-4xl px-4">
+          <div className="relative overflow-hidden rounded-none bg-black p-8 text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
+            <div className="pointer-events-none absolute -inset-6 bg-[#00f5ff]/40 blur-3xl" aria-hidden />
+            <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
+              <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                Full Name
+                <input id="volunteer-name" name="name" type="text" required className={formFieldClasses} placeholder="Enter your full name" />
+              </label>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                  Age
+                  <input id="volunteer-age" name="age" type="number" min="15" required className={formFieldClasses} placeholder="18" />
                 </label>
-                <input
-                  id="volunteer-name"
-                  name="name"
-                  type="text"
-                  required
-                  className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                  placeholder="Enter your full name"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="volunteer-age">
-                    Age
-                  </label>
-                  <input
-                    id="volunteer-age"
-                    name="age"
-                    type="number"
-                    min="15"
-                    required
-                    className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                    placeholder="18"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="volunteer-institution">
-                    Institution / Organization
-                  </label>
-                  <input
-                    id="volunteer-institution"
-                    name="institution"
-                    type="text"
-                    required
-                    className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                    placeholder="College or organization name"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="volunteer-role">
-                  Preferred Role
+                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                  Institution / Organization
+                  <input id="volunteer-institution" name="institution" type="text" required className={formFieldClasses} placeholder="College or organization name" />
                 </label>
-                <select
-                  id="volunteer-role"
-                  name="role"
-                  required
-                  className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none cursor-pointer"
-                  defaultValue=""
-                >
-                  <option value="" disabled>
-                    Choose a role
+              </div>
+              <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                Preferred Role
+                <select id="volunteer-role" name="role" required defaultValue="" className={`${formFieldClasses} cursor-pointer`}>
+                  <option value="" disabled className="bg-black text-white">
+                    Select a role
                   </option>
-                  <option value="operations">Event Operations</option>
-                  <option value="hospitality">Hospitality &amp; Guest Handling</option>
-                  <option value="media">Media &amp; Content Team</option>
-                  <option value="stage">Stage &amp; Technical Crew</option>
-                  <option value="crowd">Crowd Management</option>
+                  {volunteerRoles.map((role) => (
+                    <option key={role} value={role.toLowerCase()} className="bg-black text-white">
+                      {role}
+                    </option>
+                  ))}
                 </select>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="volunteer-phone">
-                    Contact Number
-                  </label>
-                  <input
-                    id="volunteer-phone"
-                    name="phone"
-                    type="tel"
-                    required
-                    className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                    placeholder="+91 XXXXXXXXXX"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="volunteer-email">
-                    Email ID
-                  </label>
-                  <input
-                    id="volunteer-email"
-                    name="email"
-                    type="email"
-                    required
-                    className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                    placeholder="your.email@example.com"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="volunteer-note">
-                  Why do you want to join Madooza?
+              </label>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                  Phone Number
+                  <input id="volunteer-phone" name="phone" type="tel" required className={formFieldClasses} placeholder="+91 XXXXXXXXXX" />
                 </label>
-                <textarea
-                  id="volunteer-note"
-                  name="note"
-                  rows={4}
-                  required
-                  className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                  placeholder="Share a short note"
-                />
+                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                  Email ID
+                  <input id="volunteer-email" name="email" type="email" required className={formFieldClasses} placeholder="your.email@example.com" />
+                </label>
               </div>
-
-             <button
+              <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                Anything we should know?
+                <textarea id="volunteer-note" name="note" rows={3} className={`${formFieldClasses} resize-none`} placeholder="Availability, past experience, or special skills" />
+              </label>
+              <button
                 type="submit"
                 disabled={loading}
-                className="w-full rounded-md bg-[#ffe300] px-4 py-3 font-oswald text-lg text-black uppercase tracking-wide hover:bg-[#ffd000] transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-[#ff1a1a] px-6 py-3 font-montserrat text-sm uppercase tracking-[0.3em] text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {loading ? "Submitting..." : "Apply Now"}
+                {loading ? "Submitting..." : "Apply to Volunteer"}
               </button>
-
-             {submitStatus === 'success' && (
-                <p className="rounded-md bg-green-500/10 border border-green-400/40 text-green-200 px-4 py-3 text-sm sm:text-base">
-                  Thanks for signing up! We&apos;ll reach out with the next steps and briefing schedule.
+              {submitStatus === "success" && (
+                <p className="bg-[#00f5ff]/20 px-4 py-3 text-center text-sm text-white">
+                  Thanks for joining the crew! We&apos;ll reach out with briefing details shortly. Redirecting...
                 </p>
               )}
-
-              {submitStatus === 'error' && (
-                <p className="rounded-md bg-red-500/10 border border-red-400/40 text-red-200 px-4 py-3 text-sm sm:text-base">
-                  {error}
-                </p>
+              {submitStatus === "error" && (
+                <p className="bg-[#ff1a1a]/40 px-4 py-3 text-center text-sm text-white">{error}</p>
               )}
             </form>
           </div>
