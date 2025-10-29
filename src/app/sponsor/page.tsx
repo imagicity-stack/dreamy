@@ -1,9 +1,39 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+
 import ContactUs from "@/components/ContactUs";
 import Footer from "@/components/Footer";
 import ScrollingBanner from "@/components/ScrollingBanner";
+
+const sponsorshipOptions = [
+  {
+    title: "Title Sponsor",
+    description: "Logo on stage, main banners, and all digital creatives.",
+  },
+  {
+    title: "Powered By Partner",
+    description: "Brand placement on merchandise, tickets, and influencer shout-outs.",
+  },
+  {
+    title: "Zone Sponsor",
+    description: "Own a food, art, gaming, or chill zone with immersive branding.",
+  },
+  {
+    title: "In-Kind Partner",
+    description: "Product collaboration, barter tie-ups, or experience integration.",
+  },
+];
+
+const deliverables = [
+  "Curated content collabs with our creator network.",
+  "LED screens, stage mentions, and emcee shout-outs.",
+  "Press coverage and post-event aftermovie branding.",
+  "Access to attendee data for post-event engagement.",
+];
+
+const formFieldClasses =
+  "w-full bg-black px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60";
 
 export default function SponsorPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -15,145 +45,119 @@ export default function SponsorPage() {
 
   return (
     <div className="bg-black text-white">
-      <section className="relative overflow-hidden bg-gradient-to-br from-[#7300ff] via-[#ff1a00] to-[#ffe300] py-16 sm:py-20 md:py-24">
-        <div className="absolute inset-0 bg-black/45" />
-        <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <p className="text-sm sm:text-base md:text-lg uppercase tracking-[0.4em] text-[#ffe300] font-oswald mb-4">
-            Involve With Us
-          </p>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-oswald uppercase text-white drop-shadow-xl">
+      <section className="relative overflow-hidden py-16 sm:py-20 md:py-24">
+        <div className="pointer-events-none absolute -top-20 left-0 h-72 w-72 bg-[#ff1a1a] opacity-40 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 right-0 h-72 w-72 bg-[#ffe300] opacity-40 blur-3xl" />
+        <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center gap-6 px-4 text-center">
+          <span className="font-montserrat text-xs uppercase tracking-[0.6em] text-[#ffe300]">Involve With Us</span>
+          <h1 className="font-travel-sans text-3xl sm:text-4xl md:text-5xl lg:text-6xl uppercase text-white">
             Partner With Madooza
           </h1>
-          <p className="mt-6 text-base sm:text-lg md:text-xl text-gray-100 leading-relaxed">
+          <p className="max-w-3xl text-base sm:text-lg md:text-xl text-white/80">
             Collaborate with Madooza to connect your brand with Jharkhand’s most dynamic youth audience. Sponsorship delivers
             visibility across digital media, on-ground branding, and immersive engagement opportunities.
           </p>
         </div>
       </section>
 
-      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 lg:px-8 bg-black">
-        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-[1.1fr_1fr] gap-10 lg:gap-16">
-          <div className="bg-[#11011b] border border-white/10 rounded-2xl p-6 sm:p-8 md:p-10">
-            <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-6">
-              Sponsorship Options
-            </h2>
-            <ul className="space-y-4 text-gray-200 text-sm sm:text-base leading-relaxed">
-              <li><span className="font-semibold text-white">Title Sponsor:</span> Logo on stage &amp; main banner.</li>
-              <li><span className="font-semibold text-white">Powered By Partner:</span> Brand on merchandise &amp; tickets.</li>
-              <li><span className="font-semibold text-white">Zone Sponsor:</span> Own a food, art, or chill zone.</li>
-              <li><span className="font-semibold text-white">In-Kind Partner:</span> Product collaboration or barter.</li>
+      <section className="border-y border-[#ffe300]/30 bg-black py-16">
+        <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-4 lg:grid-cols-2">
+          <div className="flex flex-col gap-6 bg-[#ffe300] p-8 text-black shadow-[0_0_35px_rgba(255,227,0,0.25)]">
+            <h2 className="font-travel-sans text-2xl sm:text-3xl uppercase">Sponsorship Options</h2>
+            <ul className="space-y-4 text-sm sm:text-base">
+              {sponsorshipOptions.map((option) => (
+                <li key={option.title} className="bg-black px-5 py-4 text-white">
+                  <span className="font-montserrat text-xs uppercase tracking-[0.3em] text-[#ffe300]">{option.title}</span>
+                  <p className="mt-2 text-sm sm:text-base text-white/80">{option.description}</p>
+                </li>
+              ))}
             </ul>
-            <div className="mt-8 p-4 sm:p-5 bg-[#9dffff]/10 border border-[#9dffff]/40 rounded-xl text-[#9dffff] text-sm sm:text-base">
-              <p>Sponsorship deck and media kit will be mailed after form submission.</p>
-            </div>
           </div>
+          <div className="flex flex-col gap-6 bg-[#ff1a1a] p-8 text-white shadow-[0_0_35px_rgba(255,26,26,0.25)]">
+            <h2 className="font-travel-sans text-2xl sm:text-3xl uppercase">Brand Deliverables</h2>
+            <ul className="space-y-3 text-sm sm:text-base text-white/80">
+              {deliverables.map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+            <p className="bg-black px-4 py-3 text-sm text-white">
+              Sponsorship deck and media kit will be mailed after form submission.
+            </p>
+          </div>
+        </div>
+      </section>
 
-          <div className="bg-[#1a062a] border border-white/10 rounded-2xl p-6 sm:p-8 md:p-10">
-            <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-6">
-              Submit Sponsorship Interest
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="sponsor-brand">
+      <section className="border-b border-[#ffe300]/30 py-16">
+        <div className="mx-auto max-w-5xl px-4 text-center">
+          <h2 className="font-travel-sans text-3xl uppercase text-[#ffe300]">Let’s Craft an Experience Together</h2>
+          <p className="mt-4 text-sm sm:text-base text-white/80">
+            Share your brand vision, preferred deliverables, and we’ll curate a partnership plan that stands out.
+          </p>
+        </div>
+      </section>
+
+      <section className="bg-black py-16">
+        <div className="mx-auto max-w-4xl px-4">
+          <div className="relative overflow-hidden rounded-none bg-black p-8 text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
+            <div className="pointer-events-none absolute -inset-6 -z-10 bg-[#00f5ff]/40 blur-3xl" aria-hidden />
+            <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
                   Brand Name
+                  <input id="sponsor-brand" name="brand" type="text" required className={formFieldClasses} placeholder="Your brand name" />
                 </label>
-                <input
-                  id="sponsor-brand"
-                  name="brand"
-                  type="text"
-                  required
-                  className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                  placeholder="Your brand name"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="sponsor-person">
+                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
                   Contact Person
+                  <input id="sponsor-person" name="person" type="text" required className={formFieldClasses} placeholder="Who should we speak with?" />
                 </label>
-                <input
-                  id="sponsor-person"
-                  name="person"
-                  type="text"
-                  required
-                  className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                  placeholder="Who should we speak with?"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="sponsor-phone">
-                    Phone Number
-                  </label>
-                  <input
-                    id="sponsor-phone"
-                    name="phone"
-                    type="tel"
-                    required
-                    className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                    placeholder="+91 XXXXXXXXXX"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="sponsor-email">
-                    Email ID
-                  </label>
-                  <input
-                    id="sponsor-email"
-                    name="email"
-                    type="email"
-                    required
-                    className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
-                    placeholder="your.email@example.com"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="sponsor-type">
-                  Sponsorship Type Interested In
+                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                  Phone Number
+                  <input id="sponsor-phone" name="phone" type="tel" required className={formFieldClasses} placeholder="+91 XXXXXXXXXX" />
                 </label>
-                <select
-                  id="sponsor-type"
-                  name="type"
-                  required
-                  className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none cursor-pointer"
-                  defaultValue=""
-                >
-                  <option value="" disabled>
+                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                  Email ID
+                  <input id="sponsor-email" name="email" type="email" required className={formFieldClasses} placeholder="your.email@example.com" />
+                </label>
+              </div>
+              <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                Sponsorship Type Interested In
+                <select id="sponsor-type" name="type" required defaultValue="" className={`${formFieldClasses} cursor-pointer`}>
+                  <option value="" disabled className="bg-black text-white">
                     Choose an option
                   </option>
-                  <option value="title">Title Sponsor</option>
-                  <option value="powered-by">Powered By Partner</option>
-                  <option value="zone">Zone Sponsor</option>
-                  <option value="in-kind">In-Kind Partner</option>
+                  <option value="title" className="bg-black text-white">
+                    Title Sponsor
+                  </option>
+                  <option value="powered-by" className="bg-black text-white">
+                    Powered By Partner
+                  </option>
+                  <option value="zone" className="bg-black text-white">
+                    Zone Sponsor
+                  </option>
+                  <option value="in-kind" className="bg-black text-white">
+                    In-Kind Partner
+                  </option>
                 </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-200 mb-2" htmlFor="sponsor-description">
-                  Brief Description of Brand / Offering
-                </label>
+              </label>
+              <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+                Brief Description of Brand / Offering
                 <textarea
                   id="sponsor-description"
                   name="description"
                   rows={4}
                   required
-                  className="w-full rounded-md border border-white/10 bg-black/60 px-4 py-3 text-sm sm:text-base focus:border-[#ffe300] focus:outline-none"
+                  className={`${formFieldClasses} resize-none`}
                   placeholder="Tell us about your brand and the collaboration you envision"
                 />
-              </div>
-
+              </label>
               <button
                 type="submit"
-                className="w-full rounded-md bg-[#ffe300] px-4 py-3 font-oswald text-lg text-black uppercase tracking-wide hover:bg-[#ffd000] transition"
+                className="w-full bg-[#ff1a1a] px-6 py-3 font-montserrat text-sm uppercase tracking-[0.3em] text-white transition-transform hover:scale-[1.02]"
               >
                 Submit Sponsorship Interest
               </button>
-
               {submitted && (
-                <p className="rounded-md bg-green-500/10 border border-green-400/40 text-green-200 px-4 py-3 text-sm sm:text-base">
+                <p className="bg-[#00f5ff]/20 px-4 py-3 text-center text-sm text-white">
                   Thank you! Our partnerships team will reach out with the sponsorship deck and media kit shortly.
                 </p>
               )}
