@@ -206,15 +206,15 @@ export default function StallPage() {
               <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <label className={formLabelClasses}>
-                  Name
+                  Name *
                   <input id="stall-name" name="name" type="text" required className={formFieldClasses} placeholder="Enter your full name" />
                 </label>
                 <label className={formLabelClasses}>
-                  Brand / Stall Name
+                  Brand / Stall Name *
                   <input id="stall-brand" name="brand" type="text" required className={formFieldClasses} placeholder="Enter your brand or stall name" />
                 </label>
                 <label className={formLabelClasses}>
-                  Product Type
+                  Product Type *
                   <select id="stall-product" name="productType" required defaultValue="" className={`${formFieldClasses} cursor-pointer`}>
                     <option value="" disabled className="bg-white text-black">
                       Select a category
@@ -234,15 +234,27 @@ export default function StallPage() {
                   </select>
                 </label>
                 <label className={formLabelClasses}>
-                  Contact Number
-                  <input id="stall-phone" name="phone" type="tel" required className={formFieldClasses} placeholder="+91 XXXXXXXXXX" />
+                  Contact Number *
+                  <input
+                    id="stall-phone"
+                    name="phone"
+                    type="tel"
+                    required
+                    inputMode="numeric"
+                    pattern="[0-9]{10}"
+                    maxLength={10}
+                    minLength={10}
+                    title="Enter a 10-digit phone number"
+                    className={formFieldClasses}
+                    placeholder="9876543210"
+                  />
                 </label>
                 <label className={formLabelClasses}>
-                  Email ID
+                  Email ID *
                   <input id="stall-email" name="email" type="email" required className={formFieldClasses} placeholder="your.email@example.com" />
                 </label>
                 <label className={formLabelClasses}>
-                  Power Requirement
+                  Power Requirement *
                   <select
                     id="stall-power"
                     name="power"
@@ -264,11 +276,12 @@ export default function StallPage() {
                 </label>
               </div>
               <label className={formLabelClasses}>
-                Additional Notes
+                Additional Notes *
                 <textarea
                   id="stall-notes"
                   name="notes"
                   rows={3}
+                  required
                   className={`${formFieldClasses} resize-none`}
                   placeholder="Share special requirements or products"
                 />

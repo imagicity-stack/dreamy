@@ -183,11 +183,11 @@ export default function PerformerPage() {
               <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <label className={formLabelClasses}>
-                  Name / Group Name
+                  Name / Group Name *
                   <input id="performer-name" name="name" type="text" required className={formFieldClasses} placeholder="Enter your name or group name" />
                 </label>
                 <label className={formLabelClasses}>
-                  Category
+                  Category *
                   <select id="performer-category" name="category" required defaultValue="" className={`${formFieldClasses} cursor-pointer`}>
                     <option value="" disabled className="bg-white text-black">
                       Choose a category
@@ -207,20 +207,39 @@ export default function PerformerPage() {
                   </select>
                 </label>
                 <label className={formLabelClasses}>
-                  Performance Duration (minutes)
+                  Performance Duration (minutes) *
                   <input id="performer-duration" name="duration" type="number" min="1" required className={formFieldClasses} placeholder="e.g. 10" />
                 </label>
                 <label className={formLabelClasses}>
-                  Contact Number
-                  <input id="performer-phone" name="phone" type="tel" required className={formFieldClasses} placeholder="+91 XXXXXXXXXX" />
+                  Contact Number *
+                  <input
+                    id="performer-phone"
+                    name="phone"
+                    type="tel"
+                    required
+                    inputMode="numeric"
+                    pattern="[0-9]{10}"
+                    maxLength={10}
+                    minLength={10}
+                    title="Enter a 10-digit phone number"
+                    className={formFieldClasses}
+                    placeholder="9876543210"
+                  />
                 </label>
                 <label className={formLabelClasses}>
-                  Email ID
+                  Email ID *
                   <input id="performer-email" name="email" type="email" required className={formFieldClasses} placeholder="your.email@example.com" />
                 </label>
                 <label className={formLabelClasses}>
-                  Upload Link to Sample Video (optional)
-                  <input id="performer-link" name="sample" type="url" className={formFieldClasses} placeholder="Share a Google Drive / YouTube link" />
+                  Upload Link to Sample Video *
+                  <input
+                    id="performer-link"
+                    name="sample"
+                    type="url"
+                    required
+                    className={formFieldClasses}
+                    placeholder="Share a Google Drive / YouTube link"
+                  />
                 </label>
               </div>
               <div>

@@ -351,10 +351,10 @@ export default function CosplayPage() {
       </section>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4 py-6 sm:py-10">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4 py-8 sm:py-12">
           <div className="relative w-full max-w-xl">
             <div className="pointer-events-none absolute -inset-6 -z-10 bg-[#00f5ff]/50 blur-3xl" aria-hidden />
-            <div className="relative flex max-h-[calc(100vh-3rem)] flex-col overflow-hidden rounded-none bg-black text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
+            <div className="relative flex max-h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-none bg-black text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
               <button
                 type="button"
                 onClick={closeModal}
@@ -374,25 +374,44 @@ export default function CosplayPage() {
                 <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
-                      Full Name
+                      Full Name *
                       <input id="cosplay-name" name="name" type="text" required className={formFieldClasses} placeholder="Enter your name" />
                     </label>
                     <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
-                      Character Name
+                      Character Name *
                       <input id="cosplay-character" name="character" type="text" required className={formFieldClasses} placeholder="Who are you cosplaying?" />
                     </label>
                     <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
-                      Email ID
+                      Email ID *
                       <input id="cosplay-email" name="email" type="email" required className={formFieldClasses} placeholder="your.email@example.com" />
                     </label>
                     <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
-                      Phone Number
-                      <input id="cosplay-phone" name="phone" type="tel" required className={formFieldClasses} placeholder="+91 XXXXXXXXXX" />
+                      Phone Number *
+                      <input
+                        id="cosplay-phone"
+                        name="phone"
+                        type="tel"
+                        required
+                        inputMode="numeric"
+                        pattern="[0-9]{10}"
+                        maxLength={10}
+                        minLength={10}
+                        title="Enter a 10-digit phone number"
+                        className={formFieldClasses}
+                        placeholder="9876543210"
+                      />
                     </label>
                   </div>
                   <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
-                    Additional Notes
-                    <textarea id="cosplay-notes" name="notes" rows={3} className={`${formFieldClasses} resize-none`} placeholder="Share performance cues or prop details" />
+                    Additional Notes *
+                    <textarea
+                      id="cosplay-notes"
+                      name="notes"
+                      rows={3}
+                      required
+                      className={`${formFieldClasses} resize-none`}
+                      placeholder="Share performance cues or prop details"
+                    />
                   </label>
                   <label className="flex items-start gap-3 text-sm font-montserrat text-white/80">
                     <input

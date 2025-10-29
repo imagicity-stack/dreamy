@@ -146,21 +146,21 @@ export default function VolunteerPage() {
             <div className="relative overflow-hidden rounded-none bg-black p-8 text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
               <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
               <label className={formLabelClasses}>
-                Full Name
+                Full Name *
                 <input id="volunteer-name" name="name" type="text" required className={formFieldClasses} placeholder="Enter your full name" />
               </label>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <label className={formLabelClasses}>
-                  Age
+                  Age *
                   <input id="volunteer-age" name="age" type="number" min="15" required className={formFieldClasses} placeholder="18" />
                 </label>
                 <label className={formLabelClasses}>
-                  Institution / Organization
+                  Institution / Organization *
                   <input id="volunteer-institution" name="institution" type="text" required className={formFieldClasses} placeholder="College or organization name" />
                 </label>
               </div>
               <label className={formLabelClasses}>
-                Preferred Role
+                Preferred Role *
                 <select id="volunteer-role" name="role" required defaultValue="" className={`${formFieldClasses} cursor-pointer`}>
                   <option value="" disabled className="bg-white text-black">
                     Select a role
@@ -174,17 +174,36 @@ export default function VolunteerPage() {
               </label>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <label className={formLabelClasses}>
-                  Phone Number
-                  <input id="volunteer-phone" name="phone" type="tel" required className={formFieldClasses} placeholder="+91 XXXXXXXXXX" />
+                  Phone Number *
+                  <input
+                    id="volunteer-phone"
+                    name="phone"
+                    type="tel"
+                    required
+                    inputMode="numeric"
+                    pattern="[0-9]{10}"
+                    maxLength={10}
+                    minLength={10}
+                    title="Enter a 10-digit phone number"
+                    className={formFieldClasses}
+                    placeholder="9876543210"
+                  />
                 </label>
                 <label className={formLabelClasses}>
-                  Email ID
+                  Email ID *
                   <input id="volunteer-email" name="email" type="email" required className={formFieldClasses} placeholder="your.email@example.com" />
                 </label>
               </div>
               <label className={formLabelClasses}>
-                Anything we should know?
-                <textarea id="volunteer-note" name="note" rows={3} className={`${formFieldClasses} resize-none`} placeholder="Availability, past experience, or special skills" />
+                Anything we should know? *
+                <textarea
+                  id="volunteer-note"
+                  name="note"
+                  rows={3}
+                  required
+                  className={`${formFieldClasses} resize-none`}
+                  placeholder="Availability, past experience, or special skills"
+                />
               </label>
               <label className="flex items-start gap-3 text-sm font-montserrat text-white/80">
                 <input type="checkbox" name="terms" value="accepted" required className="mt-1 h-5 w-5 accent-[#ff1a1a]" />

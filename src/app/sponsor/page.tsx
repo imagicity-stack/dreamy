@@ -107,24 +107,36 @@ export default function SponsorPage() {
               <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <label className={formLabelClasses}>
-                  Brand Name
+                  Brand Name *
                   <input id="sponsor-brand" name="brand" type="text" required className={formFieldClasses} placeholder="Your brand name" />
                 </label>
                 <label className={formLabelClasses}>
-                  Contact Person
+                  Contact Person *
                   <input id="sponsor-person" name="person" type="text" required className={formFieldClasses} placeholder="Who should we speak with?" />
                 </label>
                 <label className={formLabelClasses}>
-                  Phone Number
-                  <input id="sponsor-phone" name="phone" type="tel" required className={formFieldClasses} placeholder="+91 XXXXXXXXXX" />
+                  Phone Number *
+                  <input
+                    id="sponsor-phone"
+                    name="phone"
+                    type="tel"
+                    required
+                    inputMode="numeric"
+                    pattern="[0-9]{10}"
+                    maxLength={10}
+                    minLength={10}
+                    title="Enter a 10-digit phone number"
+                    className={formFieldClasses}
+                    placeholder="9876543210"
+                  />
                 </label>
                 <label className={formLabelClasses}>
-                  Email ID
+                  Email ID *
                   <input id="sponsor-email" name="email" type="email" required className={formFieldClasses} placeholder="your.email@example.com" />
                 </label>
               </div>
               <label className={formLabelClasses}>
-                Sponsorship Type Interested In
+                Sponsorship Type Interested In *
                 <select id="sponsor-type" name="type" required defaultValue="" className={`${formFieldClasses} cursor-pointer`}>
                   <option value="" disabled className="bg-white text-black">
                     Choose an option

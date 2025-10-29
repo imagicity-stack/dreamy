@@ -65,12 +65,12 @@ export default function MobileMenu() {
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex flex-col h-full p-6 pt-20">
+        <div className="relative flex h-full flex-col px-6 pt-16 pb-8">
           <button
             type="button"
             onClick={() => setIsOpen(false)}
             aria-label="Close mobile menu"
-            className="mobile-tap self-end text-2xl text-white transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60"
+            className="mobile-tap absolute top-4 right-4 text-2xl text-white transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60"
           >
             ✕
           </button>
