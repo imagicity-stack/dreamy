@@ -1,30 +1,6 @@
 import Image from "next/image";
 
 export default function AboutSection() {
-  const images = [
-    {
-      src: "/involve/perfomers.jpg",
-      alt: "Man with Microphone",
-      gradient: "from-red-600 to-red-800",
-    },
-    {
-      src: "/involve/volunteer.jpg",
-      alt: "Cosplayer",
-      gradient: "from-purple-600 to-purple-800",
-    },
-    {
-      src: "/involve/sponsorship.png",
-      alt: "Group Celebration",
-      gradient: "from-pink-600 to-red-600",
-    },
-    {
-      src: "/involve/cosplay.jpg",
-      alt: "DJ Performing",
-      gradient: "from-purple-600 to-blue-600",
-    },
-    { src: "/involve/stall.jpg", alt: "gun", gradient: "from-purple-600 to-blue-600" },
-  ];
-
   return (
     <section
       id="aboutus"
@@ -64,7 +40,7 @@ export default function AboutSection() {
             <p className="font-semibold mb-4 md:mb-6">This is 
               MADOOZA
             </p>
-            <p className="font-extrabold text-base md:text-lg mb-6 md:mb-8 text-white">
+            <p className="font-extrabold text-base md:text-lg mb-6 md:mb-8 text-black">
               The sound of pure madness
             </p>
 

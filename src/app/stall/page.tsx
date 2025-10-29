@@ -29,12 +29,15 @@ const stallTips = [
 
 const formFieldClasses =
   "w-full bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-black/50";
+const formLabelClasses =
+  "flex flex-col gap-2 text-sm font-montserrat font-medium text-white";
 
 export default function StallPage() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [paymentId, setPaymentId] = useState<string | null>(null);
+  const [selectedPower, setSelectedPower] = useState<string | null>(null);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -48,20 +51,29 @@ export default function StallPage() {
     const formData = new FormData(form);
     const getValue = (key: string) => formData.get(key)?.toString().trim() ?? "";
 
+    const powerChoice = getValue("power");
+    setSelectedPower(powerChoice || null);
+    const requiresPower = powerChoice === "yes";
+    const baseAmount = 2500;
+    const additionalPowerFee = requiresPower ? 300 : 0;
+    const totalAmount = baseAmount + additionalPowerFee;
+
     const stallDetails = {
       name: getValue("name"),
       brand: getValue("brand"),
       productType: getValue("productType"),
       phone: getValue("phone"),
       email: getValue("email"),
-      power: getValue("power"),
+      power: powerChoice,
+      powerFee: additionalPowerFee,
+      totalAmount,
       notes: getValue("notes"),
       termsAccepted: formData.get("terms") === "accepted",
       timestamp: new Date().toISOString(),
     };
 
     try {
-      const orderConfig = await createPaymentOrder("stall", 2500, stallDetails);
+      const orderConfig = await createPaymentOrder("stall", totalAmount, stallDetails);
 
       const scriptLoaded = await loadRazorpayScript();
 
@@ -88,6 +100,8 @@ export default function StallPage() {
           brand: stallDetails.brand,
           productType: stallDetails.productType,
           powerRequirement: stallDetails.power,
+          powerFee: additionalPowerFee.toString(),
+          totalAmount: totalAmount.toString(),
           displayName: "Madooza Stall Setup",
         },
         config: {
@@ -102,6 +116,7 @@ export default function StallPage() {
           setSubmitted(true);
           setError("");
           form.reset();
+          setSelectedPower(null);
         },
         modal: {
           ondismiss: () => {
@@ -127,6 +142,8 @@ export default function StallPage() {
       setLoading(false);
     }
   };
+
+  const displayedTotal = selectedPower === "yes" ? 2800 : 2500;
 
   return (
     <div className="bg-black text-white">
@@ -188,16 +205,16 @@ export default function StallPage() {
             <div className="relative overflow-hidden rounded-none bg-black p-8 text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
               <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
-                  Name
+                <label className={formLabelClasses}>
+                  Name *
                   <input id="stall-name" name="name" type="text" required className={formFieldClasses} placeholder="Enter your full name" />
                 </label>
-                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
-                  Brand / Stall Name
+                <label className={formLabelClasses}>
+                  Brand / Stall Name *
                   <input id="stall-brand" name="brand" type="text" required className={formFieldClasses} placeholder="Enter your brand or stall name" />
                 </label>
-                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
-                  Product Type
+                <label className={formLabelClasses}>
+                  Product Type *
                   <select id="stall-product" name="productType" required defaultValue="" className={`${formFieldClasses} cursor-pointer`}>
                     <option value="" disabled className="bg-white text-black">
                       Select a category
@@ -216,45 +233,62 @@ export default function StallPage() {
                     </option>
                   </select>
                 </label>
-                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
-                  Contact Number
-                  <input id="stall-phone" name="phone" type="tel" required className={formFieldClasses} placeholder="+91 XXXXXXXXXX" />
+                <label className={formLabelClasses}>
+                  Contact Number *
+                  <input
+                    id="stall-phone"
+                    name="phone"
+                    type="tel"
+                    required
+                    inputMode="numeric"
+                    pattern="[0-9]{10}"
+                    maxLength={10}
+                    minLength={10}
+                    title="Enter a 10-digit phone number"
+                    className={formFieldClasses}
+                    placeholder="9876543210"
+                  />
                 </label>
-                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
-                  Email ID
+                <label className={formLabelClasses}>
+                  Email ID *
                   <input id="stall-email" name="email" type="email" required className={formFieldClasses} placeholder="your.email@example.com" />
                 </label>
-                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
-                  Power Requirement
-                  <select id="stall-power" name="power" required defaultValue="" className={`${formFieldClasses} cursor-pointer`}>
+                <label className={formLabelClasses}>
+                  Power Requirement *
+                  <select
+                    id="stall-power"
+                    name="power"
+                    required
+                    defaultValue=""
+                    className={`${formFieldClasses} cursor-pointer`}
+                    onChange={(event) => setSelectedPower(event.target.value)}
+                  >
                     <option value="" disabled className="bg-white text-black">
                       Choose an option
                     </option>
-                    <option value="none" className="bg-white text-black">
+                    <option value="no" className="bg-white text-black">
                       No Power Needed
                     </option>
-                    <option value="basic" className="bg-white text-black">
-                      Basic Lighting (₹300)
-                    </option>
-                    <option value="heavy" className="bg-white text-black">
-                      High Load Equipment
+                    <option value="yes" className="bg-white text-black">
+                      Yes (₹300)
                     </option>
                   </select>
                 </label>
               </div>
-              <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
-                Additional Notes
+              <label className={formLabelClasses}>
+                Additional Notes *
                 <textarea
                   id="stall-notes"
                   name="notes"
                   rows={3}
+                  required
                   className={`${formFieldClasses} resize-none`}
                   placeholder="Share special requirements or products"
                 />
               </label>
-              <label className="flex items-start gap-3 text-xs font-semibold uppercase tracking-[0.2em]">
+              <label className="flex items-start gap-3 text-sm font-montserrat text-white/80">
                 <input type="checkbox" name="terms" value="accepted" required className="mt-1 h-5 w-5 accent-[#ff1a1a]" />
-                <span className="normal-case text-left text-white/80">
+                <span className="text-left">
                   I accept the{" "}
                   <Link href="/terms-and-conditions" className="text-[#00f5ff] underline-offset-4 hover:underline">
                     terms and conditions
@@ -264,9 +298,9 @@ export default function StallPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#ff1a1a] px-6 py-3 font-montserrat text-sm uppercase tracking-[0.3em] text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full bg-[#ff1a1a] px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {loading ? "Processing Payment..." : "Pay ₹2500 & Book Stall"}
+                {loading ? "Processing Payment..." : `Pay ₹${displayedTotal} & Book Stall`}
               </button>
               {error && (
                 <p className="bg-[#ff1a1a]/40 px-4 py-3 text-center text-sm text-white">{error}</p>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 import { X } from "lucide-react";
 
@@ -88,6 +88,29 @@ export default function CosplayPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [paymentId, setPaymentId] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    const { body } = document;
+    const previousOverflow = body.style.overflow;
+
+    if (isModalOpen) {
+      body.style.overflow = "hidden";
+
+      return () => {
+        body.style.overflow = previousOverflow;
+      };
+    }
+
+    body.style.overflow = previousOverflow;
+
+    return () => {
+      body.style.overflow = previousOverflow;
+    };
+  }, [isModalOpen]);
 
   const openModal = () => {
     setSubmitted(false);
@@ -328,50 +351,69 @@ export default function CosplayPage() {
       </section>
 
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 py-8">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4 py-8 sm:py-12">
           <div className="relative w-full max-w-xl">
             <div className="pointer-events-none absolute -inset-6 -z-10 bg-[#00f5ff]/50 blur-3xl" aria-hidden />
-            <div className="relative overflow-hidden rounded-none bg-black text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
+            <div className="relative flex max-h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-none bg-black text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
               <button
                 type="button"
                 onClick={closeModal}
-                className="absolute right-4 top-4 text-white transition-transform hover:scale-110"
+                className="mobile-tap absolute right-4 top-4 z-20 text-white transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00f5ff]"
                 aria-label="Close cosplay form"
               >
                 <X className="h-6 w-6" />
               </button>
-              <div className="relative z-10 space-y-6 px-6 py-8 sm:px-10">
+              <div className="relative z-10 flex flex-1 flex-col gap-6 overflow-y-auto px-6 py-8 sm:px-10">
                 <div className="text-center">
-                  <p className="font-montserrat text-xs uppercase tracking-[0.5em] text-[#00f5ff]">Cosplay Entry</p>
+                  <p className="font-montserrat text-sm font-semibold text-[#00f5ff]">Cosplay Entry</p>
                   <h3 className="mt-3 font-travel-sans text-3xl uppercase text-white">Secure Your Slot</h3>
                   <p className="mt-3 text-sm text-white/70">
                     Complete the form and lock your participation with an instant payment confirmation.
                   </p>
                 </div>
-                <form onSubmit={handleSubmit} className="space-y-4">
+                <form onSubmit={handleSubmit} className="flex flex-col gap-4">
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                    <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
-                      Full Name
+                    <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
+                      Full Name *
                       <input id="cosplay-name" name="name" type="text" required className={formFieldClasses} placeholder="Enter your name" />
                     </label>
-                    <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
-                      Character Name
+                    <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
+                      Character Name *
                       <input id="cosplay-character" name="character" type="text" required className={formFieldClasses} placeholder="Who are you cosplaying?" />
                     </label>
-                    <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
-                      Email ID
+                    <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
+                      Email ID *
                       <input id="cosplay-email" name="email" type="email" required className={formFieldClasses} placeholder="your.email@example.com" />
                     </label>
-                    <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
-                      Phone Number
-                      <input id="cosplay-phone" name="phone" type="tel" required className={formFieldClasses} placeholder="+91 XXXXXXXXXX" />
+                    <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
+                      Phone Number *
+                      <input
+                        id="cosplay-phone"
+                        name="phone"
+                        type="tel"
+                        required
+                        inputMode="numeric"
+                        pattern="[0-9]{10}"
+                        maxLength={10}
+                        minLength={10}
+                        title="Enter a 10-digit phone number"
+                        className={formFieldClasses}
+                        placeholder="9876543210"
+                      />
                     </label>
                   </div>
-                  <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
-                    Additional Notes
-                    <textarea id="cosplay-notes" name="notes" rows={3} className={`${formFieldClasses} resize-none`} placeholder="Share performance cues or prop details" />
+                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
+                    Additional Notes *
+                    <textarea
+                      id="cosplay-notes"
+                      name="notes"
+                      rows={3}
+                      required
+                      className={`${formFieldClasses} resize-none`}
+                      placeholder="Share performance cues or prop details"
+                    />
                   </label>
-                  <label className="flex items-start gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-white">
+                  <label className="flex items-start gap-3 text-sm font-montserrat text-white/80">
                     <input
                       type="checkbox"
                       name="terms"
@@ -379,7 +421,7 @@ export default function CosplayPage() {
                       required
                       className="mt-1 h-5 w-5 accent-[#ff1a1a]"
                     />
-                    <span className="normal-case text-left text-white/80">
+                    <span className="text-left">
                       I accept the{" "}
                       <Link href="/terms-and-conditions" className="text-[#00f5ff] underline-offset-4 hover:underline">
                         terms and conditions
@@ -389,7 +431,7 @@ export default function CosplayPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="w-full bg-[#ff1a1a] px-6 py-3 font-montserrat text-sm uppercase tracking-[0.3em] text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="mobile-tap w-full bg-[#ff1a1a] px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {loading ? "Processing Payment..." : "Pay ₹299 & Register"}
                   </button>

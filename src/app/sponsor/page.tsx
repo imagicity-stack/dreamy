@@ -35,6 +35,8 @@ const deliverables = [
 
 const formFieldClasses =
   "w-full bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-black/50";
+const formLabelClasses =
+  "flex flex-col gap-2 text-sm font-montserrat font-medium text-white";
 
 export default function SponsorPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -104,25 +106,37 @@ export default function SponsorPage() {
             <div className="relative overflow-hidden rounded-none bg-black p-8 text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
               <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
-                  Brand Name
+                <label className={formLabelClasses}>
+                  Brand Name *
                   <input id="sponsor-brand" name="brand" type="text" required className={formFieldClasses} placeholder="Your brand name" />
                 </label>
-                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
-                  Contact Person
+                <label className={formLabelClasses}>
+                  Contact Person *
                   <input id="sponsor-person" name="person" type="text" required className={formFieldClasses} placeholder="Who should we speak with?" />
                 </label>
-                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
-                  Phone Number
-                  <input id="sponsor-phone" name="phone" type="tel" required className={formFieldClasses} placeholder="+91 XXXXXXXXXX" />
+                <label className={formLabelClasses}>
+                  Phone Number *
+                  <input
+                    id="sponsor-phone"
+                    name="phone"
+                    type="tel"
+                    required
+                    inputMode="numeric"
+                    pattern="[0-9]{10}"
+                    maxLength={10}
+                    minLength={10}
+                    title="Enter a 10-digit phone number"
+                    className={formFieldClasses}
+                    placeholder="9876543210"
+                  />
                 </label>
-                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
-                  Email ID
+                <label className={formLabelClasses}>
+                  Email ID *
                   <input id="sponsor-email" name="email" type="email" required className={formFieldClasses} placeholder="your.email@example.com" />
                 </label>
               </div>
-              <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
-                Sponsorship Type Interested In
+              <label className={formLabelClasses}>
+                Sponsorship Type Interested In *
                 <select id="sponsor-type" name="type" required defaultValue="" className={`${formFieldClasses} cursor-pointer`}>
                   <option value="" disabled className="bg-white text-black">
                     Choose an option
@@ -141,7 +155,7 @@ export default function SponsorPage() {
                   </option>
                 </select>
               </label>
-              <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
+              <label className={formLabelClasses}>
                 Brief Description of Brand / Offering
                 <textarea
                   id="sponsor-description"
@@ -152,9 +166,9 @@ export default function SponsorPage() {
                   placeholder="Tell us about your brand and the collaboration you envision"
                 />
               </label>
-              <label className="flex items-start gap-3 text-xs font-semibold uppercase tracking-[0.2em]">
+              <label className="flex items-start gap-3 text-sm font-montserrat text-white/80">
                 <input type="checkbox" name="terms" value="accepted" required className="mt-1 h-5 w-5 accent-[#ff1a1a]" />
-                <span className="normal-case text-left text-white/80">
+                <span className="text-left">
                   I accept the{" "}
                   <Link href="/terms-and-conditions" className="text-[#00f5ff] underline-offset-4 hover:underline">
                     terms and conditions
@@ -163,7 +177,7 @@ export default function SponsorPage() {
               </label>
               <button
                 type="submit"
-                className="w-full bg-[#ff1a1a] px-6 py-3 font-montserrat text-sm uppercase tracking-[0.3em] text-white transition-transform hover:scale-[1.02]"
+                className="w-full bg-[#ff1a1a] px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02]"
               >
                 Submit Sponsorship Interest
               </button>
