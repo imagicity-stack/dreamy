@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { FormEvent, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
 import Footer from "@/components/Footer";
 import ScrollingBanner from "@/components/ScrollingBanner";
 import AboutSection from "@/components/AboutSection";
@@ -92,6 +92,29 @@ export default function Home() {
   const [active, setActive] = useState(involvementOptions[0].name);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [ticketProcessing, setTicketProcessing] = useState(false);
+
+  useEffect(() => {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    const { body } = document;
+    const previousOverflow = body.style.overflow;
+
+    if (isTicketModalOpen) {
+      body.style.overflow = "hidden";
+
+      return () => {
+        body.style.overflow = previousOverflow;
+      };
+    }
+
+    body.style.overflow = previousOverflow;
+
+    return () => {
+      body.style.overflow = previousOverflow;
+    };
+  }, [isTicketModalOpen]);
 
   const currentFestival =
     involvementOptions.find((f) => f.name === active) ?? involvementOptions[0];
@@ -242,7 +265,7 @@ export default function Home() {
                 </span>
               ))}
             </div>
-            <p className="text-white font-extrabold font-quicksand text-xs sm:text-sm md:text-base lg:text-xl xl:text-2xl 2xl:text-3xl text-center relative z-20 px-4">
+            <p className="text-black font-extrabold font-quicksand text-xs sm:text-sm md:text-base lg:text-xl xl:text-2xl 2xl:text-3xl text-center relative z-20 px-4 drop-shadow-[0_2px_6px_rgba(0,0,0,0.45)]">
               THE SOUND OF PURE MADNESS
             </p>
           </div>
@@ -313,7 +336,7 @@ export default function Home() {
               </div>
               <Link
                 href={currentFestival.href}
-                className="mt-4 inline-flex w-fit cursor-pointer bg-[#ffe300] text-black text-sm sm:text-base md:text-lg font-oswald px-5 py-2 rounded-md hover:bg-[#ffd000] transition-all uppercase"
+                className="mt-4 inline-flex w-fit cursor-pointer bg-[#ffe300] text-black text-sm sm:text-base md:text-lg font-oswald px-5 py-2 rounded-md transition-all uppercase hover:bg-[#ffd000] hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffe300]/60 active:translate-y-0"
               >
                 Learn More
               </Link>
@@ -386,11 +409,11 @@ export default function Home() {
 
       {/* Ticket Modal */}
       {isTicketModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4 py-6 sm:py-10">
           <div className="relative w-full max-w-2xl">
             <div className="pointer-events-none absolute -inset-6 -z-10 opacity-50 blur-3xl bg-[#00f5ff]" aria-hidden />
 
-            <div className="relative max-h-[95vh] overflow-y-auto rounded-none bg-black text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
+            <div className="relative flex max-h-[calc(100vh-3rem)] flex-col overflow-hidden rounded-none bg-black text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
               <button
                 type="button"
                 onClick={closeTicketModal}
@@ -400,9 +423,12 @@ export default function Home() {
                 ✕
               </button>
 
-              <form onSubmit={handleTicketSubmit} className="relative z-10 space-y-6 px-6 py-8 sm:px-10">
-              <div className="text-center">
-                <p className="font-montserrat text-xs font-semibold text-[#00f5ff] sm:text-sm">Tickets</p>
+              <form
+                onSubmit={handleTicketSubmit}
+                className="relative z-10 flex flex-1 flex-col gap-6 overflow-y-auto px-6 py-8 sm:px-10"
+              >
+                <div className="text-center">
+                  <p className="font-montserrat text-sm font-semibold text-[#00f5ff]">Tickets</p>
                 <h2 className="mt-3 text-3xl sm:text-4xl font-travel-sans uppercase text-white">
                   Get Your Passes
                 </h2>
@@ -411,11 +437,11 @@ export default function Home() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <label className="flex flex-col gap-2 text-xs font-montserrat font-semibold text-white sm:text-sm">
-                  Full Name *
-                  <input
-                    type="text"
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
+                    Full Name *
+                    <input
+                      type="text"
                     id="ticket-name"
                     name="name"
                     required
@@ -423,9 +449,9 @@ export default function Home() {
                     placeholder="Enter your full name"
                   />
                 </label>
-                <label className="flex flex-col gap-2 text-xs font-montserrat font-semibold text-white sm:text-sm">
-                  Email Address *
-                  <input
+                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
+                    Email Address *
+                    <input
                     type="email"
                     id="ticket-email"
                     name="email"
@@ -434,9 +460,9 @@ export default function Home() {
                     placeholder="your.email@example.com"
                   />
                 </label>
-                <label className="flex flex-col gap-2 text-xs font-montserrat font-semibold text-white sm:text-sm">
-                  Phone Number *
-                  <input
+                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
+                    Phone Number *
+                    <input
                     type="tel"
                     id="ticket-phone"
                     name="phone"
@@ -445,9 +471,9 @@ export default function Home() {
                     placeholder="+91 9122289578"
                   />
                 </label>
-                <label className="flex flex-col gap-2 text-xs font-montserrat font-semibold text-white sm:text-sm">
-                  Number of Tickets *
-                  <select
+                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
+                    Number of Tickets *
+                    <select
                     id="ticket-quantity"
                     name="quantity"
                     required
@@ -475,7 +501,7 @@ export default function Home() {
                 </label>
               </div>
 
-              <label className="flex flex-col gap-2 text-xs font-montserrat font-semibold text-white sm:text-sm">
+              <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
                 Special Requests / Questions (Optional)
                 <textarea
                   id="ticket-message"
@@ -486,7 +512,7 @@ export default function Home() {
                 />
               </label>
 
-              <label className="flex items-start gap-3 text-xs font-montserrat text-white/80 sm:text-sm">
+              <label className="flex items-start gap-3 text-sm font-montserrat text-white/80">
                 <input
                   type="checkbox"
                   id="ticket-terms"

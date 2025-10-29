@@ -126,7 +126,8 @@ h6 {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(0.4rem, 1.5vw, 1.25rem);
+  gap: clamp(0.35rem, 1.2vw, 1.15rem);
+  padding-inline: clamp(0.75rem, 2.5vw, 2rem);
   text-transform: uppercase;
   text-align: center;
 }
@@ -136,7 +137,7 @@ h6 {
     "TT Commons Pro", system-ui, -apple-system, "Segoe UI", Roboto,
     "Helvetica Neue", Arial;
   font-weight: 400;
-  font-size: clamp(2.3rem, 11vw, 8.5rem);
+  font-size: clamp(3rem, 19vw, 11rem);
   line-height: 0.85;
   color: #ffffff;
   opacity: 0;

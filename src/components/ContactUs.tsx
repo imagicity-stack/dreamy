@@ -36,9 +36,6 @@ export default function ContactUs() {
       <p className="break-all font-sans">📩 madooza&#64;imagicity.in</p>
               <p>📞 +91-9122289578</p>
             </div>
-            <button className="mt-6 cursor-pointer px-6 py-3 bg-white text-black font-bold rounded-full hover:bg-yellow-300 transition-colors duration-300">
-              Get in Touch  
-            </button>
           </div>
 
           {/* Small Cartoon Character */}

@@ -65,8 +65,16 @@ export default function MobileMenu() {
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
-        <div className="flex flex-col h-full pt-20 p-6">
-          <nav className="flex flex-col space-y-6 font-montserrat">
+        <div className="flex flex-col h-full p-6 pt-20">
+          <button
+            type="button"
+            onClick={() => setIsOpen(false)}
+            aria-label="Close mobile menu"
+            className="mobile-tap self-end text-2xl text-white transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60"
+          >
+            ✕
+          </button>
+          <nav className="mt-8 flex flex-col space-y-6 font-montserrat">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
