@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useState } from "react";
 
 import ContactUs from "@/components/ContactUs";
@@ -33,7 +34,7 @@ const deliverables = [
 ];
 
 const formFieldClasses =
-  "w-full bg-black px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60";
+  "w-full bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-black/50";
 
 export default function SponsorPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -98,9 +99,10 @@ export default function SponsorPage() {
 
       <section className="bg-black py-16">
         <div className="mx-auto max-w-4xl px-4">
-          <div className="relative overflow-hidden rounded-none bg-black p-8 text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
-            <div className="pointer-events-none absolute -inset-6 -z-10 bg-[#00f5ff]/40 blur-3xl" aria-hidden />
-            <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
+          <div className="relative">
+            <div className="pointer-events-none absolute -inset-6 -z-10 bg-[#00f5ff]/50 blur-3xl" aria-hidden />
+            <div className="relative overflow-hidden rounded-none bg-black p-8 text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
+              <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
                   Brand Name
@@ -122,19 +124,19 @@ export default function SponsorPage() {
               <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
                 Sponsorship Type Interested In
                 <select id="sponsor-type" name="type" required defaultValue="" className={`${formFieldClasses} cursor-pointer`}>
-                  <option value="" disabled className="bg-black text-white">
+                  <option value="" disabled className="bg-white text-black">
                     Choose an option
                   </option>
-                  <option value="title" className="bg-black text-white">
+                  <option value="title" className="bg-white text-black">
                     Title Sponsor
                   </option>
-                  <option value="powered-by" className="bg-black text-white">
+                  <option value="powered-by" className="bg-white text-black">
                     Powered By Partner
                   </option>
-                  <option value="zone" className="bg-black text-white">
+                  <option value="zone" className="bg-white text-black">
                     Zone Sponsor
                   </option>
-                  <option value="in-kind" className="bg-black text-white">
+                  <option value="in-kind" className="bg-white text-black">
                     In-Kind Partner
                   </option>
                 </select>
@@ -150,6 +152,15 @@ export default function SponsorPage() {
                   placeholder="Tell us about your brand and the collaboration you envision"
                 />
               </label>
+              <label className="flex items-start gap-3 text-xs font-semibold uppercase tracking-[0.2em]">
+                <input type="checkbox" name="terms" value="accepted" required className="mt-1 h-5 w-5 accent-[#ff1a1a]" />
+                <span className="normal-case text-left text-white/80">
+                  I accept the{" "}
+                  <Link href="/terms-and-conditions" className="text-[#00f5ff] underline-offset-4 hover:underline">
+                    terms and conditions
+                  </Link>
+                </span>
+              </label>
               <button
                 type="submit"
                 className="w-full bg-[#ff1a1a] px-6 py-3 font-montserrat text-sm uppercase tracking-[0.3em] text-white transition-transform hover:scale-[1.02]"
@@ -161,7 +172,8 @@ export default function SponsorPage() {
                   Thank you! Our partnerships team will reach out with the sponsorship deck and media kit shortly.
                 </p>
               )}
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       </section>

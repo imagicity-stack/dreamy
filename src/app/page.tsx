@@ -387,18 +387,20 @@ export default function Home() {
       {/* Ticket Modal */}
       {isTicketModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
-          <div className="relative w-full max-w-2xl max-h-[95vh] overflow-y-auto rounded-none bg-black text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
-            <div className="pointer-events-none absolute -inset-6 -z-10 opacity-40 blur-3xl bg-[#00f5ff]" aria-hidden />
+          <div className="relative w-full max-w-2xl">
+            <div className="pointer-events-none absolute -inset-6 -z-10 opacity-50 blur-3xl bg-[#00f5ff]" aria-hidden />
 
-            <button
-              onClick={closeTicketModal}
-              className="absolute top-4 right-4 text-white text-2xl transition-transform hover:scale-110"
-              aria-label="Close ticket form"
-            >
-              ✕
-            </button>
+            <div className="relative max-h-[95vh] overflow-y-auto rounded-none bg-black text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
+              <button
+                type="button"
+                onClick={closeTicketModal}
+                className="absolute top-4 right-4 text-white text-2xl transition-transform hover:scale-110"
+                aria-label="Close ticket form"
+              >
+                ✕
+              </button>
 
-            <form onSubmit={handleTicketSubmit} className="relative z-10 space-y-6 px-6 py-8 sm:px-10">
+              <form onSubmit={handleTicketSubmit} className="relative z-10 space-y-6 px-6 py-8 sm:px-10">
               <div className="text-center">
                 <p className="font-montserrat text-sm tracking-[0.4em] text-[#00f5ff]">Tickets</p>
                 <h2 className="mt-3 text-3xl sm:text-4xl font-travel-sans uppercase text-white">
@@ -417,7 +419,7 @@ export default function Home() {
                     id="ticket-name"
                     name="name"
                     required
-                    className="w-full bg-black px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60"
+                    className="w-full bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-black/50"
                     placeholder="Enter your full name"
                   />
                 </label>
@@ -428,7 +430,7 @@ export default function Home() {
                     id="ticket-email"
                     name="email"
                     required
-                    className="w-full bg-black px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60"
+                    className="w-full bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-black/50"
                     placeholder="your.email@example.com"
                   />
                 </label>
@@ -439,7 +441,7 @@ export default function Home() {
                     id="ticket-phone"
                     name="phone"
                     required
-                    className="w-full bg-black px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60"
+                    className="w-full bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-black/50"
                     placeholder="+91 9122289578"
                   />
                 </label>
@@ -449,24 +451,24 @@ export default function Home() {
                     id="ticket-quantity"
                     name="quantity"
                     required
-                    className="w-full bg-black px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black cursor-pointer"
+                    className="w-full bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black cursor-pointer"
                   >
-                    <option value="" className="bg-black text-white">
+                    <option value="" className="bg-white text-black">
                       Select quantity
                     </option>
-                    <option value="1" className="bg-black text-white">
+                    <option value="1" className="bg-white text-black">
                       1 Ticket
                     </option>
-                    <option value="2" className="bg-black text-white">
+                    <option value="2" className="bg-white text-black">
                       2 Tickets
                     </option>
-                    <option value="3" className="bg-black text-white">
+                    <option value="3" className="bg-white text-black">
                       3 Tickets
                     </option>
-                    <option value="4" className="bg-black text-white">
+                    <option value="4" className="bg-white text-black">
                       4 Tickets
                     </option>
-                    <option value="5" className="bg-black text-white">
+                    <option value="5" className="bg-white text-black">
                       5 Tickets
                     </option>
                   </select>
@@ -479,7 +481,7 @@ export default function Home() {
                   id="ticket-message"
                   name="message"
                   rows={4}
-                  className="w-full resize-none bg-black px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60"
+                  className="w-full resize-none bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-black/50"
                   placeholder="Let us know how we can help"
                 />
               </label>
@@ -494,7 +496,7 @@ export default function Home() {
                   className="mt-1 h-5 w-5 accent-[#ff1a1a]"
                 />
                 <span>
-                  I accept the{' '}
+                  I accept the{" "}
                   <Link href="/terms-and-conditions" className="text-[#00f5ff] underline-offset-4 hover:underline">
                     terms and conditions
                   </Link>
@@ -520,6 +522,7 @@ export default function Home() {
             </form>
           </div>
         </div>
+      </div>
       )}
     </div>
   );

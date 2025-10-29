@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useState } from "react";
 import type { CSSProperties } from "react";
 import { X } from "lucide-react";
@@ -79,7 +80,7 @@ const highlights = [
 ];
 
 const formFieldClasses =
-  "w-full bg-black px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60";
+  "w-full bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-black/50";
 
 export default function CosplayPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -122,6 +123,7 @@ export default function CosplayPage() {
       email: getValue("email"),
       phone: getValue("phone"),
       notes: getValue("notes"),
+      termsAccepted: formData.get("terms") === "accepted",
       timestamp: new Date().toISOString(),
     };
 
@@ -327,65 +329,83 @@ export default function CosplayPage() {
 
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 py-8">
-          <div className="relative w-full max-w-xl overflow-hidden rounded-none bg-black text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
-            <div className="pointer-events-none absolute -inset-6 -z-10 bg-[#00f5ff]/40 blur-3xl" aria-hidden />
-            <button
-              onClick={closeModal}
-              className="absolute right-4 top-4 text-white transition-transform hover:scale-110"
-              aria-label="Close cosplay form"
-            >
-              <X className="h-6 w-6" />
-            </button>
-            <div className="relative z-10 space-y-6 px-6 py-8 sm:px-10">
-              <div className="text-center">
-                <p className="font-montserrat text-xs uppercase tracking-[0.5em] text-[#00f5ff]">Cosplay Entry</p>
-                <h3 className="mt-3 font-travel-sans text-3xl uppercase text-white">Secure Your Slot</h3>
-                <p className="mt-3 text-sm text-white/70">
-                  Complete the form and lock your participation with an instant payment confirmation.
-                </p>
-              </div>
-              <form onSubmit={handleSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
-                    Full Name
-                    <input id="cosplay-name" name="name" type="text" required className={formFieldClasses} placeholder="Enter your name" />
-                  </label>
-                  <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
-                    Character Name
-                    <input id="cosplay-character" name="character" type="text" required className={formFieldClasses} placeholder="Who are you cosplaying?" />
-                  </label>
-                  <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
-                    Email ID
-                    <input id="cosplay-email" name="email" type="email" required className={formFieldClasses} placeholder="your.email@example.com" />
-                  </label>
-                  <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
-                    Phone Number
-                    <input id="cosplay-phone" name="phone" type="tel" required className={formFieldClasses} placeholder="+91 XXXXXXXXXX" />
-                  </label>
-                </div>
-                <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
-                  Additional Notes
-                  <textarea id="cosplay-notes" name="notes" rows={3} className={`${formFieldClasses} resize-none`} placeholder="Share performance cues or prop details" />
-                </label>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full bg-[#ff1a1a] px-6 py-3 font-montserrat text-sm uppercase tracking-[0.3em] text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {loading ? "Processing Payment..." : "Pay ₹299 & Register"}
-                </button>
-                {error && (
-                  <p className="bg-[#ff1a1a]/40 px-4 py-3 text-center text-sm text-white">
-                    {error}
+          <div className="relative w-full max-w-xl">
+            <div className="pointer-events-none absolute -inset-6 -z-10 bg-[#00f5ff]/50 blur-3xl" aria-hidden />
+            <div className="relative overflow-hidden rounded-none bg-black text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
+              <button
+                type="button"
+                onClick={closeModal}
+                className="absolute right-4 top-4 text-white transition-transform hover:scale-110"
+                aria-label="Close cosplay form"
+              >
+                <X className="h-6 w-6" />
+              </button>
+              <div className="relative z-10 space-y-6 px-6 py-8 sm:px-10">
+                <div className="text-center">
+                  <p className="font-montserrat text-xs uppercase tracking-[0.5em] text-[#00f5ff]">Cosplay Entry</p>
+                  <h3 className="mt-3 font-travel-sans text-3xl uppercase text-white">Secure Your Slot</h3>
+                  <p className="mt-3 text-sm text-white/70">
+                    Complete the form and lock your participation with an instant payment confirmation.
                   </p>
-                )}
-                {submitted && (
-                  <div className="space-y-1 bg-[#00f5ff]/20 px-4 py-3 text-center text-sm text-white">
-                    <p>Your cosplay slot is secured! We’ll send payment instructions and confirmation shortly.</p>
-                    {paymentId && <span className="block text-xs">Payment reference: {paymentId}</span>}
+                </div>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
+                      Full Name
+                      <input id="cosplay-name" name="name" type="text" required className={formFieldClasses} placeholder="Enter your name" />
+                    </label>
+                    <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
+                      Character Name
+                      <input id="cosplay-character" name="character" type="text" required className={formFieldClasses} placeholder="Who are you cosplaying?" />
+                    </label>
+                    <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
+                      Email ID
+                      <input id="cosplay-email" name="email" type="email" required className={formFieldClasses} placeholder="your.email@example.com" />
+                    </label>
+                    <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
+                      Phone Number
+                      <input id="cosplay-phone" name="phone" type="tel" required className={formFieldClasses} placeholder="+91 XXXXXXXXXX" />
+                    </label>
                   </div>
-                )}
-              </form>
+                  <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
+                    Additional Notes
+                    <textarea id="cosplay-notes" name="notes" rows={3} className={`${formFieldClasses} resize-none`} placeholder="Share performance cues or prop details" />
+                  </label>
+                  <label className="flex items-start gap-3 text-xs font-semibold uppercase tracking-[0.2em] text-white">
+                    <input
+                      type="checkbox"
+                      name="terms"
+                      value="accepted"
+                      required
+                      className="mt-1 h-5 w-5 accent-[#ff1a1a]"
+                    />
+                    <span className="normal-case text-left text-white/80">
+                      I accept the{" "}
+                      <Link href="/terms-and-conditions" className="text-[#00f5ff] underline-offset-4 hover:underline">
+                        terms and conditions
+                      </Link>
+                    </span>
+                  </label>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-[#ff1a1a] px-6 py-3 font-montserrat text-sm uppercase tracking-[0.3em] text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+                  >
+                    {loading ? "Processing Payment..." : "Pay ₹299 & Register"}
+                  </button>
+                  {error && (
+                    <p className="bg-[#ff1a1a]/40 px-4 py-3 text-center text-sm text-white">
+                      {error}
+                    </p>
+                  )}
+                  {submitted && (
+                    <div className="space-y-1 bg-[#00f5ff]/20 px-4 py-3 text-center text-sm text-white">
+                      <p>Your cosplay slot is secured! We’ll send payment instructions and confirmation shortly.</p>
+                      {paymentId && <span className="block text-xs">Payment reference: {paymentId}</span>}
+                    </div>
+                  )}
+                </form>
+              </div>
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { FormEvent, useState } from "react";
 
 import ContactUs from "@/components/ContactUs";
@@ -27,7 +28,7 @@ const stallTips = [
 ];
 
 const formFieldClasses =
-  "w-full bg-black px-4 py-3 text-base text-white focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-white/60";
+  "w-full bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-black/50";
 
 export default function StallPage() {
   const [submitted, setSubmitted] = useState(false);
@@ -55,6 +56,7 @@ export default function StallPage() {
       email: getValue("email"),
       power: getValue("power"),
       notes: getValue("notes"),
+      termsAccepted: formData.get("terms") === "accepted",
       timestamp: new Date().toISOString(),
     };
 
@@ -181,9 +183,10 @@ export default function StallPage() {
 
       <section className="bg-black py-16">
         <div className="mx-auto max-w-4xl px-4">
-          <div className="relative overflow-hidden rounded-none bg-black p-8 text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
-            <div className="pointer-events-none absolute -inset-6 -z-10 bg-[#00f5ff]/40 blur-3xl" aria-hidden />
-            <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
+          <div className="relative">
+            <div className="pointer-events-none absolute -inset-6 -z-10 bg-[#00f5ff]/50 blur-3xl" aria-hidden />
+            <div className="relative overflow-hidden rounded-none bg-black p-8 text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
+              <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
                   Name
@@ -196,19 +199,19 @@ export default function StallPage() {
                 <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
                   Product Type
                   <select id="stall-product" name="productType" required defaultValue="" className={`${formFieldClasses} cursor-pointer`}>
-                    <option value="" disabled className="bg-black text-white">
+                    <option value="" disabled className="bg-white text-black">
                       Select a category
                     </option>
-                    <option value="food" className="bg-black text-white">
+                    <option value="food" className="bg-white text-black">
                       Food
                     </option>
-                    <option value="merchandise" className="bg-black text-white">
+                    <option value="merchandise" className="bg-white text-black">
                       Merchandise
                     </option>
-                    <option value="art" className="bg-black text-white">
+                    <option value="art" className="bg-white text-black">
                       Art
                     </option>
-                    <option value="games" className="bg-black text-white">
+                    <option value="games" className="bg-white text-black">
                       Games & Experiences
                     </option>
                   </select>
@@ -224,16 +227,16 @@ export default function StallPage() {
                 <label className="flex flex-col gap-2 text-xs font-semibold uppercase tracking-[0.3em]">
                   Power Requirement
                   <select id="stall-power" name="power" required defaultValue="" className={`${formFieldClasses} cursor-pointer`}>
-                    <option value="" disabled className="bg-black text-white">
+                    <option value="" disabled className="bg-white text-black">
                       Choose an option
                     </option>
-                    <option value="none" className="bg-black text-white">
+                    <option value="none" className="bg-white text-black">
                       No Power Needed
                     </option>
-                    <option value="basic" className="bg-black text-white">
+                    <option value="basic" className="bg-white text-black">
                       Basic Lighting (₹300)
                     </option>
-                    <option value="heavy" className="bg-black text-white">
+                    <option value="heavy" className="bg-white text-black">
                       High Load Equipment
                     </option>
                   </select>
@@ -248,6 +251,15 @@ export default function StallPage() {
                   className={`${formFieldClasses} resize-none`}
                   placeholder="Share special requirements or products"
                 />
+              </label>
+              <label className="flex items-start gap-3 text-xs font-semibold uppercase tracking-[0.2em]">
+                <input type="checkbox" name="terms" value="accepted" required className="mt-1 h-5 w-5 accent-[#ff1a1a]" />
+                <span className="normal-case text-left text-white/80">
+                  I accept the{" "}
+                  <Link href="/terms-and-conditions" className="text-[#00f5ff] underline-offset-4 hover:underline">
+                    terms and conditions
+                  </Link>
+                </span>
               </label>
               <button
                 type="submit"
@@ -265,7 +277,8 @@ export default function StallPage() {
                   {paymentId && <span className="block text-xs">Payment reference: {paymentId}</span>}
                 </div>
               )}
-            </form>
+              </form>
+            </div>
           </div>
         </div>
       </section>
