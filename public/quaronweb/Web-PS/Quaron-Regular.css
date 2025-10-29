@@ -1,0 +1,9 @@
+/* Webfont: Quaron-Regular */@font-face {
+    font-family: 'Quaron';
+    src: url('Quaron-Regular.woff2') format('woff2'), /* Modern Browsers */
+         url('Quaron-Regular.otf') format('opentype'); /* Safari, Android, iOS */
+             font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+

@@ -1,0 +1,9 @@
+/* Webfont: Quaron-Outline */@font-face {
+    font-family: 'QuaronOutline';
+    src: url('Quaron-Outline.woff2') format('woff2'), /* Modern Browsers */
+         url('Quaron-Outline.otf') format('opentype'); /* Safari, Android, iOS */
+             font-style: normal;
+    font-weight: normal;
+    text-rendering: optimizeLegibility;
+}
+
