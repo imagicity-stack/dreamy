@@ -5,11 +5,19 @@ export async function POST(request: Request) {
         const formData = await request.json();
         console.log('Received form data:', formData);
 
+        const payload = {
+            fullName: typeof formData.fullName === 'string' ? formData.fullName : '',
+            age: typeof formData.age === 'string' ? formData.age : '',
+            institution: typeof formData.institution === 'string' ? formData.institution : '',
+            preferredRole: typeof formData.preferredRole === 'string' ? formData.preferredRole : '',
+            phone: typeof formData.phone === 'string' ? formData.phone : '',
+            email: typeof formData.email === 'string' ? formData.email : '',
+            extraInfo: typeof formData.extraInfo === 'string' ? formData.extraInfo : '',
+        };
 
         const scriptURL = 'https://script.google.com/macros/s/AKfycbzxvYZCf9IcdoW1ex-sqHai1UDup0IVAWH2UtL0ZXp-00Mxb3Ak5fcS4ZVop8bvuQQ/exec';
 
-
-        const jsonData = JSON.stringify(formData);
+        const jsonData = JSON.stringify(payload);
         console.log('Sending JSON to Google:', jsonData);
 
 
