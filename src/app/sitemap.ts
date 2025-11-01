@@ -1,6 +1,6 @@
 import type { MetadataRoute } from "next";
 
-const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://madooza.in").replace(/\/+$/, "");
+const BASE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "https://madooza.com").replace(/\/+$/, "");
 
 const ROUTES: Array<{
   path: string;
