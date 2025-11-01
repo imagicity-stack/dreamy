@@ -48,20 +48,44 @@ export default function PerformerPage() {
     setError("");
     setSubmitStatus(null);
 
-    const formData = new FormData(form);
-    const equipment = formData.getAll("equipment");
+    const categoryLabels: Record<string, string> = {
+      music: "Music",
+      dance: "Dance",
+      "open-mic": "Open Mic",
+      "special-act": "Special Act",
+    };
+
+    const getValueById = (id: string) => {
+      const field = form.querySelector<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(`#${id}`);
+      return field?.value.trim() ?? "";
+    };
+
+    const selectedCategoryValue = getValueById("performer-category");
+    const categoryLabel = categoryLabels[selectedCategoryValue] ?? selectedCategoryValue;
+
+    const selectedEquipment = Array.from(
+      form.querySelectorAll<HTMLInputElement>('input[name="equipment"]:checked')
+    )
+      .map((input) => input.value.trim())
+      .filter(Boolean);
+
+    const formattedEquipment = selectedEquipment.length
+      ? selectedEquipment
+          .map((value) => value.replace(/\b\w/g, (char) => char.toUpperCase()))
+          .join(", ")
+      : "None";
 
     const data = {
-      name: formData.get("name"),
-      category: formData.get("category"),
-      duration: formData.get("duration"),
-      phone: formData.get("phone"),
-      email: formData.get("email"),
-      equipment: equipment.join(", ") || "None",
-      sample: formData.get("sample") || "Not provided",
-      termsAccepted: formData.get("terms") === "accepted",
-      timestamp: new Date().toLocaleString("en-IN"),
+      name: getValueById("performer-name"),
+      category: categoryLabel,
+      duration: getValueById("performer-duration"),
+      contact: getValueById("performer-phone"),
+      email: getValueById("performer-email"),
+      videoLink: getValueById("performer-link"),
+      equipment: formattedEquipment,
     };
+
+    console.log(data);
 
     try {
       const response = await fetch("/api/performers", {
