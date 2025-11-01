@@ -42,20 +42,23 @@ export default function VolunteerPage() {
     setError("");
     setSubmitStatus(null);
 
-    const formData = new FormData(form);
-    const getValue = (key: string) => {
-      const value = formData.get(key);
-      return typeof value === "string" ? value : "";
+    const getValueById = (id: string) => {
+      const field = form.querySelector<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(`#${id}`);
+      return field?.value.trim() ?? "";
     };
 
+    const selectedRoleValue = getValueById("volunteer-role");
+    const preferredRoleLabel =
+      volunteerRoles.find((role) => role.toLowerCase() === selectedRoleValue.toLowerCase()) ?? selectedRoleValue;
+
     const data = {
-      fullName: getValue("name"),
-      age: getValue("age"),
-      institution: getValue("institution"),
-      preferredRole: getValue("role"),
-      phone: getValue("phone"),
-      email: getValue("email"),
-      extraInfo: getValue("note"),
+      fullName: getValueById("volunteer-name"),
+      age: getValueById("volunteer-age"),
+      institution: getValueById("volunteer-institution"),
+      preferredRole: preferredRoleLabel,
+      phone: getValueById("volunteer-phone"),
+      email: getValueById("volunteer-email"),
+      extraInfo: getValueById("volunteer-note"),
     };
 
     console.log(data);
