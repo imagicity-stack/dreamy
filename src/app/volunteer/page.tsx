@@ -43,17 +43,22 @@ export default function VolunteerPage() {
     setSubmitStatus(null);
 
     const formData = new FormData(form);
-    const data = {
-      name: formData.get("name"),
-      age: formData.get("age"),
-      institution: formData.get("institution"),
-      role: formData.get("role"),
-      phone: formData.get("phone"),
-      email: formData.get("email"),
-      note: formData.get("note"),
-      termsAccepted: formData.get("terms") === "accepted",
-      timestamp: new Date().toLocaleString("en-IN"),
+    const getValue = (key: string) => {
+      const value = formData.get(key);
+      return typeof value === "string" ? value : "";
     };
+
+    const data = {
+      fullName: getValue("name"),
+      age: getValue("age"),
+      institution: getValue("institution"),
+      preferredRole: getValue("role"),
+      phone: getValue("phone"),
+      email: getValue("email"),
+      extraInfo: getValue("note"),
+    };
+
+    console.log(data);
 
     try {
       const response = await fetch("/api/volunteer", {
