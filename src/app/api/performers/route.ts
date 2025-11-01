@@ -6,7 +6,7 @@ export async function POST(request: Request) {
         console.log('Received form data:', formData);
 
 
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzxA7OK4VOXFLVRfO8gxKX9BuPIea3ErWopVwJERqx4qFtRzk5fgnjk57Q3lSgrWXPc/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbyIW-0sLbF6urBYJMqmL5qPK_tENz9kncYF6C9Dm6CVvKEjcZ9qDhh8C9ewqoGk14Km/exec';
 
 
         const jsonData = JSON.stringify(formData);
