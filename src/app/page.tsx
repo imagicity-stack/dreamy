@@ -241,7 +241,7 @@ export default function Home() {
 
   return (
     <div className="w-full bg-black text-white">
-      <div id="tickets" className="w-full h-[50vh] md:h-[80vh] bg-blue-500 relative">
+      <div id="tickets" className="w-full h-[50vh] md:h-[80vh] bg-black relative">
         <Image
           src="/hero.png"
 

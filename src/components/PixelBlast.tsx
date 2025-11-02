@@ -150,7 +150,7 @@ void main(){
   vec2 uv = cellCoord / uResolution * vec2(aspectRatio, 1.0);
 
   float base = fbm2(uv, uTime * 0.08);
-  float feed = mix(0.25, 0.85, base);
+  float feed = mix(0.35, 0.95, base);
   feed = clamp(feed * uDensity, 0.0, 1.0);
 
   float speed     = uRippleSpeed;
@@ -175,7 +175,7 @@ void main(){
 
   float bayer = Bayer8(fragCoord / uPixelSize) - 0.5;
   float signal = feed + bayer;
-  float bw = smoothstep(0.3, 0.7, signal);
+  float bw = smoothstep(0.25, 0.6, signal);
 
   float h = fract(sin(dot(floor(fragCoord / uPixelSize), vec2(127.1, 311.7))) * 43758.5453);
   float jitterScale = 1.0 + (h - 0.5) * uPixelJitter;

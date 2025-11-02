@@ -61,7 +61,7 @@ export default function MobileMenu() {
 
       {/* Mobile menu */}
       <div
-        className={`fixed top-0 right-0 h-full w-80 bg-[#e22154] transform transition-transform duration-300 ease-in-out z-50 lg:hidden ${
+        className={`fixed top-0 right-0 h-full w-80 bg-black/95 border-l border-[#800000]/60 transform transition-transform duration-300 ease-in-out z-50 lg:hidden ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
