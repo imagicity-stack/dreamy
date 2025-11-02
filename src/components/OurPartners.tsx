@@ -1,4 +1,4 @@
-import { memo } from 'react';
+import { memo } from "react";
 
 const OurPartners = () => {
   // Partner logos - replace with actual partner logos
@@ -14,7 +14,7 @@ const OurPartners = () => {
   return (
     <section
       id="partners"
-      className="bg-[#FFFFFF] text-[#1f1f1f] py-12 md:py-20 px-4 md:px-8 lg:px-20 border-t-2 border-[#ffe300] scroll-mt-24"
+      className="bg-black text-white py-12 md:py-20 px-4 md:px-8 lg:px-20 border-t border-white/10 scroll-mt-24"
     >
       <div className="max-w-7xl mx-auto">
         {/* Title */}
@@ -22,7 +22,7 @@ const OurPartners = () => {
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-castle text-[#ffe300] uppercase tracking-wider">
             Our Partners
           </h2>
-          <p className="text-[#4a4a4a] text-lg md:text-xl mt-4">
+          <p className="text-white/80 text-lg md:text-xl mt-4">
             Powered by amazing collaborators
           </p>
         </div>
@@ -34,8 +34,8 @@ const OurPartners = () => {
               key={`${partner.name}-${index}`}
               className="flex items-center justify-center"
             >
-              <div className="bg-white rounded-xl px-6 py-8 shadow-lg hover:shadow-2xl transition-all duration-300 border-2 border-[#ffe300]/20 hover:border-[#ffe300] hover:scale-110 w-full h-32 flex items-center justify-center">
-                <span className="text-black font-bold text-sm md:text-base lg:text-lg text-center">
+              <div className="bg-black/70 backdrop-blur rounded-xl px-6 py-8 shadow-lg hover:shadow-2xl transition-all duration-300 border border-[#ffe300]/30 hover:border-[#ffe300] hover:scale-110 w-full h-32 flex items-center justify-center">
+                <span className="text-white font-bold text-sm md:text-base lg:text-lg text-center">
                   {partner.name}
                 </span>
                 {/* Replace with actual logo images */}

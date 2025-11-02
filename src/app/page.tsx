@@ -8,6 +8,7 @@ import AboutSection from "@/components/AboutSection";
 import OurPartners from "@/components/OurPartners";
 import ContactUs from "@/components/ContactUs";
 import SectionDivider from "@/components/SectionDivider";
+import PixelBlast from "@/components/PixelBlast";
 import {
   createPaymentOrder,
   loadRazorpayScript,
@@ -19,7 +20,7 @@ const involvementOptions = [
   {
     name: "Bring Your Stall",
     desc: "Showcase food, art, games, or merch in a high-energy bazaar built for creators.",
-    panelClass: "bg-[#e22154] text-[#FFFFFF]",
+    panelClass: "bg-[#800000] text-[#FFFFFF]",
     imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/stall.jpg",
     href: "/stall",
@@ -27,7 +28,7 @@ const involvementOptions = [
   {
     name: "Cosplay Event",
     desc: "Step into character and own Jharkhand’s wildest fandom stage at MADOOZA.",
-    panelClass: "bg-[#e22154] text-[#FFFFFF]",
+    panelClass: "bg-[#800000] text-[#FFFFFF]",
     imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/cosplay.jpg",
     href: "/cosplay",
@@ -35,7 +36,7 @@ const involvementOptions = [
   {
     name: "Performers",
     desc: "From bands and DJs to poets and dancers, light up the lineup with your act.",
-    panelClass: "bg-[#e22154] text-[#FFFFFF]",
+    panelClass: "bg-[#800000] text-[#FFFFFF]",
     imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/Perfomers.jpg",
     href: "/performer",
@@ -43,7 +44,7 @@ const involvementOptions = [
   {
     name: "Volunteers",
     desc: "Join the crew, earn experience, and see the madness from behind the scenes.",
-    panelClass: "bg-[#e22154] text-[#FFFFFF]",
+    panelClass: "bg-[#800000] text-[#FFFFFF]",
     imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/volunteer.jpg",
     href: "/volunteer",
@@ -51,7 +52,7 @@ const involvementOptions = [
   {
     name: "Sponsors",
     desc: "Partner with MADOOZA to amplify your brand across Jharkhand’s youth movement.",
-    panelClass: "bg-[#e22154] text-[#FFFFFF]",
+    panelClass: "bg-[#800000] text-[#FFFFFF]",
     imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/sponsorship.png",
     href: "/sponsor",
@@ -62,15 +63,19 @@ const highlights = [
   {
     title: "CREATOR 1",
     subtitle: "Coming Soon",
-    color: "bg-[#FFFFFF]",
-    textColor: "text-[#e22154]",
+    cardClass:
+      "bg-black/70 backdrop-blur border border-[#800000]/40 shadow-2xl",
+    titleClass: "text-[#ffe3f0]",
+    subtitleClass: "text-[#ffd6e1]",
     image: "/creator1.png",
   },
   {
     title: "CREATOR 2",
     subtitle: "Coming Soon",
-    color: "bg-[#FFFFFF]",
-    textColor: "text-[#e22154]",
+    cardClass:
+      "bg-black/70 backdrop-blur border border-[#800000]/40 shadow-2xl",
+    titleClass: "text-[#ffe3f0]",
+    subtitleClass: "text-[#ffd6e1]",
     image: "/creator1.png",
   },
 ];
@@ -235,8 +240,8 @@ export default function Home() {
   };
 
   return (
-    <div className="w-full">
-      <div id="tickets" className="w-full h-[50vh] md:h-[80vh] bg-blue-500 relative">
+    <div className="w-full bg-black text-white">
+      <div id="tickets" className="w-full h-[50vh] md:h-[80vh] bg-black relative">
         <Image
           src="/hero.png"
 
@@ -287,132 +292,154 @@ export default function Home() {
         </div>
 
       </div>
-      <ScrollingBanner />
-      <SectionDivider />
-      <AboutSection />
-      <SectionDivider />
-      <section
-        id="involvewithus"
-        className="bg-[#FFFFFF] text-[#1f1f1f] py-12 md:py-20 flex justify-center items-center flex-col px-4 scroll-mt-24"
-      >
-        <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl uppercase mb-6 md:mb-10 font-oswald tracking-wide text-[#e22154]">
-          INVOLVE WITH US
-        </h2>
-
-        {/* Tabs */}
-        <div className="flex justify-center w-full">
-          <div className="w-full md:w-10/12 overflow-x-auto">
-            <div className="flex gap-1 md:gap-2 min-w-max md:min-w-0">
-              {involvementOptions.map((festival) => (
-                <button
-                  key={festival.name}
-                  onClick={() => setActive(festival.name)}
-                  className={`flex items-center justify-center gap-1 md:gap-3 flex-1 px-2 md:px-4 py-2 md:py-3 cursor-pointer font-oswald tracking-wide text-sm sm:text-base md:text-lg lg:text-xl uppercase transition-all whitespace-nowrap ${
-                    active === festival.name
-                      ? "bg-[#e22154] text-[#FFFF00]"
-                      : "bg-[#FFFF00] text-[#e22154] hover:bg-[#e22154] hover:text-[#FFFF00]"
-                  }`}
-                >
-                  <span className="text-center">{festival.name}</span>
-                </button>
-              ))}
-            </div>
-          </div>
+      <div className="relative isolate">
+        <div className="absolute inset-0 -z-10 bg-black">
+          <PixelBlast
+            variant="circle"
+            pixelSize={6}
+            color="#800000"
+            patternScale={3}
+            patternDensity={1.2}
+            pixelSizeJitter={0.5}
+            enableRipples
+            rippleSpeed={0.4}
+            rippleThickness={0.12}
+            rippleIntensityScale={1.5}
+            speed={0.6}
+            edgeFade={0.25}
+            className="h-full w-full"
+          />
         </div>
 
-        {/* Active Festival Content */}
-        <div className="flex justify-center mt-6 md:mt-10 w-full">
-          <div className="w-full md:w-10/12 flex flex-col lg:flex-row items-stretch h-auto lg:min-h-[440px]">
-            {/* Left Info */}
-            <div
-              className={`${currentFestival.panelClass} p-8 md:p-12 lg:p-20 lg:w-1/2 h-auto lg:h-full flex-1 flex flex-col justify-center`}
-            >
-              <h3
-                className="mb-4 uppercase font-oswald text-xl sm:text-2xl md:text-3xl lg:text-4xl tracking-wide"
-              >
-                {currentFestival.name}
-              </h3>
-              <div className="h-auto lg:max-h-64 overflow-y-auto">
-                <p className="text-sm md:text-base leading-relaxed text-white/90">
-                  {currentFestival.desc}
-                </p>
-              </div>
-              <Link
-                href={currentFestival.href}
-                className="mobile-tap relative z-10 mt-4 inline-flex w-fit cursor-pointer bg-[#FFFF00] text-[#e22154] text-sm sm:text-base md:text-lg font-oswald px-5 py-2 rounded-md transition-all uppercase hover:bg-[#fffd66] hover:text-[#b6163f] hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFFF00]/60 active:translate-y-0"
-              >
-                Learn More
-              </Link>
-            </div>
-
-            {/* Right Image */}
-            <div
-              className={`${currentFestival.imageBgClass} lg:w-1/2 w-full flex justify-center items-center p-6 md:p-8 lg:p-10 flex-1 min-h-[280px]`}
-            >
-              <Image
-                src={currentFestival.logo}
-                alt={`${currentFestival.name} logo`}
-                width={600}
-                height={600}
-                className="object-fill max-w-full max-h-full"
-              />
-            </div>
-          </div>
-        </div>
-        <section className="py-8 md:py-12 w-full md:w-10/12 px-4 md:px-0">
-          {/* Creators Header */}
-          <div className="text-center mb-8 md:mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold uppercase tracking-wide font-oswald text-[#e22154] mb-4">
-              FEATURED CREATORS
-            </h2>
-            <p className="text-[#1f1f1f] text-base sm:text-lg md:text-xl font-bold font-quicksand">
-              Coming Soon
-            </p>
-          </div>
-
-          {/* Creator Cards */}
-          <div
-            id="creators"
-            className="flex flex-col md:flex-row justify-center items-stretch gap-8 md:gap-12 max-w-5xl mx-auto scroll-mt-24"
+        <div className="relative z-10">
+          <ScrollingBanner />
+          <SectionDivider />
+          <AboutSection />
+          <SectionDivider />
+          <section
+            id="involvewithus"
+            className="bg-black text-white py-12 md:py-20 flex justify-center items-center flex-col px-4 scroll-mt-24"
           >
-            {highlights.map((item, index) => (
-              <div
-                key={index}
-                className={`${item.color} flex flex-col items-center w-full md:w-1/2 text-center duration-300 rounded-3xl overflow-hidden shadow-2xl hover:scale-105 transition-all border-4 border-[#e22154]/20 hover:border-[#e22154]/40`}
-              >
-                <div className="flex flex-col items-center justify-center p-8 pb-6">
+            <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl uppercase mb-6 md:mb-10 font-oswald tracking-wide text-[#800000]">
+              INVOLVE WITH US
+            </h2>
+
+            {/* Tabs */}
+            <div className="flex justify-center w-full">
+              <div className="w-full md:w-10/12 overflow-x-auto">
+                <div className="flex gap-1 md:gap-2 min-w-max md:min-w-0">
+                  {involvementOptions.map((festival) => (
+                    <button
+                      key={festival.name}
+                      onClick={() => setActive(festival.name)}
+                      className={`flex items-center justify-center gap-1 md:gap-3 flex-1 px-2 md:px-4 py-2 md:py-3 cursor-pointer font-oswald tracking-wide text-sm sm:text-base md:text-lg lg:text-xl uppercase transition-all whitespace-nowrap ${
+                        active === festival.name
+                          ? "bg-[#800000] text-[#FFFF00]"
+                          : "bg-[#FFFF00] text-[#800000] hover:bg-[#800000] hover:text-[#FFFF00]"
+                      }`}
+                    >
+                      <span className="text-center">{festival.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Active Festival Content */}
+            <div className="flex justify-center mt-6 md:mt-10 w-full">
+              <div className="w-full md:w-10/12 flex flex-col lg:flex-row items-stretch h-auto lg:min-h-[440px]">
+                {/* Left Info */}
+                <div
+                  className={`${currentFestival.panelClass} p-8 md:p-12 lg:p-20 lg:w-1/2 h-auto lg:h-full flex-1 flex flex-col justify-center`}
+                >
                   <h3
-                    className={`${item.textColor} text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold uppercase tracking-wide font-oswald mb-3`}
+                    className="mb-4 uppercase font-oswald text-xl sm:text-2xl md:text-3xl lg:text-4xl tracking-wide"
                   >
-                    {item.title}
+                    {currentFestival.name}
                   </h3>
-                  <p className={`${item.textColor} text-base sm:text-lg md:text-xl font-bold opacity-90`}>
-                    {item.subtitle}
-                  </p>
+                  <div className="h-auto lg:max-h-64 overflow-y-auto">
+                    <p className="text-sm md:text-base leading-relaxed text-white/90">
+                      {currentFestival.desc}
+                    </p>
+                  </div>
+                  <Link
+                    href={currentFestival.href}
+                    className="mobile-tap relative z-10 mt-4 inline-flex w-fit cursor-pointer bg-[#FFFF00] text-[#800000] text-sm sm:text-base md:text-lg font-oswald px-5 py-2 rounded-md transition-all uppercase hover:bg-[#fffd66] hover:text-[#b6163f] hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFFF00]/60 active:translate-y-0"
+                  >
+                    Learn More
+                  </Link>
                 </div>
 
-                <div className="relative w-full flex justify-center items-end flex-1">
+                {/* Right Image */}
+                <div
+                  className={`${currentFestival.imageBgClass} lg:w-1/2 w-full flex justify-center items-center p-6 md:p-8 lg:p-10 flex-1 min-h-[280px]`}
+                >
                   <Image
-                    src={item.image}
-                    alt={item.title}
+                    src={currentFestival.logo}
+                    alt={`${currentFestival.name} logo`}
                     width={600}
                     height={600}
-                    className="object-cover w-full h-full min-h-[300px] md:min-h-[400px] lg:min-h-[450px]"
+                    className="object-fill max-w-full max-h-full"
                   />
                 </div>
               </div>
-            ))}
-          </div>
-        </section>
-      </section>
-      <SectionDivider />
-      <ScrollingBanner />
-      <SectionDivider />
-      <ContactUs />
-      <SectionDivider />
-      <OurPartners />
-      <SectionDivider />
-      <Footer />
+            </div>
+            <section className="py-8 md:py-12 w-full md:w-10/12 px-4 md:px-0">
+              {/* Creators Header */}
+              <div className="text-center mb-8 md:mb-12">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold uppercase tracking-wide font-oswald text-[#800000] mb-4">
+                  FEATURED CREATORS
+                </h2>
+                <p className="text-white/90 text-base sm:text-lg md:text-xl font-bold font-quicksand">
+                  Coming Soon
+                </p>
+              </div>
+
+              {/* Creator Cards */}
+              <div
+                id="creators"
+                className="flex flex-col md:flex-row justify-center items-stretch gap-8 md:gap-12 max-w-5xl mx-auto scroll-mt-24"
+              >
+                {highlights.map((item, index) => (
+                  <div
+                    key={index}
+                    className={`${item.cardClass} flex flex-col items-center w-full md:w-1/2 text-center duration-300 rounded-3xl overflow-hidden hover:scale-105 transition-all`}
+                  >
+                    <div className="flex flex-col items-center justify-center p-8 pb-6">
+                      <h3
+                        className={`${item.titleClass} text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-extrabold uppercase tracking-wide font-oswald mb-3`}
+                      >
+                        {item.title}
+                      </h3>
+                      <p className={`${item.subtitleClass} text-base sm:text-lg md:text-xl font-bold opacity-90`}>
+                        {item.subtitle}
+                      </p>
+                    </div>
+
+                    <div className="relative w-full flex justify-center items-end flex-1">
+                      <Image
+                        src={item.image}
+                        alt={item.title}
+                        width={600}
+                        height={600}
+                        className="object-cover w-full h-full min-h-[300px] md:min-h-[400px] lg:min-h-[450px]"
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          </section>
+          <SectionDivider />
+          <ScrollingBanner />
+          <SectionDivider />
+          <ContactUs />
+          <SectionDivider />
+          <OurPartners />
+          <SectionDivider />
+          <Footer />
+        </div>
+      </div>
 
       {/* Ticket Modal */}
       {isTicketModalOpen && (
@@ -420,11 +447,11 @@ export default function Home() {
           <div className="relative w-full max-w-2xl">
             <div className="pointer-events-none absolute -inset-6 -z-10 opacity-50 blur-3xl bg-[#00f5ff]" aria-hidden />
 
-            <div className="relative flex max-h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-none bg-[#e22154] text-white shadow-[0_0_45px_rgba(0,255,255,0.35)] md:bg-[#FFFFFF] md:text-[#1f1f1f]">
+            <div className="relative flex max-h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-none bg-[#800000] text-white shadow-[0_0_45px_rgba(0,255,255,0.35)] md:bg-[#FFFFFF] md:text-[#1f1f1f]">
               <button
                 type="button"
                 onClick={closeTicketModal}
-                className="mobile-tap absolute top-4 right-4 z-20 text-[#e22154] text-2xl transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00f5ff]"
+                className="mobile-tap absolute top-4 right-4 z-20 text-[#800000] text-2xl transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00f5ff]"
                 aria-label="Close ticket form"
               >
                 ✕
@@ -452,7 +479,7 @@ export default function Home() {
                     id="ticket-name"
                     name="name"
                     required
-                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#e22154] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
+                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#800000] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
                     placeholder="Enter your full name"
                   />
                 </label>
@@ -463,7 +490,7 @@ export default function Home() {
                     id="ticket-email"
                     name="email"
                     required
-                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#e22154] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
+                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#800000] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
                     placeholder="your.email@example.com"
                   />
                 </label>
@@ -479,7 +506,7 @@ export default function Home() {
                       maxLength={10}
                       minLength={10}
                       title="Enter a 10-digit phone number"
-                      className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#e22154] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
+                      className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#800000] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
                       placeholder="9876543210"
                     />
                   </label>
@@ -489,7 +516,7 @@ export default function Home() {
                     id="ticket-quantity"
                     name="quantity"
                     required
-                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#e22154] md:focus:ring-offset-[#FFFFFF] cursor-pointer"
+                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#800000] md:focus:ring-offset-[#FFFFFF] cursor-pointer"
                   >
                     <option value="" className="bg-white text-[#1f1f1f]">
                       Select quantity
@@ -520,7 +547,7 @@ export default function Home() {
                   name="message"
                   rows={4}
                   required
-                  className="w-full resize-none bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#e22154] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
+                  className="w-full resize-none bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#800000] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
                   placeholder="Let us know how we can help"
                 />
               </label>
@@ -536,7 +563,10 @@ export default function Home() {
                 />
                 <span>
                   I accept the{" "}
-                  <Link href="/terms-and-conditions" className="text-[#FFFF00] underline-offset-4 hover:underline md:text-[#e22154]">
+                  <Link
+                    href="/terms-and-conditions"
+                    className="text-[#FFFF00] underline-offset-4 hover:underline md:text-[#800000]"
+                  >
                     terms and conditions
                   </Link>
                 </span>
@@ -546,14 +576,14 @@ export default function Home() {
                 <button
                   type="submit"
                   disabled={ticketProcessing}
-                  className="mobile-tap flex-1 bg-[#FFFF00] px-6 py-3 text-base font-montserrat font-semibold text-[#e22154] transition-transform hover:scale-[1.02] hover:bg-[#fffd66] disabled:cursor-not-allowed disabled:opacity-60 md:bg-[#e22154] md:text-white md:hover:bg-[#c81949]"
+                  className="mobile-tap flex-1 bg-[#FFFF00] px-6 py-3 text-base font-montserrat font-semibold text-[#800000] transition-transform hover:scale-[1.02] hover:bg-[#fffd66] disabled:cursor-not-allowed disabled:opacity-60 md:bg-[#800000] md:text-white md:hover:bg-[#a00000]"
                 >
                   {ticketProcessing ? "Processing Payment..." : "Request Tickets"}
                 </button>
                 <button
                   type="button"
                   onClick={closeTicketModal}
-                  className="mobile-tap bg-[#FFFFFF] px-6 py-3 text-base font-montserrat font-semibold text-[#e22154] border border-[#e22154] transition-transform hover:scale-[1.02] hover:bg-[#FFFFFF]"
+                  className="mobile-tap bg-[#FFFFFF] px-6 py-3 text-base font-montserrat font-semibold text-[#800000] border border-[#800000] transition-transform hover:scale-[1.02] hover:bg-[#FFFFFF]"
                 >
                   Cancel
                 </button>

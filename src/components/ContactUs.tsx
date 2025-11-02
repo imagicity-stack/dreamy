@@ -4,10 +4,10 @@ export default function ContactUs() {
   return (
     <section
       id="contactus"
-      className="bg-[#FFFFFF] py-12 md:py-20 relative px-4 scroll-mt-24"
+      className="bg-black py-12 md:py-20 relative px-4 scroll-mt-24 text-white"
     >
       {/* Main Container */}
-      <div className="max-w-[1500px] mx-auto grid grid-cols-1 lg:grid-cols-2 items-stretch relative z-10 rounded-2xl overflow-hidden">
+      <div className="max-w-[1500px] mx-auto grid grid-cols-1 lg:grid-cols-2 items-stretch relative z-10 rounded-2xl overflow-hidden border border-white/10 bg-black/40 backdrop-blur">
         {/* Left Section - Image */}
         <div className="relative order-2 lg:order-1">
           <Image
@@ -20,20 +20,20 @@ export default function ContactUs() {
         </div>
 
         {/* Right Section - Newsletter Content */}
-        <div className="bg-[#ff1a00] p-8 md:p-12 lg:p-16 flex flex-col justify-center items-center text-center lg:rounded-r-2xl relative order-1 lg:order-2">
+        <div className="bg-[#3b000f]/80 p-8 md:p-12 lg:p-16 flex flex-col justify-center items-center text-center lg:rounded-r-2xl relative order-1 lg:order-2">
           {/* Heading */}
-          <h2 className="text-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-lg leading-tight uppercase mb-4 md:mb-6 tracking-wide font-castle">
+          <h2 className="text-[#ffe3f0] text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-lg leading-tight uppercase mb-4 md:mb-6 tracking-wide font-castle">
             CONTACT US
           </h2>
 
           {/* Paragraph */}
           <div className="text-white font-sans text-sm md:text-base lg:text-lg leading-relaxed max-w-xl mb-6 md:mb-8">
-            <p className="mb-4 font-semibold text-lg md:text-xl">Get in Touch</p>
-            <p className="mb-4">
+            <p className="mb-4 font-semibold text-lg md:text-xl text-[#ffd6e1]">Get in Touch</p>
+            <p className="mb-4 text-white/85">
               Have a question or want to collaborate with Madooza? Reach out to us:
             </p>
             <div className="space-y-2 font-semibold">
-      <p className="break-all font-sans">📩 madooza&#64;imagicity.in</p>
+              <p className="break-all font-sans">📩 madooza&#64;imagicity.in</p>
               <p>📞 +91-9122289578</p>
             </div>
           </div>
