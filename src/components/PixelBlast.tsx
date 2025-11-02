@@ -3,7 +3,7 @@
 import { CSSProperties, useEffect, useRef } from "react";
 import styles from "./PixelBlast.module.css";
 
-type ShapeVariant = keyof typeof SHAPE_MAP;
+type ShapeVariant = "square" | "circle" | "triangle" | "diamond";
 
 type PixelBlastProps = {
   variant?: ShapeVariant;
@@ -11,7 +11,6 @@ type PixelBlastProps = {
   color?: string;
   className?: string;
   style?: CSSProperties;
-  antialias?: boolean;
   patternScale?: number;
   patternDensity?: number;
   pixelSizeJitter?: number;
@@ -23,268 +22,99 @@ type PixelBlastProps = {
   speed?: number;
 };
 
-const SHAPE_MAP = {
-  square: 0,
-  circle: 1,
-  triangle: 2,
-  diamond: 3,
-} as const;
+type Ripple = {
+  x: number;
+  y: number;
+  born: number;
+};
 
-const MAX_CLICKS = 10;
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
 
-const VERTEX_SRC = `#version 300 es
-in vec2 position;
-void main() {
-  gl_Position = vec4(position, 0.0, 1.0);
-}
-` as const;
-
-const FRAGMENT_SRC = `#version 300 es
-precision highp float;
-
-uniform vec3  uColor;
-uniform vec2  uResolution;
-uniform float uTime;
-uniform float uPixelSize;
-uniform float uScale;
-uniform float uDensity;
-uniform float uPixelJitter;
-uniform int   uEnableRipples;
-uniform float uRippleSpeed;
-uniform float uRippleThickness;
-uniform float uRippleIntensity;
-uniform float uEdgeFade;
-uniform int   uShapeType;
-
-const int SHAPE_SQUARE   = 0;
-const int SHAPE_CIRCLE   = 1;
-const int SHAPE_TRIANGLE = 2;
-const int SHAPE_DIAMOND  = 3;
-
-const int MAX_CLICKS = 10;
-
-uniform vec2  uClickPos  [MAX_CLICKS];
-uniform float uClickTimes[MAX_CLICKS];
-
-out vec4 fragColor;
-
-float Bayer2(vec2 a) {
-  a = floor(a);
-  return fract(a.x / 2. + a.y * a.y * .75);
-}
-#define Bayer4(a) (Bayer2(.5*(a))*0.25 + Bayer2(a))
-#define Bayer8(a) (Bayer4(.5*(a))*0.25 + Bayer2(a))
-
-#define FBM_OCTAVES     5
-#define FBM_LACUNARITY  1.25
-#define FBM_GAIN        1.0
-
-float hash11(float n){ return fract(sin(n)*43758.5453); }
-
-float vnoise(vec3 p){
-  vec3 ip = floor(p);
-  vec3 fp = fract(p);
-  float n000 = hash11(dot(ip + vec3(0.0,0.0,0.0), vec3(1.0,57.0,113.0)));
-  float n100 = hash11(dot(ip + vec3(1.0,0.0,0.0), vec3(1.0,57.0,113.0)));
-  float n010 = hash11(dot(ip + vec3(0.0,1.0,0.0), vec3(1.0,57.0,113.0)));
-  float n110 = hash11(dot(ip + vec3(1.0,1.0,0.0), vec3(1.0,57.0,113.0)));
-  float n001 = hash11(dot(ip + vec3(0.0,0.0,1.0), vec3(1.0,57.0,113.0)));
-  float n101 = hash11(dot(ip + vec3(1.0,0.0,1.0), vec3(1.0,57.0,113.0)));
-  float n011 = hash11(dot(ip + vec3(0.0,1.0,1.0), vec3(1.0,57.0,113.0)));
-  float n111 = hash11(dot(ip + vec3(1.0,1.0,1.0), vec3(1.0,57.0,113.0)));
-  vec3 w = fp*fp*fp*(fp*(fp*6.0-15.0)+10.0);
-  float x00 = mix(n000, n100, w.x);
-  float x10 = mix(n010, n110, w.x);
-  float x01 = mix(n001, n101, w.x);
-  float x11 = mix(n011, n111, w.x);
-  float y0  = mix(x00, x10, w.y);
-  float y1  = mix(x01, x11, w.y);
-  return mix(y0, y1, w.z) * 2.0 - 1.0;
-}
-
-float fbm2(vec2 uv, float t){
-  vec3 p = vec3(uv * uScale, t);
-  float amp = 1.0;
-  float freq = 1.0;
-  float sum = 1.0;
-  for (int i = 0; i < FBM_OCTAVES; ++i){
-    sum  += amp * vnoise(p * freq);
-    freq *= FBM_LACUNARITY;
-    amp  *= FBM_GAIN;
-  }
-  return sum * 0.5 + 0.5;
-}
-
-float maskCircle(vec2 p, float cov){
-  float r = sqrt(cov) * .25;
-  float d = length(p - 0.5) - r;
-  float aa = 0.5 * fwidth(d);
-  return cov * (1.0 - smoothstep(-aa, aa, d * 2.0));
-}
-
-float maskTriangle(vec2 p, vec2 id, float cov){
-  bool flip = mod(id.x + id.y, 2.0) > 0.5;
-  if (flip) p.x = 1.0 - p.x;
-  float r = sqrt(cov);
-  float d  = p.y - r*(1.0 - p.x);
-  float aa = fwidth(d);
-  return cov * clamp(0.5 - d/aa, 0.0, 1.0);
-}
-
-float maskDiamond(vec2 p, float cov){
-  float r = sqrt(cov) * 0.564;
-  return step(abs(p.x - 0.49) + abs(p.y - 0.49), r);
-}
-
-void main(){
-  float pixelSize = uPixelSize;
-  vec2 fragCoord = gl_FragCoord.xy - uResolution * .5;
-  float aspectRatio = uResolution.x / uResolution.y;
-
-  vec2 pixelId = floor(fragCoord / pixelSize);
-  vec2 pixelUV = fract(fragCoord / pixelSize);
-
-  float cellPixelSize = 8.0 * pixelSize;
-  vec2 cellId = floor(fragCoord / cellPixelSize);
-  vec2 cellCoord = cellId * cellPixelSize;
-  vec2 uv = cellCoord / uResolution * vec2(aspectRatio, 1.0);
-
-  float base = fbm2(uv, uTime * 0.08);
-  float feed = mix(0.35, 0.95, base);
-  feed = clamp(feed * uDensity, 0.0, 1.0);
-
-  float speed     = uRippleSpeed;
-  float thickness = uRippleThickness;
-  const float dampT     = 1.0;
-  const float dampR     = 10.0;
-
-  if (uEnableRipples == 1) {
-    for (int i = 0; i < MAX_CLICKS; ++i){
-      vec2 pos = uClickPos[i];
-      if (pos.x < 0.0) continue;
-      float cellPixelSize = 8.0 * pixelSize;
-      vec2 cuv = (((pos - uResolution * .5 - cellPixelSize * .5) / (uResolution))) * vec2(aspectRatio, 1.0);
-      float t = max(uTime - uClickTimes[i], 0.0);
-      float r = distance(uv, cuv);
-      float waveR = speed * t;
-      float ring  = exp(-pow((r - waveR) / thickness, 2.0));
-      float atten = exp(-dampT * t) * exp(-dampR * r);
-      feed = max(feed, ring * atten * uRippleIntensity);
-    }
+const parseHexColor = (hex: string) => {
+  const fallback = { r: 128, g: 0, b: 0 };
+  if (!hex) {
+    return fallback;
   }
 
-  float bayer = Bayer8(fragCoord / uPixelSize) - 0.5;
-  float signal = feed + bayer;
-  float bw = smoothstep(0.25, 0.6, signal);
-
-  float h = fract(sin(dot(floor(fragCoord / uPixelSize), vec2(127.1, 311.7))) * 43758.5453);
-  float jitterScale = 1.0 + (h - 0.5) * uPixelJitter;
-  float coverage = clamp(bw * jitterScale, 0.0, 1.0);
-  float M;
-  if      (uShapeType == SHAPE_CIRCLE)   M = maskCircle (pixelUV, coverage);
-  else if (uShapeType == SHAPE_TRIANGLE) M = maskTriangle(pixelUV, pixelId, coverage);
-  else if (uShapeType == SHAPE_DIAMOND)  M = maskDiamond(pixelUV, coverage);
-  else                                   M = coverage;
-
-  if (uEdgeFade > 0.0) {
-    vec2 norm = gl_FragCoord.xy / uResolution;
-    float edge = min(min(norm.x, norm.y), min(1.0 - norm.x, 1.0 - norm.y));
-    float fade = smoothstep(0.0, uEdgeFade, edge);
-    M *= fade;
+  let normalized = hex.trim();
+  if (normalized.startsWith("#")) {
+    normalized = normalized.slice(1);
   }
 
-  vec3 color = uColor;
-  fragColor = vec4(color, M);
-}
-` as const;
-
-const POSITIONS = new Float32Array([
-  -1, -1,
-  1, -1,
-  -1, 1,
-  -1, 1,
-  1, -1,
-  1, 1,
-]);
-
-const hexToRgb = (value: string): [number, number, number] => {
-  let hex = value.trim();
-  if (hex.startsWith("#")) {
-    hex = hex.slice(1);
+  if (![3, 6].includes(normalized.length)) {
+    return fallback;
   }
 
-  if (hex.length === 3) {
-    hex = hex
+  if (normalized.length === 3) {
+    normalized = normalized
       .split("")
-      .map((char) => `${char}${char}`)
+      .map((segment) => segment + segment)
       .join("");
   }
 
-  const intValue = Number.parseInt(hex, 16);
-  const r = (intValue >> 16) & 0xff;
-  const g = (intValue >> 8) & 0xff;
-  const b = intValue & 0xff;
-
-  return [r / 255, g / 255, b / 255];
-};
-
-const createShader = (gl: WebGL2RenderingContext, type: GLenum, source: string) => {
-  const shader = gl.createShader(type);
-  if (!shader) {
-    throw new Error("Unable to create shader");
+  const parsed = Number.parseInt(normalized, 16);
+  if (Number.isNaN(parsed)) {
+    return fallback;
   }
 
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    const info = gl.getShaderInfoLog(shader) ?? "Unknown error";
-    gl.deleteShader(shader);
-    throw new Error(`Shader compile error: ${info}`);
-  }
-
-  return shader;
+  return {
+    r: (parsed >> 16) & 255,
+    g: (parsed >> 8) & 255,
+    b: parsed & 255,
+  };
 };
 
-const createProgram = (
-  gl: WebGL2RenderingContext,
-  vertexSource: string,
-  fragmentSource: string,
+const drawShape = (
+  ctx: CanvasRenderingContext2D,
+  variant: ShapeVariant,
+  centerX: number,
+  centerY: number,
+  size: number,
 ) => {
-  const vertex = createShader(gl, gl.VERTEX_SHADER, vertexSource);
-  const fragment = createShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
-  const program = gl.createProgram();
+  const half = size / 2;
 
-  if (!program) {
-    throw new Error("Unable to create shader program");
+  switch (variant) {
+    case "circle": {
+      ctx.beginPath();
+      ctx.arc(centerX, centerY, half, 0, Math.PI * 2);
+      ctx.fill();
+      return;
+    }
+    case "triangle": {
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY - half);
+      ctx.lineTo(centerX + half, centerY + half);
+      ctx.lineTo(centerX - half, centerY + half);
+      ctx.closePath();
+      ctx.fill();
+      return;
+    }
+    case "diamond": {
+      ctx.beginPath();
+      ctx.moveTo(centerX, centerY - half);
+      ctx.lineTo(centerX + half, centerY);
+      ctx.lineTo(centerX, centerY + half);
+      ctx.lineTo(centerX - half, centerY);
+      ctx.closePath();
+      ctx.fill();
+      return;
+    }
+    default: {
+      ctx.fillRect(centerX - half, centerY - half, size, size);
+    }
   }
-
-  gl.attachShader(program, vertex);
-  gl.attachShader(program, fragment);
-  gl.linkProgram(program);
-
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    const info = gl.getProgramInfoLog(program) ?? "Unknown error";
-    gl.deleteProgram(program);
-    gl.deleteShader(vertex);
-    gl.deleteShader(fragment);
-    throw new Error(`Program link error: ${info}`);
-  }
-
-  gl.deleteShader(vertex);
-  gl.deleteShader(fragment);
-  return program;
 };
+
+const MAX_RIPPLES = 12;
 
 const PixelBlast = ({
-  variant = "square",
-  pixelSize = 3,
+  variant = "circle",
+  pixelSize = 6,
   color = "#800000",
   className,
   style,
-  antialias = true,
-  patternScale = 2,
-  patternDensity = 1,
+  patternScale = 3,
+  patternDensity = 1.2,
   pixelSizeJitter = 0.5,
   enableRipples = true,
   rippleIntensityScale = 1.5,
@@ -294,205 +124,203 @@ const PixelBlast = ({
   speed = 0.6,
 }: PixelBlastProps) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const visibilityRef = useRef({ visible: true });
-  const speedRef = useRef(speed);
-
-  useEffect(() => {
-    const handleVisibility = () => {
-      if (typeof document === "undefined") {
-        return;
-      }
-
-      visibilityRef.current.visible = document.visibilityState !== "hidden";
-    };
-
-    if (typeof document !== "undefined") {
-      document.addEventListener("visibilitychange", handleVisibility);
-      handleVisibility();
-    }
-
-    return () => {
-      if (typeof document !== "undefined") {
-        document.removeEventListener("visibilitychange", handleVisibility);
-      }
-    };
-  }, []);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const animationRef = useRef<number>();
+  const ripplesRef = useRef<Ripple[]>([]);
 
   useEffect(() => {
     const container = containerRef.current;
+    const canvas = canvasRef.current;
 
-    if (!container) {
-      return undefined;
+    if (!container || !canvas) {
+      return;
     }
 
-    speedRef.current = speed;
-
-    const canvas = document.createElement("canvas");
-    canvas.style.width = "100%";
-    canvas.style.height = "100%";
-    container.appendChild(canvas);
-
-    const gl = canvas.getContext("webgl2", {
-      antialias,
-      alpha: true,
-    });
-
-    if (!gl) {
-      container.removeChild(canvas);
-      return undefined;
+    const ctx = canvas.getContext("2d", { alpha: true });
+    if (!ctx) {
+      return;
     }
 
-    gl.getExtension("OES_standard_derivatives");
+    const colorRGB = parseHexColor(color);
+    const basePixel = Math.max(2, pixelSize);
+    const baseScale = Math.max(patternScale, 0.1);
+    const density = Math.max(patternDensity, 0.05);
+    const rippleThicknessSafe = Math.max(rippleThickness, 0.01);
+    const rippleSpeedSafe = Math.max(rippleSpeed, 0.05);
+    const jitterAmount = Math.max(0, pixelSizeJitter);
+    const edgeFadeSafe = Math.max(edgeFade, 0);
 
-    const program = createProgram(gl, VERTEX_SRC, FRAGMENT_SRC);
-    gl.useProgram(program);
-    gl.clearColor(0, 0, 0, 0);
+    let width = 0;
+    let height = 0;
+    let devicePixelRatio = 1;
 
-    const vao = gl.createVertexArray();
-    const buffer = gl.createBuffer();
+    const updateSize = () => {
+      const rect = container.getBoundingClientRect();
+      width = Math.max(1, rect.width);
+      height = Math.max(1, rect.height);
+      devicePixelRatio = Math.min(window.devicePixelRatio || 1, 2);
 
-    if (!vao || !buffer) {
-      throw new Error("Failed to create WebGL buffers");
-    }
-
-    gl.bindVertexArray(vao);
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(gl.ARRAY_BUFFER, POSITIONS, gl.STATIC_DRAW);
-
-    const positionLocation = gl.getAttribLocation(program, "position");
-    gl.enableVertexAttribArray(positionLocation);
-    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-
-    const uniformLocations = {
-      uResolution: gl.getUniformLocation(program, "uResolution"),
-      uTime: gl.getUniformLocation(program, "uTime"),
-      uColor: gl.getUniformLocation(program, "uColor"),
-      uPixelSize: gl.getUniformLocation(program, "uPixelSize"),
-      uScale: gl.getUniformLocation(program, "uScale"),
-      uDensity: gl.getUniformLocation(program, "uDensity"),
-      uPixelJitter: gl.getUniformLocation(program, "uPixelJitter"),
-      uEnableRipples: gl.getUniformLocation(program, "uEnableRipples"),
-      uRippleSpeed: gl.getUniformLocation(program, "uRippleSpeed"),
-      uRippleThickness: gl.getUniformLocation(program, "uRippleThickness"),
-      uRippleIntensity: gl.getUniformLocation(program, "uRippleIntensity"),
-      uEdgeFade: gl.getUniformLocation(program, "uEdgeFade"),
-      uShapeType: gl.getUniformLocation(program, "uShapeType"),
-      uClickPos: Array.from({ length: MAX_CLICKS }, (_, index) =>
-        gl.getUniformLocation(program, `uClickPos[${index}]`),
-      ),
-      uClickTimes: Array.from({ length: MAX_CLICKS }, (_, index) =>
-        gl.getUniformLocation(program, `uClickTimes[${index}]`),
-      ),
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      canvas.width = Math.max(1, Math.floor(width * devicePixelRatio));
+      canvas.height = Math.max(1, Math.floor(height * devicePixelRatio));
+      ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
     };
 
-    const clickPositions = new Float32Array(MAX_CLICKS * 2).fill(-1);
-    const clickTimes = new Float32Array(MAX_CLICKS);
-    let clickIndex = 0;
+    updateSize();
 
-    const [r, g, b] = hexToRgb(color);
-    gl.uniform3f(uniformLocations.uColor!, r, g, b);
-    gl.uniform1f(uniformLocations.uScale!, patternScale);
-    gl.uniform1f(uniformLocations.uDensity!, patternDensity);
-    gl.uniform1f(uniformLocations.uPixelJitter!, pixelSizeJitter);
-    gl.uniform1i(uniformLocations.uEnableRipples!, enableRipples ? 1 : 0);
-    gl.uniform1f(uniformLocations.uRippleSpeed!, rippleSpeed);
-    gl.uniform1f(uniformLocations.uRippleThickness!, rippleThickness);
-    gl.uniform1f(uniformLocations.uRippleIntensity!, rippleIntensityScale);
-    gl.uniform1f(uniformLocations.uEdgeFade!, edgeFade);
-    gl.uniform1i(uniformLocations.uShapeType!, SHAPE_MAP[variant] ?? 0);
-
-    const resize = () => {
-      const width = container.clientWidth || 1;
-      const height = container.clientHeight || 1;
-      const ratio = Math.min(window.devicePixelRatio || 1, 2);
-
-      canvas.width = Math.floor(width * ratio);
-      canvas.height = Math.floor(height * ratio);
-      gl.viewport(0, 0, canvas.width, canvas.height);
-
-      gl.uniform2f(uniformLocations.uResolution!, canvas.width, canvas.height);
-      gl.uniform1f(uniformLocations.uPixelSize!, pixelSize * ratio);
+    const noise = (x: number, y: number) => {
+      return Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
     };
 
-    resize();
-    const resizeObserver = new ResizeObserver(resize);
-    resizeObserver.observe(container);
-
-    const start = performance.now();
-    const randomOffset = Math.random() * 1000;
-    let raf = 0;
-
-    const draw = () => {
-      if (!visibilityRef.current.visible) {
-        raf = requestAnimationFrame(draw);
+    const pruneRipples = (nowSeconds: number) => {
+      if (!ripplesRef.current.length) {
         return;
       }
 
-      const elapsed = (performance.now() - start) / 1000;
-      const timeValue = randomOffset + elapsed * speedRef.current;
-
-      gl.uniform1f(uniformLocations.uTime!, timeValue);
-
-      for (let i = 0; i < MAX_CLICKS; i += 1) {
-        const posLocation = uniformLocations.uClickPos[i];
-        const timeLocation = uniformLocations.uClickTimes[i];
-
-        if (posLocation) {
-          gl.uniform2f(
-            posLocation,
-            clickPositions[i * 2],
-            clickPositions[i * 2 + 1],
-          );
-        }
-
-        if (timeLocation) {
-          gl.uniform1f(timeLocation, clickTimes[i]);
-        }
-      }
-
-      gl.bindVertexArray(vao);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.drawArrays(gl.TRIANGLES, 0, 6);
-      raf = requestAnimationFrame(draw);
+      ripplesRef.current = ripplesRef.current.filter((ripple) => {
+        const life = nowSeconds - ripple.born;
+        return life < 6 / rippleSpeedSafe;
+      });
     };
 
-    raf = requestAnimationFrame(draw);
+    const drawFrame = (time: number) => {
+      const nowSeconds = time * 0.001;
+      pruneRipples(nowSeconds);
 
-    const pointerHandler = (event: PointerEvent) => {
+      ctx.clearRect(0, 0, width, height);
+
+      const horizontalSteps = Math.ceil(width / basePixel);
+      const verticalSteps = Math.ceil(height / basePixel);
+      const timeFactor = nowSeconds * speed;
+
+      for (let gy = 0; gy <= verticalSteps; gy += 1) {
+        const y = gy * basePixel;
+        const normY = height > 0 ? y / height : 0;
+
+        for (let gx = 0; gx <= horizontalSteps; gx += 1) {
+          const x = gx * basePixel;
+          const normX = width > 0 ? x / width : 0;
+
+          const jitterSeed = noise(gx, gy);
+          const jitter = (jitterSeed - Math.floor(jitterSeed)) - 0.5;
+          const pixelSide = basePixel * (1 + jitterAmount * jitter);
+          const centerX = x + basePixel / 2;
+          const centerY = y + basePixel / 2;
+
+          const waveA = Math.sin((normX * baseScale + timeFactor) * Math.PI * 2);
+          const waveB = Math.cos((normY * baseScale - timeFactor) * Math.PI * 2);
+          const swirl = Math.sin((normX + normY + timeFactor) * baseScale * 1.5);
+
+          let intensity = 0.5 + 0.4 * waveA + 0.35 * waveB + 0.25 * swirl;
+          intensity *= density;
+
+          if (enableRipples && ripplesRef.current.length > 0) {
+            for (const ripple of ripplesRef.current) {
+              const dx = normX - ripple.x;
+              const dy = normY - ripple.y;
+              const dist = Math.hypot(dx, dy);
+              const age = nowSeconds - ripple.born;
+              const waveFront = age * rippleSpeedSafe;
+              const gaussian = Math.exp(-Math.pow((dist - waveFront) / rippleThicknessSafe, 2));
+              const decay = Math.exp(-age * 1.5);
+              intensity += gaussian * decay * rippleIntensityScale;
+            }
+          }
+
+          intensity = clamp(intensity, 0, 1.25);
+
+          if (edgeFadeSafe > 0) {
+            const edgeX = Math.min(normX, 1 - normX);
+            const edgeY = Math.min(normY, 1 - normY);
+            const fade = clamp(Math.min(edgeX, edgeY) / edgeFadeSafe, 0, 1);
+            intensity *= fade;
+          }
+
+          if (intensity <= 0.03) {
+            continue;
+          }
+
+          const alpha = clamp(intensity, 0, 1);
+          ctx.fillStyle = `rgba(${colorRGB.r}, ${colorRGB.g}, ${colorRGB.b}, ${alpha})`;
+          drawShape(ctx, variant, centerX, centerY, pixelSide);
+        }
+      }
+    };
+
+    const handlePointer = (event: PointerEvent) => {
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) {
+        return;
+      }
+
+      const x = (event.clientX - rect.left) / rect.width;
+      const y = (event.clientY - rect.top) / rect.height;
+      const born = performance.now() * 0.001;
+
+      ripplesRef.current = [
+        ...ripplesRef.current.slice(-MAX_RIPPLES + 1),
+        { x: clamp(x, 0, 1), y: clamp(y, 0, 1), born },
+      ];
+    };
+
+    const handlePointerMove = (event: PointerEvent) => {
       if (!enableRipples) {
         return;
       }
 
-      const rect = canvas.getBoundingClientRect();
-      const scaleX = canvas.width / rect.width;
-      const scaleY = canvas.height / rect.height;
-      const fx = (event.clientX - rect.left) * scaleX;
-      const fy = (rect.height - (event.clientY - rect.top)) * scaleY;
-
-      clickPositions[clickIndex * 2] = fx;
-      clickPositions[clickIndex * 2 + 1] = fy;
-      clickTimes[clickIndex] = randomOffset + ((performance.now() - start) / 1000) * speedRef.current;
-      clickIndex = (clickIndex + 1) % MAX_CLICKS;
+      if (event.buttons & 1) {
+        handlePointer(event);
+      }
     };
 
-    canvas.addEventListener("pointerdown", pointerHandler, { passive: true });
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!enableRipples) {
+        return;
+      }
+
+      handlePointer(event);
+    };
+
+    canvas.addEventListener("pointerdown", handlePointerDown, { passive: true });
+    canvas.addEventListener("pointermove", handlePointerMove, { passive: true });
+
+    const animate = (time: number) => {
+      drawFrame(time);
+      animationRef.current = requestAnimationFrame(animate);
+    };
+
+    animationRef.current = requestAnimationFrame(animate);
+
+    let resizeObserver: ResizeObserver | undefined;
+
+    if (typeof ResizeObserver !== "undefined") {
+      resizeObserver = new ResizeObserver(() => {
+        updateSize();
+      });
+      resizeObserver.observe(container);
+    } else {
+      window.addEventListener("resize", updateSize);
+    }
 
     return () => {
-      cancelAnimationFrame(raf);
-      resizeObserver.disconnect();
-      canvas.removeEventListener("pointerdown", pointerHandler);
-      gl.deleteBuffer(buffer);
-      gl.deleteVertexArray(vao);
-      gl.deleteProgram(program);
-      if (canvas.parentElement === container) {
-        container.removeChild(canvas);
+      if (animationRef.current !== undefined) {
+        cancelAnimationFrame(animationRef.current);
+      }
+
+      canvas.removeEventListener("pointerdown", handlePointerDown);
+      canvas.removeEventListener("pointermove", handlePointerMove);
+
+      if (resizeObserver) {
+        resizeObserver.disconnect();
+      } else {
+        window.removeEventListener("resize", updateSize);
       }
     };
   }, [
-    antialias,
     color,
-    edgeFade,
     enableRipples,
+    edgeFade,
     patternDensity,
     patternScale,
     pixelSize,
@@ -509,8 +337,10 @@ const PixelBlast = ({
       ref={containerRef}
       className={`${styles.container} ${className ?? ""}`.trim()}
       style={style}
-      aria-label="PixelBlast interactive background"
-    />
+      aria-hidden="true"
+    >
+      <canvas ref={canvasRef} />
+    </div>
   );
 };
 

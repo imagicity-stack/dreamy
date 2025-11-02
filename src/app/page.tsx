@@ -318,7 +318,7 @@ export default function Home() {
           <SectionDivider />
           <section
             id="involvewithus"
-            className="bg-transparent text-white py-12 md:py-20 flex justify-center items-center flex-col px-4 scroll-mt-24"
+            className="bg-black text-white py-12 md:py-20 flex justify-center items-center flex-col px-4 scroll-mt-24"
           >
             <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl uppercase mb-6 md:mb-10 font-oswald tracking-wide text-[#800000]">
               INVOLVE WITH US

@@ -4,7 +4,7 @@ export default function ContactUs() {
   return (
     <section
       id="contactus"
-      className="bg-transparent py-12 md:py-20 relative px-4 scroll-mt-24 text-white"
+      className="bg-black py-12 md:py-20 relative px-4 scroll-mt-24 text-white"
     >
       {/* Main Container */}
       <div className="max-w-[1500px] mx-auto grid grid-cols-1 lg:grid-cols-2 items-stretch relative z-10 rounded-2xl overflow-hidden border border-white/10 bg-black/40 backdrop-blur">

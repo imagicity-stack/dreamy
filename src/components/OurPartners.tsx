@@ -14,7 +14,7 @@ const OurPartners = () => {
   return (
     <section
       id="partners"
-      className="bg-transparent text-white py-12 md:py-20 px-4 md:px-8 lg:px-20 border-t border-white/10 scroll-mt-24"
+      className="bg-black text-white py-12 md:py-20 px-4 md:px-8 lg:px-20 border-t border-white/10 scroll-mt-24"
     >
       <div className="max-w-7xl mx-auto">
         {/* Title */}

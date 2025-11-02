@@ -4,7 +4,7 @@ export default function AboutSection() {
   return (
     <section
       id="aboutus"
-      className="bg-transparent py-12 md:py-20 scroll-mt-24 text-white"
+      className="bg-black py-12 md:py-20 scroll-mt-24 text-white"
     >
       <div className="max-w-[1500px] mx-auto px-4 md:px-6 lg:px-12">
         {/* Top Section */}
