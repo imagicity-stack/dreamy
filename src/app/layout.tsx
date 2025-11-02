@@ -44,7 +44,7 @@ const leagueGothic = League_Gothic({
 });
 
 export const metadata: Metadata = {
-  title: "MADOOZA Festival 2025 | Hazaribagh's Ultimate Pop Culture Experience",
+  title: "Madooza 2025 | Hazaribagh's Youth Fusion Fest",
   description:
     "Discover MADOOZA Festival 2024 in Hazaribagh – a high-energy celebration of cosplay, music, art, food, and creator culture.",
 };

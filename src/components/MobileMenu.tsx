@@ -24,7 +24,7 @@ export default function MobileMenu() {
       {/* Mobile menu button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="mobile-tap relative z-50 p-2 text-white transition-transform lg:hidden"
+        className="mobile-tap relative z-50 p-2 text-[#FFFFFF] transition-transform lg:hidden"
         aria-label="Toggle mobile menu"
       >
         <svg
@@ -61,7 +61,7 @@ export default function MobileMenu() {
 
       {/* Mobile menu */}
       <div
-        className={`fixed top-0 right-0 h-full w-80 bg-[#ff1600] transform transition-transform duration-300 ease-in-out z-50 lg:hidden ${
+        className={`fixed top-0 right-0 h-full w-80 bg-[#e22154] transform transition-transform duration-300 ease-in-out z-50 lg:hidden ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >
@@ -70,7 +70,7 @@ export default function MobileMenu() {
             type="button"
             onClick={() => setIsOpen(false)}
             aria-label="Close mobile menu"
-            className="mobile-tap absolute top-4 right-4 text-2xl text-white transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60"
+            className="mobile-tap absolute top-4 right-4 text-2xl text-[#FFFFFF] transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60"
           >
             ✕
           </button>
@@ -79,7 +79,7 @@ export default function MobileMenu() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="mobile-tap text-xl font-bold uppercase text-white transition hover:text-gray-200"
+                className="mobile-tap text-xl font-bold uppercase text-[#FFFFFF] transition hover:text-gray-200"
                 onClick={() => setIsOpen(false)}
               >
                 {link.label}
@@ -93,7 +93,7 @@ export default function MobileMenu() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="mobile-tap text-white/80 transition hover:text-white hover:underline"
+                  className="mobile-tap text-white/80 transition hover:text-[#FFFFFF] hover:underline"
                   onClick={() => setIsOpen(false)}
                 >
                   {link.label}
