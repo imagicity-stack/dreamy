@@ -22,7 +22,7 @@ export default function ContactUs() {
         {/* Right Section - Newsletter Content */}
         <div className="bg-[#3b000f]/80 p-8 md:p-12 lg:p-16 flex flex-col justify-center items-center text-center lg:rounded-r-2xl relative order-1 lg:order-2">
           {/* Heading */}
-          <h2 className="text-[#ffe3f0] text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-lg leading-tight uppercase mb-4 md:mb-6 tracking-wide font-castle">
+          <h2 className="text-[#FFF700] text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-lg leading-tight uppercase mb-4 md:mb-6 tracking-wide font-castle">
             CONTACT US
           </h2>
 

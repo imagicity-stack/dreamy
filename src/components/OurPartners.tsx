@@ -19,7 +19,7 @@ const OurPartners = () => {
       <div className="max-w-7xl mx-auto">
         {/* Title */}
         <div className="text-center mb-12 md:mb-16">
-          <h2 className="text-4xl md:text-6xl lg:text-7xl font-castle text-[#ffe300] uppercase tracking-wider">
+          <h2 className="text-4xl md:text-6xl lg:text-7xl font-castle text-[#FFF700] uppercase tracking-wider">
             Our Partners
           </h2>
           <p className="text-white/80 text-lg md:text-xl mt-4">
