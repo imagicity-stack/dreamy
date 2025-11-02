@@ -76,13 +76,14 @@ export default function PerformerPage() {
       : "None";
 
     const data = {
-      name: getValueById("performer-name"),
+      formType: "performer" as const,
+      nameGroup: getValueById("performer-name"),
       category: categoryLabel,
-      duration: getValueById("performer-duration"),
-      contact: getValueById("performer-phone"),
-      email: getValueById("performer-email"),
-      videoLink: getValueById("performer-link"),
-      equipment: formattedEquipment,
+      performanceDuration: getValueById("performer-duration"),
+      contactNumber: getValueById("performer-phone"),
+      emailId: getValueById("performer-email"),
+      sampleVideoLink: getValueById("performer-link"),
+      equipmentRequirements: formattedEquipment,
     };
 
     console.log(data);

@@ -8,6 +8,7 @@ export async function POST(request: Request) {
         const sanitize = (value: unknown) => (typeof value === 'string' ? value.trim() : '');
 
         const payload = {
+            formType: 'volunteer' as const,
             fullName: sanitize(formData.fullName),
             age: sanitize(formData.age),
             institution: sanitize(formData.institution),
@@ -17,7 +18,7 @@ export async function POST(request: Request) {
             extraInfo: sanitize(formData.extraInfo),
         };
 
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzxvYZCf9IcdoW1ex-sqHai1UDup0IVAWH2UtL0ZXp-00Mxb3Ak5fcS4ZVop8bvuQQ/exec';
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwmNQlxEvGT6r3qgL8riXgh4ZCDynlb8AiHPa2TJaiIVmgSlA_WtIiEsFeRNCyruJvA/exec';
 
         const jsonData = JSON.stringify(payload);
         console.log('Sending JSON to Google:', jsonData);

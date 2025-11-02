@@ -52,6 +52,7 @@ export default function VolunteerPage() {
       volunteerRoles.find((role) => role.toLowerCase() === selectedRoleValue.toLowerCase()) ?? selectedRoleValue;
 
     const data = {
+      formType: "volunteer" as const,
       fullName: getValueById("volunteer-name"),
       age: getValueById("volunteer-age"),
       institution: getValueById("volunteer-institution"),
