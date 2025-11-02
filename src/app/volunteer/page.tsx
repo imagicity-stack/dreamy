@@ -42,18 +42,27 @@ export default function VolunteerPage() {
     setError("");
     setSubmitStatus(null);
 
-    const formData = new FormData(form);
-    const data = {
-      name: formData.get("name"),
-      age: formData.get("age"),
-      institution: formData.get("institution"),
-      role: formData.get("role"),
-      phone: formData.get("phone"),
-      email: formData.get("email"),
-      note: formData.get("note"),
-      termsAccepted: formData.get("terms") === "accepted",
-      timestamp: new Date().toLocaleString("en-IN"),
+    const getValueById = (id: string) => {
+      const field = form.querySelector<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>(`#${id}`);
+      return field?.value.trim() ?? "";
     };
+
+    const selectedRoleValue = getValueById("volunteer-role");
+    const preferredRoleLabel =
+      volunteerRoles.find((role) => role.toLowerCase() === selectedRoleValue.toLowerCase()) ?? selectedRoleValue;
+
+    const data = {
+      formType: "volunteer" as const,
+      fullName: getValueById("volunteer-name"),
+      age: getValueById("volunteer-age"),
+      institution: getValueById("volunteer-institution"),
+      preferredRole: preferredRoleLabel,
+      phone: getValueById("volunteer-phone"),
+      email: getValueById("volunteer-email"),
+      extraInfo: getValueById("volunteer-note"),
+    };
+
+    console.log(data);
 
     try {
       const response = await fetch("/api/volunteer", {

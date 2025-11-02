@@ -5,11 +5,22 @@ export async function POST(request: Request) {
         const formData = await request.json();
         console.log('Received form data:', formData);
 
+        const sanitize = (value: unknown) => (typeof value === 'string' ? value.trim() : '');
 
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbzxA7OK4VOXFLVRfO8gxKX9BuPIea3ErWopVwJERqx4qFtRzk5fgnjk57Q3lSgrWXPc/exec';
+        const payload = {
+            formType: 'performer' as const,
+            nameGroup: sanitize(formData.nameGroup),
+            category: sanitize(formData.category),
+            performanceDuration: sanitize(formData.performanceDuration),
+            contactNumber: sanitize(formData.contactNumber),
+            emailId: sanitize(formData.emailId),
+            sampleVideoLink: sanitize(formData.sampleVideoLink),
+            equipmentRequirements: sanitize(formData.equipmentRequirements) || 'None',
+        };
 
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbwmNQlxEvGT6r3qgL8riXgh4ZCDynlb8AiHPa2TJaiIVmgSlA_WtIiEsFeRNCyruJvA/exec';
 
-        const jsonData = JSON.stringify(formData);
+        const jsonData = JSON.stringify(payload);
         console.log('Sending JSON to Google:', jsonData);
 
 
