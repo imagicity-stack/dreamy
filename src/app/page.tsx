@@ -7,6 +7,7 @@ import ScrollingBanner from "@/components/ScrollingBanner";
 import AboutSection from "@/components/AboutSection";
 import OurPartners from "@/components/OurPartners";
 import ContactUs from "@/components/ContactUs";
+import SectionDivider from "@/components/SectionDivider";
 import {
   createPaymentOrder,
   loadRazorpayScript,
@@ -26,23 +27,23 @@ const involvementOptions = [
   {
     name: "Cosplay Event",
     desc: "Step into character and own Jharkhand’s wildest fandom stage at MADOOZA.",
-    panelClass: "bg-[#FFFFFF] text-[#1f1f1f]",
-    imageBgClass: "bg-[#A1FFFD]",
+    panelClass: "bg-[#e22154] text-[#FFFFFF]",
+    imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/cosplay.jpg",
     href: "/cosplay",
   },
   {
     name: "Performers",
     desc: "From bands and DJs to poets and dancers, light up the lineup with your act.",
-    panelClass: "bg-[#FFFFFF] text-[#1f1f1f]",
-    imageBgClass: "bg-[#FFFFFF]",
+    panelClass: "bg-[#e22154] text-[#FFFFFF]",
+    imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/Perfomers.jpg",
     href: "/performer",
   },
   {
     name: "Volunteers",
     desc: "Join the crew, earn experience, and see the madness from behind the scenes.",
-    panelClass: "bg-blue-500 text-[#FFFFFF]",
+    panelClass: "bg-[#e22154] text-[#FFFFFF]",
     imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/volunteer.jpg",
     href: "/volunteer",
@@ -50,8 +51,8 @@ const involvementOptions = [
   {
     name: "Sponsors",
     desc: "Partner with MADOOZA to amplify your brand across Jharkhand’s youth movement.",
-    panelClass: "bg-green-400 text-[#1f1f1f]",
-    imageBgClass: "bg-blue-600",
+    panelClass: "bg-[#e22154] text-[#FFFFFF]",
+    imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/sponsorship.png",
     href: "/sponsor",
   },
@@ -287,7 +288,9 @@ export default function Home() {
 
       </div>
       <ScrollingBanner />
+      <SectionDivider />
       <AboutSection />
+      <SectionDivider />
       <section
         id="involvewithus"
         className="bg-[#FFFFFF] text-[#1f1f1f] py-12 md:py-20 flex justify-center items-center flex-col px-4 scroll-mt-24"
@@ -304,10 +307,10 @@ export default function Home() {
                 <button
                   key={festival.name}
                   onClick={() => setActive(festival.name)}
-                  className={`flex items-center justify-center gap-1 md:gap-3 flex-1 px-2 md:px-4 py-2 md:py-3 cursor-pointer font-oswald tracking-wide text-sm sm:text-base md:text-lg lg:text-xl uppercase transition-all text-[#e22154] whitespace-nowrap ${
+                  className={`flex items-center justify-center gap-1 md:gap-3 flex-1 px-2 md:px-4 py-2 md:py-3 cursor-pointer font-oswald tracking-wide text-sm sm:text-base md:text-lg lg:text-xl uppercase transition-all whitespace-nowrap ${
                     active === festival.name
-                      ? "bg-[#FFFFFF]"
-                      : "bg-[#FFFF00] hover:bg-[#FFFFFF]"
+                      ? "bg-[#e22154] text-[#FFFF00]"
+                      : "bg-[#FFFF00] text-[#e22154] hover:bg-[#e22154] hover:text-[#FFFF00]"
                   }`}
                 >
                   <span className="text-center">{festival.name}</span>
@@ -330,13 +333,13 @@ export default function Home() {
                 {currentFestival.name}
               </h3>
               <div className="h-auto lg:max-h-64 overflow-y-auto">
-                <p className="text-sm md:text-base leading-relaxed">
+                <p className="text-sm md:text-base leading-relaxed text-white/90">
                   {currentFestival.desc}
                 </p>
               </div>
               <Link
                 href={currentFestival.href}
-                className="mobile-tap relative z-10 mt-4 inline-flex w-fit cursor-pointer bg-[#FFFF00] text-[#1f1f1f] text-sm sm:text-base md:text-lg font-oswald px-5 py-2 rounded-md transition-all uppercase hover:bg-[#e5e500] hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFFF00]/60 active:translate-y-0"
+                className="mobile-tap relative z-10 mt-4 inline-flex w-fit cursor-pointer bg-[#FFFF00] text-[#e22154] text-sm sm:text-base md:text-lg font-oswald px-5 py-2 rounded-md transition-all uppercase hover:bg-[#fffd66] hover:text-[#b6163f] hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFFF00]/60 active:translate-y-0"
               >
                 Learn More
               </Link>
@@ -402,9 +405,13 @@ export default function Home() {
           </div>
         </section>
       </section>
+      <SectionDivider />
       <ScrollingBanner />
+      <SectionDivider />
       <ContactUs />
+      <SectionDivider />
       <OurPartners />
+      <SectionDivider />
       <Footer />
 
       {/* Ticket Modal */}
@@ -413,7 +420,7 @@ export default function Home() {
           <div className="relative w-full max-w-2xl">
             <div className="pointer-events-none absolute -inset-6 -z-10 opacity-50 blur-3xl bg-[#00f5ff]" aria-hidden />
 
-            <div className="relative flex max-h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-none bg-[#FFFFFF] text-[#1f1f1f] shadow-[0_0_45px_rgba(0,255,255,0.35)]">
+            <div className="relative flex max-h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-none bg-[#e22154] text-white shadow-[0_0_45px_rgba(0,255,255,0.35)] md:bg-[#FFFFFF] md:text-[#1f1f1f]">
               <button
                 type="button"
                 onClick={closeTicketModal}
@@ -429,38 +436,38 @@ export default function Home() {
               >
                 <div className="text-center">
                   <p className="font-montserrat text-sm font-semibold text-[#00f5ff]">Tickets</p>
-                  <h2 className="mt-3 text-3xl sm:text-4xl font-travel-sans uppercase text-[#1f1f1f]">
+                  <h2 className="mt-3 text-3xl sm:text-4xl font-travel-sans uppercase text-white md:text-[#1f1f1f]">
                     Get Your Passes
                   </h2>
-                  <p className="mt-3 text-sm sm:text-base text-[#1f1f1f]/70">
+                  <p className="mt-3 text-sm sm:text-base text-white/80 md:text-[#1f1f1f]/70">
                     Drop your details below and we&apos;ll confirm your tickets instantly once the payment succeeds.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-[#1f1f1f]">
+                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white md:text-[#1f1f1f]">
                     Full Name *
                     <input
                       type="text"
                     id="ticket-name"
                     name="name"
                     required
-                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
+                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#e22154] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
                     placeholder="Enter your full name"
                   />
                 </label>
-                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-[#1f1f1f]">
+                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white md:text-[#1f1f1f]">
                     Email Address *
                     <input
                     type="email"
                     id="ticket-email"
                     name="email"
                     required
-                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
+                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#e22154] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
                     placeholder="your.email@example.com"
                   />
                 </label>
-                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-[#1f1f1f]">
+                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white md:text-[#1f1f1f]">
                     Phone Number *
                     <input
                       type="tel"
@@ -472,17 +479,17 @@ export default function Home() {
                       maxLength={10}
                       minLength={10}
                       title="Enter a 10-digit phone number"
-                      className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
+                      className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#e22154] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
                       placeholder="9876543210"
                     />
                   </label>
-                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-[#1f1f1f]">
+                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white md:text-[#1f1f1f]">
                     Number of Tickets *
                     <select
                     id="ticket-quantity"
                     name="quantity"
                     required
-                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#FFFFFF] cursor-pointer"
+                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#e22154] md:focus:ring-offset-[#FFFFFF] cursor-pointer"
                   >
                     <option value="" className="bg-white text-[#1f1f1f]">
                       Select quantity
@@ -506,19 +513,19 @@ export default function Home() {
                 </label>
               </div>
 
-              <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-[#1f1f1f]">
+              <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white md:text-[#1f1f1f]">
                 Special Requests / Questions *
                 <textarea
                   id="ticket-message"
                   name="message"
                   rows={4}
                   required
-                  className="w-full resize-none bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
+                  className="w-full resize-none bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#e22154] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
                   placeholder="Let us know how we can help"
                 />
               </label>
 
-              <label className="flex items-start gap-3 text-sm font-montserrat text-[#1f1f1f]/80">
+              <label className="flex items-start gap-3 text-sm font-montserrat text-white/80 md:text-[#1f1f1f]/80">
                 <input
                   type="checkbox"
                   id="ticket-terms"
@@ -529,7 +536,7 @@ export default function Home() {
                 />
                 <span>
                   I accept the{" "}
-                  <Link href="/terms-and-conditions" className="text-[#e22154] underline-offset-4 hover:underline">
+                  <Link href="/terms-and-conditions" className="text-[#FFFF00] underline-offset-4 hover:underline md:text-[#e22154]">
                     terms and conditions
                   </Link>
                 </span>
@@ -539,7 +546,7 @@ export default function Home() {
                 <button
                   type="submit"
                   disabled={ticketProcessing}
-                  className="mobile-tap flex-1 bg-[#e22154] px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mobile-tap flex-1 bg-[#FFFF00] px-6 py-3 text-base font-montserrat font-semibold text-[#e22154] transition-transform hover:scale-[1.02] hover:bg-[#fffd66] disabled:cursor-not-allowed disabled:opacity-60 md:bg-[#e22154] md:text-white md:hover:bg-[#c81949]"
                 >
                   {ticketProcessing ? "Processing Payment..." : "Request Tickets"}
                 </button>
