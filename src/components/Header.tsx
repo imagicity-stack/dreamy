@@ -14,12 +14,12 @@ const navLinks = [
 const Header = () => {
   return (
     <>
-     <div className="fixed top-0 left-0 right-0 z-50 w-full bg-[#ff1600] h-16 flex text-white justify-between p-2 px-4 md:px-10 items-center">
+      <div className="fixed top-0 left-0 right-0 z-50 w-full bg-[#e22154] h-16 flex text-[#FFFFFF] justify-between p-2 px-4 md:px-10 items-center">
         <div className="text-xl md:text-2xl font-quicksand font-extrabold">
-            <Link href="/">
-              <Image src="/MADOOZA.png" alt="DREAMHACK" width={150} height={40} />
-            </Link>
-          </div>
+          <Link href="/">
+            <Image src="/MADOOZA.png" alt="DREAMHACK" width={150} height={40} />
+          </Link>
+        </div>
         <div className="hidden lg:flex gap-12 font-montserrat font-bold text-[1.2rem] tracking-[0.14em]">
           {navLinks.map((link) => (
             <Link key={link.href} href={link.href} prefetch className="uppercase">

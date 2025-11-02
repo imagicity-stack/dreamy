@@ -8,7 +8,7 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <div className="flex flex-col items-center gap-6 md:flex-row md:items-center md:justify-between">
           <div className="flex w-full justify-center md:w-auto md:justify-start">
-            <Image src="/MADOOZA.png" alt="MADOOZA" width={150} height={40} />
+            <Image src="/MADOOZA.png" alt="MADOOZA" width={200} height={60} />
           </div>
 
           <div className="flex w-full justify-center md:w-auto">
@@ -17,14 +17,14 @@ export default function Footer() {
               aria-label="Instagram"
               target="_blank"
               rel="noreferrer"
-              className="flex items-center justify-center text-white transition-all hover:text-[#ffd6e1]"
+              className="flex items-center justify-center text-[#FFFFFF] transition-all hover:text-[#ffd6e1]"
             >
               <Instagram size={24} strokeWidth={3} />
             </Link>
           </div>
 
           <div className="flex w-full justify-center md:w-auto md:justify-end">
-            <ul className="flex flex-wrap items-center justify-center gap-4 text-center text-sm sm:text-base md:text-sm lg:text-base text-white">
+            <ul className="flex flex-wrap items-center justify-center gap-4 text-center text-sm sm:text-base md:text-sm lg:text-base text-[#FFFFFF]">
               {[
                 { name: "Privacy Policy", link: "/privacy-policy" },
                 { name: "Terms & Conditions", link: "/terms-and-conditions" },

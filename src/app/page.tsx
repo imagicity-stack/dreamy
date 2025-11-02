@@ -18,15 +18,15 @@ const involvementOptions = [
   {
     name: "Bring Your Stall",
     desc: "Showcase food, art, games, or merch in a high-energy bazaar built for creators.",
-    panelClass: "bg-[#e22154] text-white",
-    imageBgClass: "bg-yellow-300",
+    panelClass: "bg-[#e22154] text-[#FFFFFF]",
+    imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/stall.jpg",
     href: "/stall",
   },
   {
     name: "Cosplay Event",
     desc: "Step into character and own Jharkhand’s wildest fandom stage at MADOOZA.",
-    panelClass: "bg-[#F1F3F4] text-[#1f1f1f]",
+    panelClass: "bg-[#FFFFFF] text-[#1f1f1f]",
     imageBgClass: "bg-[#A1FFFD]",
     logo: "/involve/cosplay.jpg",
     href: "/cosplay",
@@ -34,16 +34,16 @@ const involvementOptions = [
   {
     name: "Performers",
     desc: "From bands and DJs to poets and dancers, light up the lineup with your act.",
-    panelClass: "bg-[#F1F3F4] text-[#1f1f1f]",
-    imageBgClass: "bg-[#F1F3F4]",
+    panelClass: "bg-[#FFFFFF] text-[#1f1f1f]",
+    imageBgClass: "bg-[#FFFFFF]",
     logo: "/involve/Perfomers.jpg",
     href: "/performer",
   },
   {
     name: "Volunteers",
     desc: "Join the crew, earn experience, and see the madness from behind the scenes.",
-    panelClass: "bg-blue-500 text-white",
-    imageBgClass: "bg-yellow-300",
+    panelClass: "bg-blue-500 text-[#FFFFFF]",
+    imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/volunteer.jpg",
     href: "/volunteer",
   },
@@ -61,14 +61,14 @@ const highlights = [
   {
     title: "CREATOR 1",
     subtitle: "Coming Soon",
-    color: "bg-[#F1F3F4]",
+    color: "bg-[#FFFFFF]",
     textColor: "text-[#e22154]",
     image: "/creator1.png",
   },
   {
     title: "CREATOR 2",
     subtitle: "Coming Soon",
-    color: "bg-[#F1F3F4]",
+    color: "bg-[#FFFFFF]",
     textColor: "text-[#e22154]",
     image: "/creator1.png",
   },
@@ -290,7 +290,7 @@ export default function Home() {
       <AboutSection />
       <section
         id="involvewithus"
-        className="bg-[#F1F3F4] text-[#1f1f1f] py-12 md:py-20 flex justify-center items-center flex-col px-4 scroll-mt-24"
+        className="bg-[#FFFFFF] text-[#1f1f1f] py-12 md:py-20 flex justify-center items-center flex-col px-4 scroll-mt-24"
       >
         <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl uppercase mb-6 md:mb-10 font-oswald tracking-wide text-[#e22154]">
           INVOLVE WITH US
@@ -306,8 +306,8 @@ export default function Home() {
                   onClick={() => setActive(festival.name)}
                   className={`flex items-center justify-center gap-1 md:gap-3 flex-1 px-2 md:px-4 py-2 md:py-3 cursor-pointer font-oswald tracking-wide text-sm sm:text-base md:text-lg lg:text-xl uppercase transition-all text-[#e22154] whitespace-nowrap ${
                     active === festival.name
-                      ? "bg-white"
-                      : "bg-[#FFD600] hover:bg-white"
+                      ? "bg-[#FFFFFF]"
+                      : "bg-[#FFFF00] hover:bg-[#FFFFFF]"
                   }`}
                 >
                   <span className="text-center">{festival.name}</span>
@@ -336,7 +336,7 @@ export default function Home() {
               </div>
               <Link
                 href={currentFestival.href}
-                className="mobile-tap relative z-10 mt-4 inline-flex w-fit cursor-pointer bg-[#ffe300] text-[#1f1f1f] text-sm sm:text-base md:text-lg font-oswald px-5 py-2 rounded-md transition-all uppercase hover:bg-[#ffd000] hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffe300]/60 active:translate-y-0"
+                className="mobile-tap relative z-10 mt-4 inline-flex w-fit cursor-pointer bg-[#FFFF00] text-[#1f1f1f] text-sm sm:text-base md:text-lg font-oswald px-5 py-2 rounded-md transition-all uppercase hover:bg-[#e5e500] hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFFF00]/60 active:translate-y-0"
               >
                 Learn More
               </Link>
@@ -409,11 +409,11 @@ export default function Home() {
 
       {/* Ticket Modal */}
       {isTicketModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#F1F3F4]/80 backdrop-blur-sm px-4 py-8 sm:py-12">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-white/80 backdrop-blur-sm px-4 py-8 sm:py-12">
           <div className="relative w-full max-w-2xl">
             <div className="pointer-events-none absolute -inset-6 -z-10 opacity-50 blur-3xl bg-[#00f5ff]" aria-hidden />
 
-            <div className="relative flex max-h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-none bg-[#F1F3F4] text-[#1f1f1f] shadow-[0_0_45px_rgba(0,255,255,0.35)]">
+            <div className="relative flex max-h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-none bg-[#FFFFFF] text-[#1f1f1f] shadow-[0_0_45px_rgba(0,255,255,0.35)]">
               <button
                 type="button"
                 onClick={closeTicketModal}
@@ -445,7 +445,7 @@ export default function Home() {
                     id="ticket-name"
                     name="name"
                     required
-                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#F1F3F4] placeholder:text-[#1f1f1f]/50"
+                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
                     placeholder="Enter your full name"
                   />
                 </label>
@@ -456,7 +456,7 @@ export default function Home() {
                     id="ticket-email"
                     name="email"
                     required
-                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#F1F3F4] placeholder:text-[#1f1f1f]/50"
+                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
                     placeholder="your.email@example.com"
                   />
                 </label>
@@ -472,7 +472,7 @@ export default function Home() {
                       maxLength={10}
                       minLength={10}
                       title="Enter a 10-digit phone number"
-                      className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#F1F3F4] placeholder:text-[#1f1f1f]/50"
+                      className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
                       placeholder="9876543210"
                     />
                   </label>
@@ -482,7 +482,7 @@ export default function Home() {
                     id="ticket-quantity"
                     name="quantity"
                     required
-                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#F1F3F4] cursor-pointer"
+                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#FFFFFF] cursor-pointer"
                   >
                     <option value="" className="bg-white text-[#1f1f1f]">
                       Select quantity
@@ -513,7 +513,7 @@ export default function Home() {
                   name="message"
                   rows={4}
                   required
-                  className="w-full resize-none bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#F1F3F4] placeholder:text-[#1f1f1f]/50"
+                  className="w-full resize-none bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
                   placeholder="Let us know how we can help"
                 />
               </label>
@@ -546,7 +546,7 @@ export default function Home() {
                 <button
                   type="button"
                   onClick={closeTicketModal}
-                  className="mobile-tap bg-[#F1F3F4] px-6 py-3 text-base font-montserrat font-semibold text-[#e22154] border border-[#e22154] transition-transform hover:scale-[1.02] hover:bg-white"
+                  className="mobile-tap bg-[#FFFFFF] px-6 py-3 text-base font-montserrat font-semibold text-[#e22154] border border-[#e22154] transition-transform hover:scale-[1.02] hover:bg-[#FFFFFF]"
                 >
                   Cancel
                 </button>
