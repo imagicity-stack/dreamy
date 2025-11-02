@@ -4,7 +4,7 @@ import { Instagram } from "lucide-react";
 
 export default function Footer() {
   return (
-    <footer className="bg-black py-6 md:py-8 border-t border-[#800000]/60">
+    <footer className="bg-[#e22154] py-6 md:py-8 border-t border-[#e22154]">
       <div className="mx-auto max-w-6xl px-4 md:px-6">
         <div className="flex flex-col items-center gap-6 md:flex-row md:items-center md:justify-between">
           <div className="flex w-full justify-center md:w-auto md:justify-start">

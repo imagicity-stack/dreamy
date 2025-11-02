@@ -14,7 +14,7 @@ const navLinks = [
 const Header = () => {
   return (
     <>
-      <div className="fixed top-0 left-0 right-0 z-50 w-full bg-black/90 backdrop-blur h-16 flex text-[#FFFFFF] justify-between p-2 px-4 md:px-10 items-center border-b border-[#800000]/60">
+      <div className="fixed top-0 left-0 right-0 z-50 w-full bg-[#e22154] backdrop-blur h-16 flex text-[#FFFFFF] justify-between p-2 px-4 md:px-10 items-center border-b border-[#e22154]">
         <div className="text-xl md:text-2xl font-quicksand font-extrabold">
           <Link href="/">
             <Image src="/MADOOZA.png" alt="DREAMHACK" width={150} height={40} />

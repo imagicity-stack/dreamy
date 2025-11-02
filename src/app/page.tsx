@@ -8,7 +8,6 @@ import AboutSection from "@/components/AboutSection";
 import OurPartners from "@/components/OurPartners";
 import ContactUs from "@/components/ContactUs";
 import SectionDivider from "@/components/SectionDivider";
-import PixelBlast from "@/components/PixelBlast";
 import {
   createPaymentOrder,
   loadRazorpayScript,
@@ -293,23 +292,7 @@ export default function Home() {
 
       </div>
       <div className="relative isolate">
-        <div className="absolute inset-0 -z-10 bg-black">
-          <PixelBlast
-            variant="circle"
-            pixelSize={6}
-            color="#800000"
-            patternScale={3}
-            patternDensity={1.2}
-            pixelSizeJitter={0.5}
-            enableRipples
-            rippleSpeed={0.4}
-            rippleThickness={0.12}
-            rippleIntensityScale={1.5}
-            speed={0.6}
-            edgeFade={0.25}
-            className="h-full w-full"
-          />
-        </div>
+        <div className="absolute inset-0 -z-10 bg-black" />
 
         <div className="relative z-10">
           <ScrollingBanner />
