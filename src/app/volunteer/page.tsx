@@ -99,7 +99,7 @@ export default function VolunteerPage() {
     <div className="bg-black text-white">
       <section className="relative overflow-hidden py-16 sm:py-20 md:py-24">
         <div className="pointer-events-none absolute -top-24 right-0 h-72 w-72 bg-[#ffe300] opacity-40 blur-3xl" />
-        <div className="pointer-events-none absolute bottom-0 left-0 h-72 w-72 bg-[#ff1a1a] opacity-40 blur-3xl" />
+        <div className="pointer-events-none absolute bottom-0 left-0 h-72 w-72 bg-[#e22154] opacity-40 blur-3xl" />
         <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center gap-6 px-4 text-center">
           <span className="font-montserrat text-xs uppercase tracking-[0.6em] text-[#ffe300]">Involve With Us</span>
           <h1 className="font-travel-sans text-3xl sm:text-4xl md:text-5xl lg:text-6xl uppercase text-white">
@@ -114,7 +114,7 @@ export default function VolunteerPage() {
 
       <section className="border-y border-[#ffe300]/30 bg-black py-16">
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-10 px-4 lg:grid-cols-2">
-          <div className="flex flex-col gap-6 bg-[#ff1a1a] p-8 text-white shadow-[0_0_35px_rgba(255,26,26,0.25)]">
+          <div className="flex flex-col gap-6 bg-[#e22154] p-8 text-white shadow-[0_0_35px_rgba(226,33,84,0.25)]">
             <h2 className="font-travel-sans text-2xl sm:text-3xl uppercase">Volunteer Roles</h2>
             <ul className="space-y-3 text-sm sm:text-base text-white/80">
               {volunteerRoles.map((role) => (
@@ -215,7 +215,7 @@ export default function VolunteerPage() {
                 />
               </label>
               <label className="flex items-start gap-3 text-sm font-montserrat text-white/80">
-                <input type="checkbox" name="terms" value="accepted" required className="mt-1 h-5 w-5 accent-[#ff1a1a]" />
+                <input type="checkbox" name="terms" value="accepted" required className="mt-1 h-5 w-5 accent-[#e22154]" />
                 <span className="text-left">
                   I accept the{" "}
                   <Link href="/terms-and-conditions" className="text-[#00f5ff] underline-offset-4 hover:underline">
@@ -226,7 +226,7 @@ export default function VolunteerPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-[#ff1a1a] px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full bg-[#e22154] px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {loading ? "Submitting..." : "Apply to Volunteer"}
               </button>
@@ -236,7 +236,7 @@ export default function VolunteerPage() {
                 </p>
               )}
               {submitStatus === "error" && (
-                <p className="bg-[#ff1a1a]/40 px-4 py-3 text-center text-sm text-white">{error}</p>
+                <p className="bg-[#e22154]/40 px-4 py-3 text-center text-sm text-white">{error}</p>
               )}
               </form>
             </div>

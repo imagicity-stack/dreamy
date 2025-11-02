@@ -37,7 +37,7 @@ const participationDetails = [
 
 const yellowBulletStyle: CSSProperties = {
   backgroundImage:
-    "url(\"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='6'><rect width='6' height='6' fill='%23ff1a1a'/></svg>\")",
+    "url(\"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='6' height='6'><rect width='6' height='6' fill='%23e22154'/></svg>\")",
   backgroundRepeat: "no-repeat",
   backgroundPosition: "0 0.45rem",
 };
@@ -221,7 +221,7 @@ export default function CosplayPage() {
   return (
     <div className="bg-black text-white">
       <section className="relative overflow-hidden py-16 sm:py-20 md:py-24">
-        <div className="pointer-events-none absolute -top-24 left-0 h-64 w-64 bg-[#ff1a1a] opacity-40 blur-3xl" />
+        <div className="pointer-events-none absolute -top-24 left-0 h-64 w-64 bg-[#e22154] opacity-40 blur-3xl" />
         <div className="pointer-events-none absolute bottom-0 right-0 h-72 w-72 bg-[#ffe300] opacity-40 blur-3xl" />
         <div className="relative z-10 mx-auto flex max-w-5xl flex-col items-center gap-6 px-4 text-center">
           <span className="font-montserrat text-xs uppercase tracking-[0.6em] text-[#ffe300]">
@@ -236,7 +236,7 @@ export default function CosplayPage() {
           </p>
           <button
             onClick={openModal}
-            className="mt-4 inline-flex items-center justify-center bg-[#ff1a1a] px-6 py-3 font-montserrat text-sm uppercase tracking-[0.3em] text-white transition-transform hover:scale-[1.03]"
+            className="mt-4 inline-flex items-center justify-center bg-[#e22154] px-6 py-3 font-montserrat text-sm uppercase tracking-[0.3em] text-white transition-transform hover:scale-[1.03]"
           >
             Register Now
           </button>
@@ -245,7 +245,7 @@ export default function CosplayPage() {
 
       <section className="border-y border-[#ffe300]/30 bg-black py-16">
         <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 lg:grid-cols-2">
-          <div className="flex h-full flex-col gap-6 bg-[#ff1a1a] p-8 shadow-[0_0_35px_rgba(255,26,26,0.25)]">
+          <div className="flex h-full flex-col gap-6 bg-[#e22154] p-8 shadow-[0_0_35px_rgba(226,33,84,0.25)]">
             <h2 className="font-travel-sans text-2xl sm:text-3xl uppercase text-white">Event Format</h2>
             <div className="space-y-4 text-left">
               {eventFormat.map((item) => (
@@ -280,9 +280,9 @@ export default function CosplayPage() {
             <h2 className="font-travel-sans text-2xl sm:text-3xl uppercase text-[#ffe300]">Prizes & Titles</h2>
             <div className="grid gap-6 md:grid-cols-2">
               {prizes.map((prize, index) => {
-                const tone = index === 1 ? "bg-[#ffe300] text-black" : index === 2 ? "bg-black border border-[#ffe300] text-white" : "bg-[#ff1a1a] text-white";
+                const tone = index === 1 ? "bg-[#ffe300] text-black" : index === 2 ? "bg-black border border-[#ffe300] text-white" : "bg-[#e22154] text-white";
                 return (
-                  <div key={prize.title} className={`${tone} p-6 shadow-[0_0_30px_rgba(255,26,26,0.2)]`}> 
+                  <div key={prize.title} className={`${tone} p-6 shadow-[0_0_30px_rgba(226,33,84,0.2)]`}> 
                     <h3 className="font-montserrat text-base uppercase tracking-[0.2em]">{prize.title}</h3>
                     <p className="mt-3 text-sm sm:text-base">
                       {prize.description}
@@ -303,7 +303,7 @@ export default function CosplayPage() {
                   ))}
                 </ul>
               </div>
-              <div className="bg-[#ff1a1a] p-6 text-white shadow-[0_0_30px_rgba(255,26,26,0.2)]">
+              <div className="bg-[#e22154] p-6 text-white shadow-[0_0_30px_rgba(226,33,84,0.2)]">
                 <h3 className="font-travel-sans text-xl uppercase">Judging Panel</h3>
                 <p className="mt-3 text-sm sm:text-base text-white/80">
                   1 creative representative from Imagicity, 1 faculty member, and 1 local artist or influencer.
@@ -335,7 +335,7 @@ export default function CosplayPage() {
         </div>
       </section>
 
-      <section className="bg-[#ff1a1a] py-16 text-white">
+      <section className="bg-[#e22154] py-16 text-white">
         <div className="mx-auto max-w-3xl px-4 text-center">
           <h2 className="font-travel-sans text-3xl uppercase">Ready to Own the Parade?</h2>
           <p className="mt-4 text-sm sm:text-base text-white/80">
@@ -419,7 +419,7 @@ export default function CosplayPage() {
                       name="terms"
                       value="accepted"
                       required
-                      className="mt-1 h-5 w-5 accent-[#ff1a1a]"
+                      className="mt-1 h-5 w-5 accent-[#e22154]"
                     />
                     <span className="text-left">
                       I accept the{" "}
@@ -431,12 +431,12 @@ export default function CosplayPage() {
                   <button
                     type="submit"
                     disabled={loading}
-                    className="mobile-tap w-full bg-[#ff1a1a] px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+                    className="mobile-tap w-full bg-[#e22154] px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
                   >
                     {loading ? "Processing Payment..." : "Pay ₹299 & Register"}
                   </button>
                   {error && (
-                    <p className="bg-[#ff1a1a]/40 px-4 py-3 text-center text-sm text-white">
+                    <p className="bg-[#e22154]/40 px-4 py-3 text-center text-sm text-white">
                       {error}
                     </p>
                   )}

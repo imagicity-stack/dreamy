@@ -18,7 +18,7 @@ const involvementOptions = [
   {
     name: "Bring Your Stall",
     desc: "Showcase food, art, games, or merch in a high-energy bazaar built for creators.",
-    panelClass: "bg-red-500 text-white",
+    panelClass: "bg-[#e22154] text-white",
     imageBgClass: "bg-yellow-300",
     logo: "/involve/stall.jpg",
     href: "/stall",
@@ -26,7 +26,7 @@ const involvementOptions = [
   {
     name: "Cosplay Event",
     desc: "Step into character and own Jharkhand’s wildest fandom stage at MADOOZA.",
-    panelClass: "bg-orange-500 text-white",
+    panelClass: "bg-[#F1F3F4] text-[#1f1f1f]",
     imageBgClass: "bg-[#A1FFFD]",
     logo: "/involve/cosplay.jpg",
     href: "/cosplay",
@@ -34,8 +34,8 @@ const involvementOptions = [
   {
     name: "Performers",
     desc: "From bands and DJs to poets and dancers, light up the lineup with your act.",
-    panelClass: "bg-[#A1FFFD] text-black",
-    imageBgClass: "bg-pink-600",
+    panelClass: "bg-[#F1F3F4] text-[#1f1f1f]",
+    imageBgClass: "bg-[#F1F3F4]",
     logo: "/involve/Perfomers.jpg",
     href: "/performer",
   },
@@ -50,7 +50,7 @@ const involvementOptions = [
   {
     name: "Sponsors",
     desc: "Partner with MADOOZA to amplify your brand across Jharkhand’s youth movement.",
-    panelClass: "bg-green-400 text-black",
+    panelClass: "bg-green-400 text-[#1f1f1f]",
     imageBgClass: "bg-blue-600",
     logo: "/involve/sponsorship.png",
     href: "/sponsor",
@@ -61,15 +61,15 @@ const highlights = [
   {
     title: "CREATOR 1",
     subtitle: "Coming Soon",
-    color: "bg-[#ff1a00]",
-    textColor: "text-[#ffe300]",
+    color: "bg-[#F1F3F4]",
+    textColor: "text-[#e22154]",
     image: "/creator1.png",
   },
   {
     title: "CREATOR 2",
     subtitle: "Coming Soon",
-    color: "bg-[#7300ff]",
-    textColor: "text-[#9dffff]",
+    color: "bg-[#F1F3F4]",
+    textColor: "text-[#e22154]",
     image: "/creator1.png",
   },
 ];
@@ -272,7 +272,7 @@ export default function Home() {
 
           <button
             onClick={openTicketModal}
-            className="hero-cta-button mobile-tap bg-[#ffe300] text-black text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-montserrat pointer-events-auto cursor-pointer z-20"
+            className="hero-cta-button mobile-tap bg-[#ffe300] text-[#1f1f1f] text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-montserrat pointer-events-auto cursor-pointer z-20"
           >
             <Image
               src="/ticketicon.png"
@@ -290,9 +290,9 @@ export default function Home() {
       <AboutSection />
       <section
         id="involvewithus"
-        className="bg-[#7300ff] text-white py-12 md:py-20 flex justify-center items-center flex-col px-4 scroll-mt-24"
+        className="bg-[#F1F3F4] text-[#1f1f1f] py-12 md:py-20 flex justify-center items-center flex-col px-4 scroll-mt-24"
       >
-        <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl uppercase mb-6 md:mb-10 font-oswald tracking-wide text-[#9dffff]">
+        <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl uppercase mb-6 md:mb-10 font-oswald tracking-wide text-[#e22154]">
           INVOLVE WITH US
         </h2>
 
@@ -304,10 +304,10 @@ export default function Home() {
                 <button
                   key={festival.name}
                   onClick={() => setActive(festival.name)}
-                  className={`flex items-center justify-center gap-1 md:gap-3 flex-1 px-2 md:px-4 py-2 md:py-3 cursor-pointer font-oswald tracking-wide text-sm sm:text-base md:text-lg lg:text-xl uppercase transition-all text-blue-700 whitespace-nowrap ${
+                  className={`flex items-center justify-center gap-1 md:gap-3 flex-1 px-2 md:px-4 py-2 md:py-3 cursor-pointer font-oswald tracking-wide text-sm sm:text-base md:text-lg lg:text-xl uppercase transition-all text-[#e22154] whitespace-nowrap ${
                     active === festival.name
-                      ? "bg-[#A1FFFD]"
-                      : "bg-[#FFD600] hover:bg-[#A1FFFD]"
+                      ? "bg-white"
+                      : "bg-[#FFD600] hover:bg-white"
                   }`}
                 >
                   <span className="text-center">{festival.name}</span>
@@ -336,7 +336,7 @@ export default function Home() {
               </div>
               <Link
                 href={currentFestival.href}
-                className="mobile-tap relative z-10 mt-4 inline-flex w-fit cursor-pointer bg-[#ffe300] text-black text-sm sm:text-base md:text-lg font-oswald px-5 py-2 rounded-md transition-all uppercase hover:bg-[#ffd000] hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffe300]/60 active:translate-y-0"
+                className="mobile-tap relative z-10 mt-4 inline-flex w-fit cursor-pointer bg-[#ffe300] text-[#1f1f1f] text-sm sm:text-base md:text-lg font-oswald px-5 py-2 rounded-md transition-all uppercase hover:bg-[#ffd000] hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ffe300]/60 active:translate-y-0"
               >
                 Learn More
               </Link>
@@ -359,10 +359,10 @@ export default function Home() {
         <section className="py-8 md:py-12 w-full md:w-10/12 px-4 md:px-0">
           {/* Creators Header */}
           <div className="text-center mb-8 md:mb-12">
-            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold uppercase tracking-wide font-oswald text-[#ffe300] mb-4">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold uppercase tracking-wide font-oswald text-[#e22154] mb-4">
               FEATURED CREATORS
             </h2>
-            <p className="text-white text-base sm:text-lg md:text-xl font-bold font-quicksand">
+            <p className="text-[#1f1f1f] text-base sm:text-lg md:text-xl font-bold font-quicksand">
               Coming Soon
             </p>
           </div>
@@ -375,7 +375,7 @@ export default function Home() {
             {highlights.map((item, index) => (
               <div
                 key={index}
-                className={`${item.color} flex flex-col items-center w-full md:w-1/2 text-center duration-300 rounded-3xl overflow-hidden shadow-2xl hover:scale-105 transition-all border-4 border-white/20 hover:border-white/40`}
+                className={`${item.color} flex flex-col items-center w-full md:w-1/2 text-center duration-300 rounded-3xl overflow-hidden shadow-2xl hover:scale-105 transition-all border-4 border-[#e22154]/20 hover:border-[#e22154]/40`}
               >
                 <div className="flex flex-col items-center justify-center p-8 pb-6">
                   <h3
@@ -409,15 +409,15 @@ export default function Home() {
 
       {/* Ticket Modal */}
       {isTicketModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm px-4 py-8 sm:py-12">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#F1F3F4]/80 backdrop-blur-sm px-4 py-8 sm:py-12">
           <div className="relative w-full max-w-2xl">
             <div className="pointer-events-none absolute -inset-6 -z-10 opacity-50 blur-3xl bg-[#00f5ff]" aria-hidden />
 
-            <div className="relative flex max-h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-none bg-black text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
+            <div className="relative flex max-h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-none bg-[#F1F3F4] text-[#1f1f1f] shadow-[0_0_45px_rgba(0,255,255,0.35)]">
               <button
                 type="button"
                 onClick={closeTicketModal}
-                className="mobile-tap absolute top-4 right-4 z-20 text-white text-2xl transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00f5ff]"
+                className="mobile-tap absolute top-4 right-4 z-20 text-[#e22154] text-2xl transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00f5ff]"
                 aria-label="Close ticket form"
               >
                 ✕
@@ -429,38 +429,38 @@ export default function Home() {
               >
                 <div className="text-center">
                   <p className="font-montserrat text-sm font-semibold text-[#00f5ff]">Tickets</p>
-                <h2 className="mt-3 text-3xl sm:text-4xl font-travel-sans uppercase text-white">
-                  Get Your Passes
-                </h2>
-                <p className="mt-3 text-sm sm:text-base text-white/70">
-                  Drop your details below and we&apos;ll confirm your tickets instantly once the payment succeeds.
-                </p>
-              </div>
+                  <h2 className="mt-3 text-3xl sm:text-4xl font-travel-sans uppercase text-[#1f1f1f]">
+                    Get Your Passes
+                  </h2>
+                  <p className="mt-3 text-sm sm:text-base text-[#1f1f1f]/70">
+                    Drop your details below and we&apos;ll confirm your tickets instantly once the payment succeeds.
+                  </p>
+                </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
+                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-[#1f1f1f]">
                     Full Name *
                     <input
                       type="text"
                     id="ticket-name"
                     name="name"
                     required
-                    className="w-full bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-black/50"
+                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#F1F3F4] placeholder:text-[#1f1f1f]/50"
                     placeholder="Enter your full name"
                   />
                 </label>
-                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
+                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-[#1f1f1f]">
                     Email Address *
                     <input
                     type="email"
                     id="ticket-email"
                     name="email"
                     required
-                    className="w-full bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-black/50"
+                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#F1F3F4] placeholder:text-[#1f1f1f]/50"
                     placeholder="your.email@example.com"
                   />
                 </label>
-                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
+                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-[#1f1f1f]">
                     Phone Number *
                     <input
                       type="tel"
@@ -472,53 +472,53 @@ export default function Home() {
                       maxLength={10}
                       minLength={10}
                       title="Enter a 10-digit phone number"
-                      className="w-full bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-black/50"
+                      className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#F1F3F4] placeholder:text-[#1f1f1f]/50"
                       placeholder="9876543210"
                     />
                   </label>
-                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
+                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-[#1f1f1f]">
                     Number of Tickets *
                     <select
                     id="ticket-quantity"
                     name="quantity"
                     required
-                    className="w-full bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black cursor-pointer"
+                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#F1F3F4] cursor-pointer"
                   >
-                    <option value="" className="bg-white text-black">
+                    <option value="" className="bg-white text-[#1f1f1f]">
                       Select quantity
                     </option>
-                    <option value="1" className="bg-white text-black">
+                    <option value="1" className="bg-white text-[#1f1f1f]">
                       1 Ticket
                     </option>
-                    <option value="2" className="bg-white text-black">
+                    <option value="2" className="bg-white text-[#1f1f1f]">
                       2 Tickets
                     </option>
-                    <option value="3" className="bg-white text-black">
+                    <option value="3" className="bg-white text-[#1f1f1f]">
                       3 Tickets
                     </option>
-                    <option value="4" className="bg-white text-black">
+                    <option value="4" className="bg-white text-[#1f1f1f]">
                       4 Tickets
                     </option>
-                    <option value="5" className="bg-white text-black">
+                    <option value="5" className="bg-white text-[#1f1f1f]">
                       5 Tickets
                     </option>
                   </select>
                 </label>
               </div>
 
-              <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
+              <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-[#1f1f1f]">
                 Special Requests / Questions *
                 <textarea
                   id="ticket-message"
                   name="message"
                   rows={4}
                   required
-                  className="w-full resize-none bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-black/50"
+                  className="w-full resize-none bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#F1F3F4] placeholder:text-[#1f1f1f]/50"
                   placeholder="Let us know how we can help"
                 />
               </label>
 
-              <label className="flex items-start gap-3 text-sm font-montserrat text-white/80">
+              <label className="flex items-start gap-3 text-sm font-montserrat text-[#1f1f1f]/80">
                 <input
                   type="checkbox"
                   id="ticket-terms"
@@ -529,7 +529,7 @@ export default function Home() {
                 />
                 <span>
                   I accept the{" "}
-                  <Link href="/terms-and-conditions" className="text-[#00f5ff] underline-offset-4 hover:underline">
+                  <Link href="/terms-and-conditions" className="text-[#e22154] underline-offset-4 hover:underline">
                     terms and conditions
                   </Link>
                 </span>
@@ -539,14 +539,14 @@ export default function Home() {
                 <button
                   type="submit"
                   disabled={ticketProcessing}
-                  className="mobile-tap flex-1 bg-[#ff1a1a] px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mobile-tap flex-1 bg-[#e22154] px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {ticketProcessing ? "Processing Payment..." : "Request Tickets"}
                 </button>
                 <button
                   type="button"
                   onClick={closeTicketModal}
-                  className="mobile-tap bg-black px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02]"
+                  className="mobile-tap bg-[#F1F3F4] px-6 py-3 text-base font-montserrat font-semibold text-[#e22154] border border-[#e22154] transition-transform hover:scale-[1.02] hover:bg-white"
                 >
                   Cancel
                 </button>
