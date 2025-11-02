@@ -182,3 +182,31 @@ h6 {
     transform: translateY(0);
   }
 }
+
+.section-divider-line {
+  width: min(90%, 48rem);
+  height: 0.35rem;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #e22154, #ffff00, #e22154);
+  background-size: 200% 100%;
+  animation: section-divider-glow 3s ease-in-out infinite;
+  box-shadow: 0 0 20px rgba(226, 33, 84, 0.45);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-divider-line {
+    animation: none;
+  }
+}
+
+@keyframes section-divider-glow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}

@@ -14,7 +14,7 @@ const OurPartners = () => {
   return (
     <section
       id="partners"
-      className="bg-black text-white py-12 md:py-20 px-4 md:px-8 lg:px-20 border-t-2 border-[#ffe300] scroll-mt-24"
+      className="bg-[#FFFFFF] text-[#1f1f1f] py-12 md:py-20 px-4 md:px-8 lg:px-20 border-t-2 border-[#ffe300] scroll-mt-24"
     >
       <div className="max-w-7xl mx-auto">
         {/* Title */}
@@ -22,7 +22,7 @@ const OurPartners = () => {
           <h2 className="text-4xl md:text-6xl lg:text-7xl font-castle text-[#ffe300] uppercase tracking-wider">
             Our Partners
           </h2>
-          <p className="text-gray-400 text-lg md:text-xl mt-4">
+          <p className="text-[#4a4a4a] text-lg md:text-xl mt-4">
             Powered by amazing collaborators
           </p>
         </div>
