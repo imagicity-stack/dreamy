@@ -149,10 +149,9 @@ void main(){
   vec2 cellCoord = cellId * cellPixelSize;
   vec2 uv = cellCoord / uResolution * vec2(aspectRatio, 1.0);
 
-  float base = fbm2(uv, uTime * 0.05);
-  base = base * 0.5 - 0.65;
-
-  float feed = base + (uDensity - 0.5) * 0.3;
+  float base = fbm2(uv, uTime * 0.08);
+  float feed = mix(0.25, 0.85, base);
+  feed = clamp(feed * uDensity, 0.0, 1.0);
 
   float speed     = uRippleSpeed;
   float thickness = uRippleThickness;
@@ -175,11 +174,12 @@ void main(){
   }
 
   float bayer = Bayer8(fragCoord / uPixelSize) - 0.5;
-  float bw = step(0.5, feed + bayer);
+  float signal = feed + bayer;
+  float bw = smoothstep(0.3, 0.7, signal);
 
   float h = fract(sin(dot(floor(fragCoord / uPixelSize), vec2(127.1, 311.7))) * 43758.5453);
   float jitterScale = 1.0 + (h - 0.5) * uPixelJitter;
-  float coverage = bw * jitterScale;
+  float coverage = clamp(bw * jitterScale, 0.0, 1.0);
   float M;
   if      (uShapeType == SHAPE_CIRCLE)   M = maskCircle (pixelUV, coverage);
   else if (uShapeType == SHAPE_TRIANGLE) M = maskTriangle(pixelUV, pixelId, coverage);
@@ -279,7 +279,7 @@ const createProgram = (
 const PixelBlast = ({
   variant = "square",
   pixelSize = 3,
-  color = "#e22154",
+  color = "#800000",
   className,
   style,
   antialias = true,

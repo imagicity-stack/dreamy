@@ -20,7 +20,7 @@ const involvementOptions = [
   {
     name: "Bring Your Stall",
     desc: "Showcase food, art, games, or merch in a high-energy bazaar built for creators.",
-    panelClass: "bg-[#e22154] text-[#FFFFFF]",
+    panelClass: "bg-[#800000] text-[#FFFFFF]",
     imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/stall.jpg",
     href: "/stall",
@@ -28,7 +28,7 @@ const involvementOptions = [
   {
     name: "Cosplay Event",
     desc: "Step into character and own Jharkhand’s wildest fandom stage at MADOOZA.",
-    panelClass: "bg-[#e22154] text-[#FFFFFF]",
+    panelClass: "bg-[#800000] text-[#FFFFFF]",
     imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/cosplay.jpg",
     href: "/cosplay",
@@ -36,7 +36,7 @@ const involvementOptions = [
   {
     name: "Performers",
     desc: "From bands and DJs to poets and dancers, light up the lineup with your act.",
-    panelClass: "bg-[#e22154] text-[#FFFFFF]",
+    panelClass: "bg-[#800000] text-[#FFFFFF]",
     imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/Perfomers.jpg",
     href: "/performer",
@@ -44,7 +44,7 @@ const involvementOptions = [
   {
     name: "Volunteers",
     desc: "Join the crew, earn experience, and see the madness from behind the scenes.",
-    panelClass: "bg-[#e22154] text-[#FFFFFF]",
+    panelClass: "bg-[#800000] text-[#FFFFFF]",
     imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/volunteer.jpg",
     href: "/volunteer",
@@ -52,7 +52,7 @@ const involvementOptions = [
   {
     name: "Sponsors",
     desc: "Partner with MADOOZA to amplify your brand across Jharkhand’s youth movement.",
-    panelClass: "bg-[#e22154] text-[#FFFFFF]",
+    panelClass: "bg-[#800000] text-[#FFFFFF]",
     imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/sponsorship.png",
     href: "/sponsor",
@@ -64,7 +64,7 @@ const highlights = [
     title: "CREATOR 1",
     subtitle: "Coming Soon",
     cardClass:
-      "bg-black/70 backdrop-blur border border-[#e22154]/40 shadow-2xl",
+      "bg-black/70 backdrop-blur border border-[#800000]/40 shadow-2xl",
     titleClass: "text-[#ffe3f0]",
     subtitleClass: "text-[#ffd6e1]",
     image: "/creator1.png",
@@ -73,7 +73,7 @@ const highlights = [
     title: "CREATOR 2",
     subtitle: "Coming Soon",
     cardClass:
-      "bg-black/70 backdrop-blur border border-[#e22154]/40 shadow-2xl",
+      "bg-black/70 backdrop-blur border border-[#800000]/40 shadow-2xl",
     titleClass: "text-[#ffe3f0]",
     subtitleClass: "text-[#ffd6e1]",
     image: "/creator1.png",
@@ -293,11 +293,11 @@ export default function Home() {
 
       </div>
       <div className="relative isolate">
-        <div className="absolute inset-0 -z-10">
+        <div className="absolute inset-0 -z-10 bg-black">
           <PixelBlast
             variant="circle"
             pixelSize={6}
-            color="#e22154"
+            color="#800000"
             patternScale={3}
             patternDensity={1.2}
             pixelSizeJitter={0.5}
@@ -320,7 +320,7 @@ export default function Home() {
             id="involvewithus"
             className="bg-transparent text-white py-12 md:py-20 flex justify-center items-center flex-col px-4 scroll-mt-24"
           >
-            <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl uppercase mb-6 md:mb-10 font-oswald tracking-wide text-[#e22154]">
+            <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl uppercase mb-6 md:mb-10 font-oswald tracking-wide text-[#800000]">
               INVOLVE WITH US
             </h2>
 
@@ -334,8 +334,8 @@ export default function Home() {
                       onClick={() => setActive(festival.name)}
                       className={`flex items-center justify-center gap-1 md:gap-3 flex-1 px-2 md:px-4 py-2 md:py-3 cursor-pointer font-oswald tracking-wide text-sm sm:text-base md:text-lg lg:text-xl uppercase transition-all whitespace-nowrap ${
                         active === festival.name
-                          ? "bg-[#e22154] text-[#FFFF00]"
-                          : "bg-[#FFFF00] text-[#e22154] hover:bg-[#e22154] hover:text-[#FFFF00]"
+                          ? "bg-[#800000] text-[#FFFF00]"
+                          : "bg-[#FFFF00] text-[#800000] hover:bg-[#800000] hover:text-[#FFFF00]"
                       }`}
                     >
                       <span className="text-center">{festival.name}</span>
@@ -364,7 +364,7 @@ export default function Home() {
                   </div>
                   <Link
                     href={currentFestival.href}
-                    className="mobile-tap relative z-10 mt-4 inline-flex w-fit cursor-pointer bg-[#FFFF00] text-[#e22154] text-sm sm:text-base md:text-lg font-oswald px-5 py-2 rounded-md transition-all uppercase hover:bg-[#fffd66] hover:text-[#b6163f] hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFFF00]/60 active:translate-y-0"
+                    className="mobile-tap relative z-10 mt-4 inline-flex w-fit cursor-pointer bg-[#FFFF00] text-[#800000] text-sm sm:text-base md:text-lg font-oswald px-5 py-2 rounded-md transition-all uppercase hover:bg-[#fffd66] hover:text-[#b6163f] hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFFF00]/60 active:translate-y-0"
                   >
                     Learn More
                   </Link>
@@ -387,7 +387,7 @@ export default function Home() {
             <section className="py-8 md:py-12 w-full md:w-10/12 px-4 md:px-0">
               {/* Creators Header */}
               <div className="text-center mb-8 md:mb-12">
-                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold uppercase tracking-wide font-oswald text-[#e22154] mb-4">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold uppercase tracking-wide font-oswald text-[#800000] mb-4">
                   FEATURED CREATORS
                 </h2>
                 <p className="text-white/90 text-base sm:text-lg md:text-xl font-bold font-quicksand">
@@ -447,11 +447,11 @@ export default function Home() {
           <div className="relative w-full max-w-2xl">
             <div className="pointer-events-none absolute -inset-6 -z-10 opacity-50 blur-3xl bg-[#00f5ff]" aria-hidden />
 
-            <div className="relative flex max-h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-none bg-[#e22154] text-white shadow-[0_0_45px_rgba(0,255,255,0.35)] md:bg-[#FFFFFF] md:text-[#1f1f1f]">
+            <div className="relative flex max-h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-none bg-[#800000] text-white shadow-[0_0_45px_rgba(0,255,255,0.35)] md:bg-[#FFFFFF] md:text-[#1f1f1f]">
               <button
                 type="button"
                 onClick={closeTicketModal}
-                className="mobile-tap absolute top-4 right-4 z-20 text-[#e22154] text-2xl transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00f5ff]"
+                className="mobile-tap absolute top-4 right-4 z-20 text-[#800000] text-2xl transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00f5ff]"
                 aria-label="Close ticket form"
               >
                 ✕
@@ -479,7 +479,7 @@ export default function Home() {
                     id="ticket-name"
                     name="name"
                     required
-                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#e22154] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
+                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#800000] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
                     placeholder="Enter your full name"
                   />
                 </label>
@@ -490,7 +490,7 @@ export default function Home() {
                     id="ticket-email"
                     name="email"
                     required
-                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#e22154] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
+                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#800000] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
                     placeholder="your.email@example.com"
                   />
                 </label>
@@ -506,7 +506,7 @@ export default function Home() {
                       maxLength={10}
                       minLength={10}
                       title="Enter a 10-digit phone number"
-                      className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#e22154] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
+                      className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#800000] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
                       placeholder="9876543210"
                     />
                   </label>
@@ -516,7 +516,7 @@ export default function Home() {
                     id="ticket-quantity"
                     name="quantity"
                     required
-                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#e22154] md:focus:ring-offset-[#FFFFFF] cursor-pointer"
+                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#800000] md:focus:ring-offset-[#FFFFFF] cursor-pointer"
                   >
                     <option value="" className="bg-white text-[#1f1f1f]">
                       Select quantity
@@ -547,7 +547,7 @@ export default function Home() {
                   name="message"
                   rows={4}
                   required
-                  className="w-full resize-none bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#e22154] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
+                  className="w-full resize-none bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#800000] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
                   placeholder="Let us know how we can help"
                 />
               </label>
@@ -563,7 +563,10 @@ export default function Home() {
                 />
                 <span>
                   I accept the{" "}
-                  <Link href="/terms-and-conditions" className="text-[#FFFF00] underline-offset-4 hover:underline md:text-[#e22154]">
+                  <Link
+                    href="/terms-and-conditions"
+                    className="text-[#FFFF00] underline-offset-4 hover:underline md:text-[#800000]"
+                  >
                     terms and conditions
                   </Link>
                 </span>
@@ -573,14 +576,14 @@ export default function Home() {
                 <button
                   type="submit"
                   disabled={ticketProcessing}
-                  className="mobile-tap flex-1 bg-[#FFFF00] px-6 py-3 text-base font-montserrat font-semibold text-[#e22154] transition-transform hover:scale-[1.02] hover:bg-[#fffd66] disabled:cursor-not-allowed disabled:opacity-60 md:bg-[#e22154] md:text-white md:hover:bg-[#c81949]"
+                  className="mobile-tap flex-1 bg-[#FFFF00] px-6 py-3 text-base font-montserrat font-semibold text-[#800000] transition-transform hover:scale-[1.02] hover:bg-[#fffd66] disabled:cursor-not-allowed disabled:opacity-60 md:bg-[#800000] md:text-white md:hover:bg-[#a00000]"
                 >
                   {ticketProcessing ? "Processing Payment..." : "Request Tickets"}
                 </button>
                 <button
                   type="button"
                   onClick={closeTicketModal}
-                  className="mobile-tap bg-[#FFFFFF] px-6 py-3 text-base font-montserrat font-semibold text-[#e22154] border border-[#e22154] transition-transform hover:scale-[1.02] hover:bg-[#FFFFFF]"
+                  className="mobile-tap bg-[#FFFFFF] px-6 py-3 text-base font-montserrat font-semibold text-[#800000] border border-[#800000] transition-transform hover:scale-[1.02] hover:bg-[#FFFFFF]"
                 >
                   Cancel
                 </button>
