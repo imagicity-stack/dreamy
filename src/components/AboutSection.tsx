@@ -22,7 +22,7 @@ export default function AboutSection() {
 
           {/* Right Text Block */}
           <div className="bg-[#2b0015]/80 backdrop-blur relative flex flex-col justify-center p-6 md:p-10 lg:p-16 text-white order-1 lg:order-2">
-            <h2 className="font-extrabold text-2xl sm:text-3xl md:text-4xl mb-4 md:mb-6 leading-tight text-[#ffe3f0]">
+            <h2 className="font-extrabold text-2xl sm:text-3xl md:text-4xl mb-4 md:mb-6 leading-tight text-[#FFF700]">
               ABOUT MADOOZA
             </h2>
 

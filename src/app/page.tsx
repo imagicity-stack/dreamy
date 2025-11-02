@@ -19,7 +19,7 @@ const involvementOptions = [
   {
     name: "Bring Your Stall",
     desc: "Showcase food, art, games, or merch in a high-energy bazaar built for creators.",
-    panelClass: "bg-[#800000] text-[#FFFFFF]",
+    panelClass: "bg-[#e22154] text-[#FFFFFF]",
     imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/stall.jpg",
     href: "/stall",
@@ -27,7 +27,7 @@ const involvementOptions = [
   {
     name: "Cosplay Event",
     desc: "Step into character and own Jharkhand’s wildest fandom stage at MADOOZA.",
-    panelClass: "bg-[#800000] text-[#FFFFFF]",
+    panelClass: "bg-[#e22154] text-[#FFFFFF]",
     imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/cosplay.jpg",
     href: "/cosplay",
@@ -35,7 +35,7 @@ const involvementOptions = [
   {
     name: "Performers",
     desc: "From bands and DJs to poets and dancers, light up the lineup with your act.",
-    panelClass: "bg-[#800000] text-[#FFFFFF]",
+    panelClass: "bg-[#e22154] text-[#FFFFFF]",
     imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/Perfomers.jpg",
     href: "/performer",
@@ -43,7 +43,7 @@ const involvementOptions = [
   {
     name: "Volunteers",
     desc: "Join the crew, earn experience, and see the madness from behind the scenes.",
-    panelClass: "bg-[#800000] text-[#FFFFFF]",
+    panelClass: "bg-[#e22154] text-[#FFFFFF]",
     imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/volunteer.jpg",
     href: "/volunteer",
@@ -51,7 +51,7 @@ const involvementOptions = [
   {
     name: "Sponsors",
     desc: "Partner with MADOOZA to amplify your brand across Jharkhand’s youth movement.",
-    panelClass: "bg-[#800000] text-[#FFFFFF]",
+    panelClass: "bg-[#e22154] text-[#FFFFFF]",
     imageBgClass: "bg-[#FFFF00]",
     logo: "/involve/sponsorship.png",
     href: "/sponsor",
@@ -64,7 +64,7 @@ const highlights = [
     subtitle: "Coming Soon",
     cardClass:
       "bg-black/70 backdrop-blur border border-[#800000]/40 shadow-2xl",
-    titleClass: "text-[#ffe3f0]",
+    titleClass: "text-[#FFF700]",
     subtitleClass: "text-[#ffd6e1]",
     image: "/creator1.png",
   },
@@ -73,7 +73,7 @@ const highlights = [
     subtitle: "Coming Soon",
     cardClass:
       "bg-black/70 backdrop-blur border border-[#800000]/40 shadow-2xl",
-    titleClass: "text-[#ffe3f0]",
+    titleClass: "text-[#FFF700]",
     subtitleClass: "text-[#ffd6e1]",
     image: "/creator1.png",
   },
@@ -303,7 +303,7 @@ export default function Home() {
             id="involvewithus"
             className="bg-black text-white py-12 md:py-20 flex justify-center items-center flex-col px-4 scroll-mt-24"
           >
-            <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl uppercase mb-6 md:mb-10 font-oswald tracking-wide text-[#800000]">
+            <h2 className="text-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl uppercase mb-6 md:mb-10 font-oswald tracking-wide text-[#FFF700]">
               INVOLVE WITH US
             </h2>
 
@@ -317,8 +317,8 @@ export default function Home() {
                       onClick={() => setActive(festival.name)}
                       className={`flex items-center justify-center gap-1 md:gap-3 flex-1 px-2 md:px-4 py-2 md:py-3 cursor-pointer font-oswald tracking-wide text-sm sm:text-base md:text-lg lg:text-xl uppercase transition-all whitespace-nowrap ${
                         active === festival.name
-                          ? "bg-[#800000] text-[#FFFF00]"
-                          : "bg-[#FFFF00] text-[#800000] hover:bg-[#800000] hover:text-[#FFFF00]"
+                          ? "bg-[#e22154] text-[#FFFF00]"
+                          : "bg-[#FFFF00] text-[#e22154] hover:bg-[#e22154] hover:text-[#FFFF00]"
                       }`}
                     >
                       <span className="text-center">{festival.name}</span>
@@ -336,7 +336,7 @@ export default function Home() {
                   className={`${currentFestival.panelClass} p-8 md:p-12 lg:p-20 lg:w-1/2 h-auto lg:h-full flex-1 flex flex-col justify-center`}
                 >
                   <h3
-                    className="mb-4 uppercase font-oswald text-xl sm:text-2xl md:text-3xl lg:text-4xl tracking-wide"
+                    className="mb-4 uppercase font-oswald text-xl sm:text-2xl md:text-3xl lg:text-4xl tracking-wide text-[#FFF700]"
                   >
                     {currentFestival.name}
                   </h3>
@@ -347,7 +347,7 @@ export default function Home() {
                   </div>
                   <Link
                     href={currentFestival.href}
-                    className="mobile-tap relative z-10 mt-4 inline-flex w-fit cursor-pointer bg-[#FFFF00] text-[#800000] text-sm sm:text-base md:text-lg font-oswald px-5 py-2 rounded-md transition-all uppercase hover:bg-[#fffd66] hover:text-[#b6163f] hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFFF00]/60 active:translate-y-0"
+                    className="mobile-tap relative z-10 mt-4 inline-flex w-fit cursor-pointer bg-[#FFFF00] text-[#e22154] text-sm sm:text-base md:text-lg font-oswald px-5 py-2 rounded-md transition-all uppercase hover:bg-[#fffd66] hover:text-[#c91c47] hover:-translate-y-0.5 focus-visible:-translate-y-0.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFFF00]/60 active:translate-y-0"
                   >
                     Learn More
                   </Link>
@@ -370,7 +370,7 @@ export default function Home() {
             <section className="py-8 md:py-12 w-full md:w-10/12 px-4 md:px-0">
               {/* Creators Header */}
               <div className="text-center mb-8 md:mb-12">
-                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold uppercase tracking-wide font-oswald text-[#800000] mb-4">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold uppercase tracking-wide font-oswald text-[#FFF700] mb-4">
                   FEATURED CREATORS
                 </h2>
                 <p className="text-white/90 text-base sm:text-lg md:text-xl font-bold font-quicksand">
@@ -446,7 +446,7 @@ export default function Home() {
               >
                 <div className="text-center">
                   <p className="font-montserrat text-sm font-semibold text-[#00f5ff]">Tickets</p>
-                  <h2 className="mt-3 text-3xl sm:text-4xl font-travel-sans uppercase text-white md:text-[#1f1f1f]">
+                  <h2 className="mt-3 text-3xl sm:text-4xl font-travel-sans uppercase text-[#FFF700]">
                     Get Your Passes
                   </h2>
                   <p className="mt-3 text-sm sm:text-base text-white/80 md:text-[#1f1f1f]/70">
