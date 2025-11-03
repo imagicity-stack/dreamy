@@ -228,6 +228,9 @@ export default function StallPage() {
                     <option value="art" className="bg-white text-black">
                       Art
                     </option>
+                    <option value="advertisement" className="bg-white text-black">
+                      Advertisement
+                    </option>
                     <option value="games" className="bg-white text-black">
                       Games & Experiences
                     </option>
