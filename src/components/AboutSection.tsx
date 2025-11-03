@@ -6,48 +6,111 @@ export default function AboutSection() {
       id="aboutus"
       className="bg-black py-12 md:py-20 scroll-mt-24 text-white"
     >
-      <div className="max-w-[1500px] mx-auto px-4 md:px-6 lg:px-12">
-        {/* Top Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 overflow-hidden rounded-2xl mb-6 md:mb-8">
-          {/* Left Image */}
-          <div className="relative order-2 lg:order-1">
-            <Image
-              src="/aboutUs.jpg" // replace with your own
-              alt="Gaming Friends"
-              width={500}
-              height={200}
-              className="w-full h-full object-cover min-h-[200px] lg:min-h-0"
-            />
-          </div>
-
-          {/* Right Text Block */}
-          <div className="bg-[#2b0015]/80 backdrop-blur relative flex flex-col justify-center p-6 md:p-10 lg:p-16 text-white order-1 lg:order-2">
-            <h2 className="font-extrabold text-2xl sm:text-3xl md:text-4xl mb-4 md:mb-6 leading-tight text-[#FFF700]">
-              ABOUT MADOOZA
-            </h2>
-
-            <p className="text-sm md:text-base lg:text-lg leading-relaxed mb-4 md:mb-6 text-white/85">
-              Madooza is not just another fest. It’s Hazaribagh’s first creative explosion where art, food,
-              music, and ideas collide.
-              Conceptualized and organized by IMAGICITY, Madooza is built to give local creators, brands,
-              and students a platform that feels premium yet rooted.
-              From vibrant food stalls to live exhibitions, performances, and interactive zones, every corner of
-              Madooza is designed to spark curiosity and collaboration.
-              It’s a space where creativity meets opportunity — for entrepreneurs, artists, and dreamers ready
-              to make noise in Hazaribagh
-            </p>
-
-            <p className="font-semibold mb-4 md:mb-6 text-[#ffd6e1]">This is
-              MADOOZA
-            </p>
-            <p className="font-extrabold text-base md:text-lg mb-6 md:mb-8 text-[#ffe300]">
-              The sound of pure madness
-            </p>
-
-
-          </div>
+      <div className="mx-auto flex max-w-[1400px] flex-col gap-12 px-4 md:px-8 lg:px-12">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <span className="font-montserrat text-xs uppercase tracking-[0.6em] text-[#48cdd3]">
+            Why Madooza
+          </span>
+          <h2 className="font-travel-sans text-3xl sm:text-4xl md:text-5xl uppercase text-[#FFF700]">
+            About Madooza
+          </h2>
+          <p className="max-w-3xl text-sm sm:text-base md:text-lg text-white/80">
+            Madooza is Hazaribagh’s first creative explosion where art, food, music, and ideas collide. Built by
+            IMAGICITY, it gives local creators, brands, and students a premium stage that still feels deeply rooted in the city’s
+            energy.
+          </p>
         </div>
 
+        <div className="grid items-stretch gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+          <div className="flex flex-col gap-8">
+            <div className="relative overflow-hidden rounded-3xl border border-[#e22154]/40 bg-[#1a0010]/70 p-8 md:p-10 shadow-[0_0_35px_rgba(226,33,84,0.2)]">
+              <div
+                className="pointer-events-none absolute inset-0 bg-gradient-to-br from-[#e22154]/40 via-transparent to-transparent opacity-70"
+                aria-hidden
+              />
+              <div className="relative space-y-4">
+                <h3 className="font-travel-sans text-2xl sm:text-3xl uppercase text-[#ffe300]">
+                  The Movement
+                </h3>
+                <p className="text-sm sm:text-base text-white/80">
+                  Madooza is not just another fest. It is a playground for creators, entrepreneurs, and dreamers who want to make
+                  noise in Hazaribagh, giving them a space that feels both premium and welcoming.
+                </p>
+                <p className="text-sm sm:text-base text-white/80">
+                  From vibrant food stalls to live exhibitions, performances, and interactive zones, every corner is designed to
+                  spark curiosity, collaboration, and unforgettable memories.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid gap-5 sm:grid-cols-2">
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-lg backdrop-blur-sm">
+                <h4 className="font-montserrat text-base font-semibold uppercase tracking-wide text-[#48cdd3]">
+                  Immersive Zones
+                </h4>
+                <p className="mt-3 text-sm text-white/70">
+                  Live stages, art alleys, gaming corners, and food pop-ups crafted to keep every sense buzzing from day to night.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-lg backdrop-blur-sm">
+                <h4 className="font-montserrat text-base font-semibold uppercase tracking-wide text-[#e22154]">
+                  Creator-First
+                </h4>
+                <p className="mt-3 text-sm text-white/70">
+                  Local brands and artists get the spotlight, resources, and networking opportunities to scale their craft.
+                </p>
+              </div>
+              <div className="rounded-2xl border border-white/10 bg-white/5 p-5 shadow-lg backdrop-blur-sm sm:col-span-2">
+                <h4 className="font-montserrat text-base font-semibold uppercase tracking-wide text-[#f6cd4a]">
+                  Community Energy
+                </h4>
+                <p className="mt-3 text-sm text-white/70">
+                  Built by IMAGICITY with and for the people of Hazaribagh, ensuring the vibe stays raw, real, and community-driven.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="rounded-2xl border border-[#f6cd4a]/40 bg-[#f6cd4a]/10 px-4 py-6 text-center">
+                <p className="text-3xl font-travel-sans text-[#f6cd4a]">50+</p>
+                <p className="mt-2 text-xs uppercase tracking-[0.35em] text-white/70">Creators &amp; Brands</p>
+              </div>
+              <div className="rounded-2xl border border-[#48cdd3]/40 bg-[#48cdd3]/10 px-4 py-6 text-center">
+                <p className="text-3xl font-travel-sans text-[#48cdd3]">20+</p>
+                <p className="mt-2 text-xs uppercase tracking-[0.35em] text-white/70">Experiences &amp; Zones</p>
+              </div>
+              <div className="rounded-2xl border border-[#e22154]/40 bg-[#e22154]/10 px-4 py-6 text-center">
+                <p className="text-3xl font-travel-sans text-[#e22154]">1</p>
+                <p className="mt-2 text-xs uppercase tracking-[0.35em] text-white/70">City. Pure Madness.</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="relative overflow-hidden rounded-3xl border border-white/10">
+            <Image
+              src="/aboutUs.jpg"
+              alt="Friends enjoying at Madooza"
+              width={900}
+              height={900}
+              className="h-full w-full object-cover"
+            />
+            <div
+              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
+              aria-hidden
+            />
+            <div className="absolute bottom-6 left-6 right-6 space-y-3">
+              <p className="font-montserrat text-xs uppercase tracking-[0.4em] text-[#ffe300]">
+                This is Madooza
+              </p>
+              <p className="font-travel-sans text-2xl sm:text-3xl text-white">
+                The Sound of Pure Madness
+              </p>
+              <p className="text-sm text-white/70">
+                Crafted by IMAGICITY for the dreamers, makers, and fans turning Hazaribagh into a creative capital.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -140,6 +140,16 @@ h6 {
   font-size: clamp(3rem, 19vw, 11rem);
   line-height: 0.85;
   color: #fff700;
+  background-image: linear-gradient(
+    to bottom,
+    #e22154 0%,
+    #48cdd3 50%,
+    #f6cd4a 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
   opacity: 0;
   transform: translateY(100%);
   animation: hero-letter-reveal 0.6s ease-out forwards;

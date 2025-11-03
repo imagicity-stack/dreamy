@@ -277,7 +277,7 @@ export default function Home() {
 
           <button
             onClick={openTicketModal}
-            className="hero-cta-button mobile-tap bg-[#ffe300] text-[#1f1f1f] text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-montserrat pointer-events-auto cursor-pointer z-20"
+            className="hero-cta-button mobile-tap bg-[#ffe300] text-[#1f1f1f] border-2 border-black text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl font-montserrat pointer-events-auto cursor-pointer z-20"
           >
             <Image
               src="/ticketicon.png"
@@ -430,11 +430,11 @@ export default function Home() {
           <div className="relative w-full max-w-2xl">
             <div className="pointer-events-none absolute -inset-6 -z-10 opacity-50 blur-3xl bg-[#00f5ff]" aria-hidden />
 
-            <div className="relative flex max-h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-none bg-[#800000] text-white shadow-[0_0_45px_rgba(0,255,255,0.35)] md:bg-[#FFFFFF] md:text-[#1f1f1f]">
+            <div className="relative flex max-h-[calc(100vh-4rem)] flex-col overflow-hidden rounded-none bg-black/95 text-white shadow-[0_0_45px_rgba(0,255,255,0.35)]">
               <button
                 type="button"
                 onClick={closeTicketModal}
-                className="mobile-tap absolute top-4 right-4 z-20 text-[#800000] text-2xl transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00f5ff]"
+                className="mobile-tap absolute top-4 right-4 z-20 text-[#ffe300] text-2xl transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00f5ff]"
                 aria-label="Close ticket form"
               >
                 ✕
@@ -449,35 +449,35 @@ export default function Home() {
                   <h2 className="mt-3 text-3xl sm:text-4xl font-travel-sans uppercase text-[#FFF700]">
                     Get Your Passes
                   </h2>
-                  <p className="mt-3 text-sm sm:text-base text-white/80 md:text-[#1f1f1f]/70">
+                  <p className="mt-3 text-sm sm:text-base text-white/80">
                     Drop your details below and we&apos;ll confirm your tickets instantly once the payment succeeds.
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white md:text-[#1f1f1f]">
+                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
                     Full Name *
                     <input
                       type="text"
-                    id="ticket-name"
-                    name="name"
-                    required
-                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#800000] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
-                    placeholder="Enter your full name"
-                  />
-                </label>
-                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white md:text-[#1f1f1f]">
+                      id="ticket-name"
+                      name="name"
+                      required
+                      className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-[#1f1f1f]/50"
+                      placeholder="Enter your full name"
+                    />
+                  </label>
+                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
                     Email Address *
                     <input
-                    type="email"
-                    id="ticket-email"
-                    name="email"
-                    required
-                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#800000] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
-                    placeholder="your.email@example.com"
-                  />
-                </label>
-                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white md:text-[#1f1f1f]">
+                      type="email"
+                      id="ticket-email"
+                      name="email"
+                      required
+                      className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-[#1f1f1f]/50"
+                      placeholder="your.email@example.com"
+                    />
+                  </label>
+                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
                     Phone Number *
                     <input
                       type="tel"
@@ -489,53 +489,53 @@ export default function Home() {
                       maxLength={10}
                       minLength={10}
                       title="Enter a 10-digit phone number"
-                      className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#800000] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
+                      className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-[#1f1f1f]/50"
                       placeholder="9876543210"
                     />
                   </label>
-                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white md:text-[#1f1f1f]">
+                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
                     Number of Tickets *
                     <select
-                    id="ticket-quantity"
-                    name="quantity"
-                    required
-                    className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#800000] md:focus:ring-offset-[#FFFFFF] cursor-pointer"
-                  >
-                    <option value="" className="bg-white text-[#1f1f1f]">
-                      Select quantity
-                    </option>
-                    <option value="1" className="bg-white text-[#1f1f1f]">
-                      1 Ticket
-                    </option>
-                    <option value="2" className="bg-white text-[#1f1f1f]">
-                      2 Tickets
-                    </option>
-                    <option value="3" className="bg-white text-[#1f1f1f]">
-                      3 Tickets
-                    </option>
-                    <option value="4" className="bg-white text-[#1f1f1f]">
-                      4 Tickets
-                    </option>
-                    <option value="5" className="bg-white text-[#1f1f1f]">
-                      5 Tickets
-                    </option>
-                  </select>
-                </label>
-              </div>
+                      id="ticket-quantity"
+                      name="quantity"
+                      required
+                      className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black cursor-pointer"
+                    >
+                      <option value="" className="bg-white text-[#1f1f1f]">
+                        Select quantity
+                      </option>
+                      <option value="1" className="bg-white text-[#1f1f1f]">
+                        1 Ticket
+                      </option>
+                      <option value="2" className="bg-white text-[#1f1f1f]">
+                        2 Tickets
+                      </option>
+                      <option value="3" className="bg-white text-[#1f1f1f]">
+                        3 Tickets
+                      </option>
+                      <option value="4" className="bg-white text-[#1f1f1f]">
+                        4 Tickets
+                      </option>
+                      <option value="5" className="bg-white text-[#1f1f1f]">
+                        5 Tickets
+                      </option>
+                    </select>
+                  </label>
+                </div>
 
-              <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white md:text-[#1f1f1f]">
+              <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
                 Special Requests / Questions *
                 <textarea
                   id="ticket-message"
                   name="message"
                   rows={4}
                   required
-                  className="w-full resize-none bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-[#800000] md:focus:ring-offset-[#FFFFFF] placeholder:text-[#1f1f1f]/50"
+                  className="w-full resize-none bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-[#1f1f1f]/50"
                   placeholder="Let us know how we can help"
                 />
               </label>
 
-              <label className="flex items-start gap-3 text-sm font-montserrat text-white/80 md:text-[#1f1f1f]/80">
+              <label className="flex items-start gap-3 text-sm font-montserrat text-white/80">
                 <input
                   type="checkbox"
                   id="ticket-terms"
@@ -548,7 +548,7 @@ export default function Home() {
                   I accept the{" "}
                   <Link
                     href="/terms-and-conditions"
-                    className="text-[#FFFF00] underline-offset-4 hover:underline md:text-[#800000]"
+                    className="text-[#FFFF00] underline-offset-4 hover:underline"
                   >
                     terms and conditions
                   </Link>
@@ -559,14 +559,14 @@ export default function Home() {
                 <button
                   type="submit"
                   disabled={ticketProcessing}
-                  className="mobile-tap flex-1 bg-[#FFFF00] px-6 py-3 text-base font-montserrat font-semibold text-[#800000] transition-transform hover:scale-[1.02] hover:bg-[#fffd66] disabled:cursor-not-allowed disabled:opacity-60 md:bg-[#800000] md:text-white md:hover:bg-[#a00000]"
+                  className="mobile-tap flex-1 bg-[#FFFF00] px-6 py-3 text-base font-montserrat font-semibold text-[#1f1f1f] transition-transform hover:scale-[1.02] hover:bg-[#fffd66] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {ticketProcessing ? "Processing Payment..." : "Request Tickets"}
                 </button>
                 <button
                   type="button"
                   onClick={closeTicketModal}
-                  className="mobile-tap bg-[#FFFFFF] px-6 py-3 text-base font-montserrat font-semibold text-[#800000] border border-[#800000] transition-transform hover:scale-[1.02] hover:bg-[#FFFFFF]"
+                  className="mobile-tap border border-white/40 px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02] hover:border-white hover:bg-white/10"
                 >
                   Cancel
                 </button>
