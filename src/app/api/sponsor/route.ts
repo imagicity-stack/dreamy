@@ -47,7 +47,7 @@ export async function POST(request: Request) {
     }
 
     const scriptURL =
-      "https://script.google.com/macros/s/AKfycbwmNQlxEvGT6r3qgL8riXgh4ZCDynlb8AiHPa2TJaiIVmgSlA_WtIiEsFeRNCyruJvA/exec";
+      "https://script.google.com/macros/s/AKfycbxXk292_Xm0t9Lb-lUJLqCzG8cX0Py-Kdpq8S4g5AhM18gVDdlHSC0fkdEv5LQDI7LZzQ/exec";
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
