@@ -16,32 +16,48 @@ export async function POST(request: Request) {
       brandDescription: sanitize(formData.brandDescription),
     };
 
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwmNQlxEvGT6r3qgL8riXgh4ZCDynlb8AiHPa2TJaiIVmgSlA_WtIiEsFeRNCyruJvA/exec";
+    const scriptURL =
+      "https://script.google.com/macros/s/AKfycbwmNQlxEvGT6r3qgL8riXgh4ZCDynlb8AiHPa2TJaiIVmgSlA_WtIiEsFeRNCyruJvA/exec";
 
     const jsonData = JSON.stringify(payload);
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
     try {
-      const fetchPromise = fetch(scriptURL, {
+      const response = await fetch(scriptURL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: jsonData,
-        mode: "no-cors",
+        signal: controller.signal,
       });
 
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("Request timed out")), 5000);
-      });
-
-      await Promise.race([fetchPromise, timeoutPromise]).catch((error) => {
-        console.warn(
-          "Sponsor fetch encountered an issue but continuing:",
-          error instanceof Error ? error.message : error,
+      if (!response.ok) {
+        const responseText = await response.text().catch(() => "");
+        throw new Error(
+          `Google Apps Script responded with ${response.status}: ${responseText || "No response body"}`,
         );
-      });
+      }
+
+      const result = await response
+        .json()
+        .catch(() => ({ result: "Unknown", message: "Unable to parse response" }));
+
+      if (result.result !== "Success") {
+        throw new Error(result.message ?? "Google Apps Script reported a failure");
+      }
     } catch (fetchError) {
-      console.error("Error during sponsor fetch operation:", fetchError);
+      const errorMessage =
+        fetchError instanceof Error ? fetchError.message : "Unknown error during sponsor submission";
+      console.error("Error during sponsor fetch operation:", errorMessage);
+      return NextResponse.json(
+        { success: false, message: `Failed to submit form: ${errorMessage}` },
+        { status: 502 },
+      );
+    } finally {
+      clearTimeout(timeoutId);
     }
 
     return NextResponse.json({
