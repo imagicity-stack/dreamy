@@ -3,18 +3,10 @@ import { NextResponse } from "next/server";
 export async function POST(request: Request) {
   try {
     const formData = await request.json();
+    console.log("Received sponsor form data:", formData);
 
-    const sanitize = (value: unknown) => {
-      if (typeof value === "string") {
-        return value.trim();
-      }
-
-      if (value === null || value === undefined) {
-        return "";
-      }
-
-      return String(value).trim();
-    };
+    // Sanitize inputs like your volunteer form
+    const sanitize = (value: unknown) => (typeof value === "string" ? value.trim() : "");
 
     const payload = {
       formType: "sponsor" as const,
@@ -26,89 +18,47 @@ export async function POST(request: Request) {
       brandDescription: sanitize(formData.brandDescription),
     };
 
-    const requiredFields = [
-      ["brandName", payload.brandName],
-      ["contactPerson", payload.contactPerson],
-      ["phoneNumber", payload.phoneNumber],
-      ["emailId", payload.emailId],
-      ["sponsorshipType", payload.sponsorshipType],
-      ["brandDescription", payload.brandDescription],
-    ] as const;
-
-    const missingField = requiredFields.find(([, value]) => value.length === 0);
-    if (missingField) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: `Missing required field: ${missingField[0]}`,
-        },
-        { status: 400 },
-      );
-    }
-
     const scriptURL =
       "https://script.google.com/macros/s/AKfycbxXk292_Xm0t9Lb-lUJLqCzG8cX0Py-Kdpq8S4g5AhM18gVDdlHSC0fkdEv5LQDI7LZzQ/exec";
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
-
-    let responseText = "";
+    const jsonData = JSON.stringify(payload);
+    console.log("Sending JSON to Google:", jsonData);
 
     try {
-      const response = await fetch(scriptURL, {
+      console.log("About to send sponsor request to Google Apps Script...");
+
+      // Fire-and-forget like the volunteer route
+      const fetchPromise = fetch(scriptURL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
-        signal: controller.signal,
+        body: jsonData,
+        mode: "no-cors",
       });
 
-      responseText = await response.text().catch(() => "");
+      const timeoutPromise = new Promise((_, reject) => {
+        setTimeout(() => reject(new Error("Request timed out")), 5000);
+      });
 
-      if (!response.ok) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: `Failed to submit form: Google Apps Script responded with ${response.status}: ${
-              responseText || "No response body"
-            }`,
-          },
-          { status: 502 },
-        );
-      }
+      await Promise.race([fetchPromise, timeoutPromise])
+        .then(() => {
+          console.log("Sponsor request sent to Google Apps Script");
+        })
+        .catch((error) => {
+          console.log("Fetch failed but continuing:", error.message);
+        });
 
-      if (responseText) {
-        try {
-          const parsed = JSON.parse(responseText) as { result?: string; message?: string };
-
-          if (parsed.result && parsed.result !== "Success") {
-            return NextResponse.json(
-              {
-                success: false,
-                message: parsed.message ?? `Google Apps Script reported ${parsed.result}`,
-              },
-              { status: 502 },
-            );
-          }
-        } catch (parseError) {
-          console.warn("Unable to parse Apps Script response as JSON:", parseError);
-        }
-      }
     } catch (fetchError) {
-      const errorMessage = fetchError instanceof Error ? fetchError.message : "Unknown error during sponsor submission";
-      return NextResponse.json(
-        { success: false, message: `Failed to submit form: ${errorMessage}` },
-        { status: 502 },
-      );
-    } finally {
-      clearTimeout(timeoutId);
+      console.error("Error during fetch operation:", fetchError);
     }
 
+    console.log("Sending success response to client");
     return NextResponse.json({
       success: true,
       redirectUrl: "/",
     });
+
   } catch (error: unknown) {
     if (error instanceof Error) {
       console.error("Error in sponsor API route:", error.message);
@@ -117,9 +67,8 @@ export async function POST(request: Request) {
     }
 
     const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
-
     return NextResponse.json(
-      { success: false, message: `Failed to submit form: ${errorMessage}` },
+      { success: false, message: `Failed to submit sponsor form: ${errorMessage}` },
       { status: 500 },
     );
   }
