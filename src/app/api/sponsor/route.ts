@@ -17,6 +17,7 @@ export async function POST(request: Request) {
     };
 
     const payload = {
+      formType: "sponsor" as const,
       brandName: sanitize(formData.brandName),
       contactPerson: sanitize(formData.contactPerson),
       phoneNumber: sanitize(formData.phoneNumber),
@@ -46,7 +47,7 @@ export async function POST(request: Request) {
     }
 
     const scriptURL =
-      "https://script.google.com/macros/s/AKfycbxXk292_Xm0t9Lb-lUJLqCzG8cX0Py-Kdpq8S4g5AhM18gVDdlHSC0fkdEv5LQDI7LZzQ/exec";
+      "https://script.google.com/macros/s/AKfycbwmNQlxEvGT6r3qgL8riXgh4ZCDynlb8AiHPa2TJaiIVmgSlA_WtIiEsFeRNCyruJvA/exec";
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 10000);
