@@ -4,10 +4,19 @@ export async function POST(request: Request) {
   try {
     const formData = await request.json();
 
-    const sanitize = (value: unknown) => (typeof value === "string" ? value.trim() : "");
+    const sanitize = (value: unknown) => {
+      if (typeof value === "string") {
+        return value.trim();
+      }
+
+      if (value === null || value === undefined) {
+        return "";
+      }
+
+      return String(value).trim();
+    };
 
     const payload = {
-      formType: "sponsor" as const,
       brandName: sanitize(formData.brandName),
       contactPerson: sanitize(formData.contactPerson),
       phoneNumber: sanitize(formData.phoneNumber),
@@ -16,32 +25,83 @@ export async function POST(request: Request) {
       brandDescription: sanitize(formData.brandDescription),
     };
 
-    const scriptURL = "https://script.google.com/macros/s/AKfycbwmNQlxEvGT6r3qgL8riXgh4ZCDynlb8AiHPa2TJaiIVmgSlA_WtIiEsFeRNCyruJvA/exec";
+    const requiredFields = [
+      ["brandName", payload.brandName],
+      ["contactPerson", payload.contactPerson],
+      ["phoneNumber", payload.phoneNumber],
+      ["emailId", payload.emailId],
+      ["sponsorshipType", payload.sponsorshipType],
+      ["brandDescription", payload.brandDescription],
+    ] as const;
 
-    const jsonData = JSON.stringify(payload);
+    const missingField = requiredFields.find(([, value]) => value.length === 0);
+    if (missingField) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: `Missing required field: ${missingField[0]}`,
+        },
+        { status: 400 },
+      );
+    }
+
+    const scriptURL =
+      "https://script.google.com/macros/s/AKfycbxXk292_Xm0t9Lb-lUJLqCzG8cX0Py-Kdpq8S4g5AhM18gVDdlHSC0fkdEv5LQDI7LZzQ/exec";
+
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+    let responseText = "";
 
     try {
-      const fetchPromise = fetch(scriptURL, {
+      const response = await fetch(scriptURL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: jsonData,
-        mode: "no-cors",
+        body: JSON.stringify(payload),
+        signal: controller.signal,
       });
 
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error("Request timed out")), 5000);
-      });
+      responseText = await response.text().catch(() => "");
 
-      await Promise.race([fetchPromise, timeoutPromise]).catch((error) => {
-        console.warn(
-          "Sponsor fetch encountered an issue but continuing:",
-          error instanceof Error ? error.message : error,
+      if (!response.ok) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Failed to submit form: Google Apps Script responded with ${response.status}: ${
+              responseText || "No response body"
+            }`,
+          },
+          { status: 502 },
         );
-      });
+      }
+
+      if (responseText) {
+        try {
+          const parsed = JSON.parse(responseText) as { result?: string; message?: string };
+
+          if (parsed.result && parsed.result !== "Success") {
+            return NextResponse.json(
+              {
+                success: false,
+                message: parsed.message ?? `Google Apps Script reported ${parsed.result}`,
+              },
+              { status: 502 },
+            );
+          }
+        } catch (parseError) {
+          console.warn("Unable to parse Apps Script response as JSON:", parseError);
+        }
+      }
     } catch (fetchError) {
-      console.error("Error during sponsor fetch operation:", fetchError);
+      const errorMessage = fetchError instanceof Error ? fetchError.message : "Unknown error during sponsor submission";
+      return NextResponse.json(
+        { success: false, message: `Failed to submit form: ${errorMessage}` },
+        { status: 502 },
+      );
+    } finally {
+      clearTimeout(timeoutId);
     }
 
     return NextResponse.json({
