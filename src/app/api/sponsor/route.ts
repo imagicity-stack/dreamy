@@ -4,10 +4,19 @@ export async function POST(request: Request) {
   try {
     const formData = await request.json();
 
-    const sanitize = (value: unknown) => (typeof value === "string" ? value.trim() : "");
+    const sanitize = (value: unknown) => {
+      if (typeof value === "string") {
+        return value.trim();
+      }
+
+      if (value === null || value === undefined) {
+        return "";
+      }
+
+      return String(value).trim();
+    };
 
     const payload = {
-      formType: "sponsor" as const,
       brandName: sanitize(formData.brandName),
       contactPerson: sanitize(formData.contactPerson),
       phoneNumber: sanitize(formData.phoneNumber),
@@ -37,85 +46,62 @@ export async function POST(request: Request) {
     }
 
     const scriptURL =
-      "https://script.google.com/macros/s/AKfycbwmNQlxEvGT6r3qgL8riXgh4ZCDynlb8AiHPa2TJaiIVmgSlA_WtIiEsFeRNCyruJvA/exec";
+      "https://script.google.com/macros/s/AKfycbxXk292_Xm0t9Lb-lUJLqCzG8cX0Py-Kdpq8S4g5AhM18gVDdlHSC0fkdEv5LQDI7LZzQ/exec";
 
-    const submitToAppsScript = async (
-      body: BodyInit,
-      headers: Record<string, string>,
-    ): Promise<{ ok: true } | { ok: false; message: string }> => {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000);
 
-      try {
-        const response = await fetch(scriptURL, {
-          method: "POST",
-          headers,
-          body,
-          signal: controller.signal,
-        });
+    let responseText = "";
 
-        const responseText = await response.text().catch(() => "");
+    try {
+      const response = await fetch(scriptURL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+        signal: controller.signal,
+      });
 
-        if (!response.ok) {
-          return {
-            ok: false,
-            message: `Google Apps Script responded with ${response.status}: ${responseText || "No response body"}`,
-          };
-        }
+      responseText = await response.text().catch(() => "");
 
-        if (!responseText) {
-          return { ok: true };
-        }
+      if (!response.ok) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `Failed to submit form: Google Apps Script responded with ${response.status}: ${
+              responseText || "No response body"
+            }`,
+          },
+          { status: 502 },
+        );
+      }
 
+      if (responseText) {
         try {
           const parsed = JSON.parse(responseText) as { result?: string; message?: string };
 
           if (parsed.result && parsed.result !== "Success") {
-            return { ok: false, message: parsed.message ?? `Google Apps Script reported ${parsed.result}` };
+            return NextResponse.json(
+              {
+                success: false,
+                message: parsed.message ?? `Google Apps Script reported ${parsed.result}`,
+              },
+              { status: 502 },
+            );
           }
-
-          return { ok: true };
         } catch (parseError) {
           console.warn("Unable to parse Apps Script response as JSON:", parseError);
-          return { ok: true };
         }
-      } catch (fetchError) {
-        const errorMessage =
-          fetchError instanceof Error ? fetchError.message : "Unknown error during sponsor submission";
-        return { ok: false, message: errorMessage };
-      } finally {
-        clearTimeout(timeoutId);
       }
-    };
-
-    const jsonAttempt = await submitToAppsScript(JSON.stringify(payload), {
-      "Content-Type": "application/json",
-    });
-
-    if (!jsonAttempt.ok) {
-      console.error("Sponsor JSON submission failed:", jsonAttempt.message);
-
-      const fallbackParams = new URLSearchParams();
-      fallbackParams.set("formType", "sponsor");
-      fallbackParams.set("brandName", payload.brandName);
-      fallbackParams.set("contactPerson", payload.contactPerson);
-      fallbackParams.set("phoneNumber", payload.phoneNumber);
-      fallbackParams.set("emailId", payload.emailId);
-      fallbackParams.set("sponsorshipType", payload.sponsorshipType);
-      fallbackParams.set("brandDescription", payload.brandDescription);
-      fallbackParams.set("form_type", "sponsor");
-
-      const formAttempt = await submitToAppsScript(fallbackParams.toString(), {
-        "Content-Type": "application/x-www-form-urlencoded; charset=utf-8",
-      });
-
-      if (!formAttempt.ok) {
-        console.error("Sponsor fallback submission failed:", formAttempt.message);
-        return NextResponse.json(
-          { success: false, message: `Failed to submit form: ${formAttempt.message}` },
-          { status: 502 },
-        );
-      }
+    } catch (fetchError) {
+      const errorMessage = fetchError instanceof Error ? fetchError.message : "Unknown error during sponsor submission";
+      return NextResponse.json(
+        { success: false, message: `Failed to submit form: ${errorMessage}` },
+        { status: 502 },
+      );
+    } finally {
+      clearTimeout(timeoutId);
     }
 
     return NextResponse.json({
