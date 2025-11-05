@@ -54,16 +54,19 @@ export default function MobileMenu() {
       {/* Mobile menu overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+          className="fixed inset-0 z-40 !bg-[#e22154] lg:hidden"
+          style={{ backgroundColor: "#e22154" }}
           onClick={() => setIsOpen(false)}
+          aria-hidden
         />
       )}
 
       {/* Mobile menu */}
       <div
-        className={`fixed top-0 right-0 h-full w-80 bg-[#e22154] text-[#FFFFFF] border-l border-black/30 shadow-xl transform transition-transform duration-300 ease-in-out z-50 lg:hidden ${
+        className={`fixed top-0 right-0 h-full w-80 !bg-[#e22154] text-[#FFFFFF] border-l border-black/30 shadow-xl transform transition-transform duration-300 ease-in-out z-50 lg:hidden ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
+        style={{ backgroundColor: "#e22154" }}
       >
         <div className="relative flex h-full flex-col px-6 pt-16 pb-8">
           <button
