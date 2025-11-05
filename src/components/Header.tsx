@@ -1,7 +1,6 @@
 import { memo } from 'react';
 import Link from "next/link";
 import Image from "next/image";
-import MobileMenu from './MobileMenu';
 
 const navLinks = [
   { href: "/#aboutus", label: "ABOUT" },
@@ -27,8 +26,6 @@ const Header = () => {
             </Link>
           ))}
         </div>
-        {/* Mobile menu */}
-        <MobileMenu />
       </div>
 
     </>
