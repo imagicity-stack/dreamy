@@ -1,8 +1,9 @@
 "use client";
+
 import Link from "next/link";
 import { useState } from "react";
 
-const navLinks = [
+const primaryLinks = [
   { href: "/#aboutus", label: "ABOUT" },
   { href: "/#involvewithus", label: "INVOLVE WITH US" },
   { href: "/#creators", label: "CREATORS" },
@@ -10,7 +11,7 @@ const navLinks = [
   { href: "/#contactus", label: "CONTACT US" },
 ];
 
-const legalLinks = [
+const secondaryLinks = [
   { href: "/terms-and-conditions", label: "Terms & Conditions" },
   { href: "/privacy-policy", label: "Privacy Policy" },
   { href: "/cancellation-refund-policy", label: "Cancellation & Refund" },
@@ -19,93 +20,72 @@ const legalLinks = [
 export default function MobileMenu() {
   const [isOpen, setIsOpen] = useState(false);
 
+  const toggleMenu = () => setIsOpen((open) => !open);
+  const closeMenu = () => setIsOpen(false);
+
   return (
     <>
-      {/* Mobile menu button */}
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="mobile-tap relative z-50 p-2 text-[#FFFFFF] transition-transform lg:hidden"
+        onClick={toggleMenu}
+        className="mobile-tap relative z-50 p-2 text-white transition-transform lg:hidden"
+        aria-expanded={isOpen}
+        aria-controls="mobile-navigation"
         aria-label="Toggle mobile menu"
+        type="button"
       >
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           {isOpen ? (
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M6 18L18 6M6 6l12 12"
-            />
+            <path d="M6 18L18 6M6 6l12 12" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
           ) : (
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M4 6h16M4 12h16M4 18h16"
-            />
+            <path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} />
           )}
         </svg>
       </button>
 
-      {/* Mobile menu overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 bg-[#e22154] lg:hidden"
-          style={{ backgroundColor: "#e22154", opacity: 1 }}
-          onClick={() => setIsOpen(false)}
-          aria-hidden
-        />
-      )}
+          id="mobile-navigation"
+          className="fixed inset-0 z-40 flex flex-col bg-[#e22154] text-white lg:hidden"
+          role="dialog"
+          aria-modal="true"
+        >
+          <div className="flex items-center justify-end px-6 pt-6">
+            <button
+              onClick={closeMenu}
+              className="mobile-tap text-2xl transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white"
+              aria-label="Close mobile menu"
+              type="button"
+            >
+              ✕
+            </button>
+          </div>
 
-      {/* Mobile menu */}
-      <div
-        className={`fixed top-0 right-0 h-full w-80 bg-[#e22154] text-[#FFFFFF] border-l border-black/30 shadow-xl transform transition-transform duration-300 ease-in-out z-50 lg:hidden ${
-          isOpen ? "translate-x-0" : "translate-x-full"
-        }`}
-        style={{ backgroundColor: "#e22154", opacity: 1 }}
-      >
-        <div className="relative flex h-full flex-col px-6 pt-16 pb-8">
-          <button
-            type="button"
-            onClick={() => setIsOpen(false)}
-            aria-label="Close mobile menu"
-            className="mobile-tap absolute top-4 right-4 text-2xl text-[#FFFFFF] transition-transform hover:scale-110 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white/60"
-          >
-            ✕
-          </button>
-          <nav className="mt-8 flex flex-col space-y-6 font-montserrat">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="mobile-tap text-xl font-bold uppercase text-[#FFFFFF] transition hover:text-gray-200"
-                onClick={() => setIsOpen(false)}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </nav>
-
-          <div className="mt-auto border-t border-white/20 pt-8">
-            <nav className="flex flex-col space-y-3 text-sm font-montserrat">
-              {legalLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="mobile-tap text-white/80 transition hover:text-[#FFFFFF] hover:underline"
-                  onClick={() => setIsOpen(false)}
-                >
+          <nav className="flex flex-1 flex-col justify-start px-6 pb-10 pt-8 font-montserrat">
+            <div className="flex flex-col space-y-6 text-xl font-bold uppercase">
+              {primaryLinks.map((link) => (
+                <Link key={link.href} href={link.href} className="mobile-tap" onClick={closeMenu}>
                   {link.label}
                 </Link>
               ))}
-            </nav>
-          </div>
+            </div>
+
+            <div className="mt-auto border-t border-white/20 pt-6 text-sm">
+              <nav className="flex flex-col space-y-3">
+                {secondaryLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    className="mobile-tap text-white/80 transition hover:text-white hover:underline"
+                    onClick={closeMenu}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          </nav>
         </div>
-      </div>
+      )}
     </>
   );
 }
