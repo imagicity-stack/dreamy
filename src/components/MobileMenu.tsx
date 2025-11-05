@@ -54,8 +54,7 @@ export default function MobileMenu() {
       {/* Mobile menu overlay */}
       {isOpen && (
         <div
-          className="fixed inset-0 z-40 lg:hidden"
-          style={{ backgroundColor: "#e22154" }}
+          className="fixed inset-0 z-40 bg-[#e22154] lg:hidden"
           onClick={() => setIsOpen(false)}
           aria-hidden
         />
