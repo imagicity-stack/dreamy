@@ -167,7 +167,6 @@ export default function CosplayPage() {
         currency: orderConfig.currency,
         name: "Madooza Cosplay",
         description: "Cosplay Registration",
-        order_id: orderConfig.orderId,
         prefill: {
           name: cosplayDetails.name,
           email: cosplayDetails.email,
@@ -201,6 +200,10 @@ export default function CosplayPage() {
           },
         },
       };
+
+      if (orderConfig.orderId) {
+        options.order_id = orderConfig.orderId;
+      }
 
       const razorpay = new window.Razorpay(options);
 

@@ -13,7 +13,7 @@ export interface RazorpayOptions {
   currency?: string;
   name?: string;
   description?: string;
-  order_id: string;
+  order_id?: string;
   prefill?: {
     name?: string;
     email?: string;
@@ -83,7 +83,7 @@ export async function loadRazorpayScript(): Promise<boolean> {
 }
 
 export interface PaymentOrderConfig {
-  orderId: string;
+  orderId?: string;
   razorpayKeyId: string;
   amount: number;
   currency: string;
@@ -102,7 +102,16 @@ export async function createPaymentOrder(
   formData: Record<string, unknown>
 ): Promise<PaymentOrderConfig> {
   if (!PAYMENT_API_BASE_URL) {
-    throw new Error("Payment API base URL is not configured.");
+    if (!FALLBACK_RAZORPAY_KEY_ID) {
+      throw new Error("Razorpay key ID is not configured.");
+    }
+
+    return {
+      orderId: undefined,
+      razorpayKeyId: FALLBACK_RAZORPAY_KEY_ID,
+      amount,
+      currency: "INR",
+    };
   }
 
   const response = await fetch(`${PAYMENT_API_BASE_URL}/api/orders/${formType}`, {
