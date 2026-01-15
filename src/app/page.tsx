@@ -14,6 +14,7 @@ import {
   RazorpayOptions,
   RazorpaySuccessResponse,
 } from "@/lib/razorpay";
+import { recordPayment } from "@/lib/payment-records";
 
 const involvementOptions = [
   {
@@ -201,6 +202,17 @@ export default function Home() {
           paymentCompleted = true;
           form.reset();
           closeTicketModal();
+          void recordPayment({
+            formType: "ticket",
+            paymentId: response.razorpay_payment_id,
+            orderId: response.razorpay_order_id,
+            signature: response.razorpay_signature,
+            amount: orderConfig.amount,
+            currency: orderConfig.currency,
+            details: ticketDetails,
+          }).catch((error) => {
+            console.error("Failed to record ticket payment:", error);
+          });
           const reference = response.razorpay_payment_id
             ? ` Reference: ${response.razorpay_payment_id}`
             : "";
