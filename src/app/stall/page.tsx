@@ -89,7 +89,6 @@ export default function StallPage() {
         currency: orderConfig.currency,
         name: "Madooza Stall Setup",
         description: "Stall Registration",
-        order_id: orderConfig.orderId,
         prefill: {
           name: stallDetails.name,
           email: stallDetails.email,
@@ -126,6 +125,10 @@ export default function StallPage() {
           },
         },
       };
+
+      if (orderConfig.orderId) {
+        options.order_id = orderConfig.orderId;
+      }
 
       const razorpay = new window.Razorpay(options);
 

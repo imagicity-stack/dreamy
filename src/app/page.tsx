@@ -179,7 +179,6 @@ export default function Home() {
         currency: orderConfig.currency,
         name: "Madooza Event Pass",
         description: "Ticket Purchase",
-        order_id: orderConfig.orderId,
         prefill: {
           name: ticketDetails.name,
           email: ticketDetails.email,
@@ -221,6 +220,10 @@ export default function Home() {
           },
         },
       };
+
+      if (orderConfig.orderId) {
+        options.order_id = orderConfig.orderId;
+      }
 
       const razorpay = new window.Razorpay(options);
 
