@@ -14,6 +14,7 @@ import {
   RazorpayOptions,
   RazorpaySuccessResponse,
 } from "@/lib/razorpay";
+import { recordPayment } from "@/lib/payment-records";
 
 const eventFormat = [
   {
@@ -167,7 +168,6 @@ export default function CosplayPage() {
         currency: orderConfig.currency,
         name: "Madooza Cosplay",
         description: "Cosplay Registration",
-        order_id: orderConfig.orderId,
         prefill: {
           name: cosplayDetails.name,
           email: cosplayDetails.email,
@@ -190,6 +190,17 @@ export default function CosplayPage() {
           setSubmitted(true);
           setError("");
           form.reset();
+          void recordPayment({
+            formType: "cosplay",
+            paymentId: response.razorpay_payment_id,
+            orderId: response.razorpay_order_id,
+            signature: response.razorpay_signature,
+            amount: orderConfig.amount,
+            currency: orderConfig.currency,
+            details: cosplayDetails,
+          }).catch((error) => {
+            console.error("Failed to record cosplay payment:", error);
+          });
         },
         modal: {
           ondismiss: () => {
@@ -201,6 +212,10 @@ export default function CosplayPage() {
           },
         },
       };
+
+      if (orderConfig.orderId) {
+        options.order_id = orderConfig.orderId;
+      }
 
       const razorpay = new window.Razorpay(options);
 
