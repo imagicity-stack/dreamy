@@ -1,8 +1,11 @@
 const RAZORPAY_SCRIPT_ID = "razorpay-checkout-js";
 const RAZORPAY_SCRIPT_SRC = "https://checkout.razorpay.com/v1/checkout.js";
-const PAYMENT_API_BASE_URL = "https://madooza-back.onrender.com";
+const PAYMENT_API_BASE_URL =
+  process.env.NEXT_PUBLIC_PAYMENT_API_BASE_URL ??
+  process.env.PAYMENT_API_BASE_URL ??
+  "";
 const FALLBACK_RAZORPAY_KEY_ID =
-  process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID ?? "rzp_live_RXcMT65q6e27Ut";
+  process.env.NEXT_PUBLIC_RZP_LIVE_KEY_ID ?? process.env.RZP_LIVE_KEY_ID ?? "";
 
 export interface RazorpayOptions {
   key: string;
@@ -98,6 +101,10 @@ export async function createPaymentOrder(
   amount: number,
   formData: Record<string, unknown>
 ): Promise<PaymentOrderConfig> {
+  if (!PAYMENT_API_BASE_URL) {
+    throw new Error("Payment API base URL is not configured.");
+  }
+
   const response = await fetch(`${PAYMENT_API_BASE_URL}/api/orders/${formType}`, {
     method: "POST",
     headers: {
