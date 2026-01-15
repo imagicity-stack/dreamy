@@ -35,7 +35,7 @@ export default function TermsAndConditionsPage() {
             <section>
               <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-4">2. Event Organizer</h2>
               <p className="text-sm sm:text-base md:text-lg leading-relaxed text-gray-200">
-                Madooza is conceptualized and managed by IMAGICITY, headquartered in Hazaribagh, Jharkhand.
+                Madooza is conceptualized and managed by INEVITA ESPORTS PRIVATE LIMITED, headquartered in Hazaribagh, Jharkhand.
               </p>
             </section>
 
@@ -54,7 +54,7 @@ export default function TermsAndConditionsPage() {
               <ul className="list-disc pl-5 space-y-3 text-sm sm:text-base md:text-lg leading-relaxed text-gray-200 marker:text-[#ffe300]">
                 <li>All ticket prices are in INR (Indian Rupees).</li>
                 <li>Payments are processed securely via third-party gateways.</li>
-                <li>IMAGICITY is not responsible for payment failures or delays due to user error or technical issues.</li>
+                <li>INEVITA ESPORTS PRIVATE LIMITED is not responsible for payment failures or delays due to user error or technical issues.</li>
               </ul>
             </section>
 
@@ -63,7 +63,7 @@ export default function TermsAndConditionsPage() {
               <ul className="list-disc pl-5 space-y-3 text-sm sm:text-base md:text-lg leading-relaxed text-gray-200 marker:text-[#ffe300]">
                 <li>Attendees must comply with on-ground security checks.</li>
                 <li>Outside food, alcohol, drugs, sharp objects, or hazardous materials are strictly banned.</li>
-                <li>IMAGICITY reserves the right to deny entry to any person for safety or disciplinary reasons.</li>
+                <li>INEVITA ESPORTS PRIVATE LIMITED reserves the right to deny entry to any person for safety or disciplinary reasons.</li>
               </ul>
             </section>
 
@@ -86,21 +86,21 @@ export default function TermsAndConditionsPage() {
             <section>
               <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-4">8. Cancellation or Postponement</h2>
               <p className="text-sm sm:text-base md:text-lg leading-relaxed text-gray-200">
-                In case of cancellation due to weather, unforeseen circumstances, or government orders, IMAGICITY will not be liable for refunds beyond what is feasible.
+                In case of cancellation due to weather, unforeseen circumstances, or government orders, INEVITA ESPORTS PRIVATE LIMITED will not be liable for refunds beyond what is feasible.
               </p>
             </section>
 
             <section>
               <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-4">9. Limitation of Liability</h2>
               <p className="text-sm sm:text-base md:text-lg leading-relaxed text-gray-200">
-                IMAGICITY and its affiliates are not responsible for any injury, loss, or damage occurring at or during the event. Entry and participation are at your own risk.
+                INEVITA ESPORTS PRIVATE LIMITED and its affiliates are not responsible for any injury, loss, or damage occurring at or during the event. Entry and participation are at your own risk.
               </p>
             </section>
 
             <section>
               <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-4">10. Intellectual Property</h2>
               <p className="text-sm sm:text-base md:text-lg leading-relaxed text-gray-200">
-                All event content, designs, and branding are owned by IMAGICITY. Reproduction or misuse is prohibited without written consent.
+                All event content, designs, and branding are owned by INEVITA ESPORTS PRIVATE LIMITED. Reproduction or misuse is prohibited without written consent.
               </p>
             </section>
 
@@ -121,7 +121,8 @@ export default function TermsAndConditionsPage() {
             <section className="bg-[#ffe300]/10 border border-[#ffe300]/30 rounded-2xl p-6 sm:p-8">
               <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-4">13. Contact</h2>
               <div className="space-y-2 text-sm sm:text-base md:text-lg text-gray-100 leading-relaxed">
-                <p>📧 contact@imagicity.in</p>
+                <p>📧 contact@madooza.com</p>
+                <p>Registered business: INEVITA ESPORTS PRIVATE LIMITED</p>
                 <p>📍 Hazaribagh, Jharkhand, India</p>
               </div>
             </section>

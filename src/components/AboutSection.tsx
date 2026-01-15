@@ -16,7 +16,7 @@ export default function AboutSection() {
           </h2>
           <p className="max-w-3xl text-sm sm:text-base md:text-lg text-white/80">
             Madooza is Hazaribagh’s first creative explosion where art, food, music, and ideas collide. Built by
-            IMAGICITY, it gives local creators, brands, and students a premium stage that still feels deeply rooted in the city’s
+            the Madooza team, it gives local creators, brands, and students a premium stage that still feels deeply rooted in the city’s
             energy.
           </p>
         </div>
@@ -65,7 +65,7 @@ export default function AboutSection() {
                   Community Energy
                 </h4>
                 <p className="mt-3 text-sm text-white/70">
-                  Built by IMAGICITY with and for the people of Hazaribagh, ensuring the vibe stays raw, real, and community-driven.
+                  Built with and for the people of Hazaribagh, ensuring the vibe stays raw, real, and community-driven.
                 </p>
               </div>
             </div>
@@ -106,7 +106,7 @@ export default function AboutSection() {
                 The Sound of Pure Madness
               </p>
               <p className="text-sm text-white/70">
-                Crafted by IMAGICITY for the dreamers, makers, and fans turning Hazaribagh into a creative capital.
+                Crafted for the dreamers, makers, and fans turning Hazaribagh into a creative capital.
               </p>
             </div>
           </div>

@@ -5,7 +5,7 @@ export default function CosplayBanner() {
     "COSPLAY ARENA",
     "STEP INTO CHARACTER",
     "MADVERSE AWAITS",
-    "₹299 ENTRY",
+    "₹420 ENTRY",
     "WIN UP TO ₹3000",
     "PHOTO BOOTHS",
     "LIVE PERFORMANCE",

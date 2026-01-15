@@ -12,7 +12,7 @@ const Highlights = () => {
     {
       icon: "🎬",
       title: "Pro Coverage",
-      desc: "Professional photos + aftermovie coverage by Imagicity",
+      desc: "Professional photos + aftermovie coverage by the team",
       borderColor: "border-[#7300ff]",
       bgColor: "bg-[#7300ff]/10",
     },

@@ -53,7 +53,7 @@ export default function CosplayNewsletter() {
                 Judging Panel:
               </h4>
               <p className="text-white font-sans text-sm sm:text-sm">
-                1 creative representative from Imagicity, 1 faculty member, and 1
+                1 creative representative from the team, 1 faculty member, and 1
                 local artist / influencer.
               </p>
             </div>

@@ -44,7 +44,7 @@ export default function Footer() {
         </div>
 
         <div className="mt-6 border-t border-white/40 pt-4 text-center text-xs sm:text-sm text-white/80">
-          Madooza 2025 powered by Imagicity © All rights reserved.
+          Madooza 2025 © All rights reserved.
         </div>
       </div>
     </footer>

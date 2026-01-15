@@ -33,7 +33,7 @@ export default function ContactUs() {
               Have a question or want to collaborate with Madooza? Reach out to us:
             </p>
             <div className="space-y-2 font-semibold">
-              <p className="break-all font-sans">📩 madooza&#64;imagicity.in</p>
+              <p className="break-all font-sans">📩 contact&#64;madooza.com</p>
               <p>📞 +91-9122289578</p>
             </div>
           </div>

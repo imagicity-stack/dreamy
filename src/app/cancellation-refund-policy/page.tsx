@@ -28,7 +28,7 @@ export default function CancellationRefundPolicyPage() {
             <section>
               <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-4">1. Overview</h2>
               <p className="text-sm sm:text-base md:text-lg leading-relaxed text-gray-200">
-                This Cancellation and Refund Policy governs all payments made for participation in Madooza, organized by IMAGICITY, Hazaribagh, Jharkhand. It applies to all ticket holders, stall vendors, and cosplay event participants. By making a payment or registering for Madooza, you agree to these terms.
+                This Cancellation and Refund Policy governs all payments made for participation in Madooza, organized by INEVITA ESPORTS PRIVATE LIMITED, Hazaribagh, Jharkhand. It applies to all ticket holders, stall vendors, and cosplay event participants. By making a payment or registering for Madooza, you agree to these terms.
               </p>
             </section>
 
@@ -58,7 +58,7 @@ export default function CancellationRefundPolicyPage() {
                 <div>
                   <h3 className="text-xl sm:text-2xl font-oswald text-[#ffe300] uppercase mb-3">3.1 Eligibility for Refund</h3>
                   <ul className="list-disc pl-5 space-y-3 text-sm sm:text-base md:text-lg leading-relaxed text-gray-200 marker:text-[#ffe300]">
-                    <li>A written cancellation request must be sent to madooza@imagicity.in from the registered email ID used during booking.</li>
+                    <li>A written cancellation request must be sent to contact@madooza.com from the registered email ID used during booking.</li>
                     <li>The email must include stall details, payment proof, and a valid reason for cancellation.</li>
                     <li>Requests made on or after the event day will not be eligible for refunds.</li>
                   </ul>
@@ -84,7 +84,7 @@ export default function CancellationRefundPolicyPage() {
                   </div>
                   <ul className="list-disc pl-5 space-y-3 text-sm sm:text-base md:text-lg leading-relaxed text-gray-200 marker:text-[#ffe300] mt-4">
                     <li>Administrative and processing charges will be deducted from the refund amount.</li>
-                    <li>Final approval of any refund remains at the discretion of IMAGICITY management.</li>
+                    <li>Final approval of any refund remains at the discretion of INEVITA ESPORTS PRIVATE LIMITED management.</li>
                   </ul>
                 </div>
 
@@ -92,7 +92,7 @@ export default function CancellationRefundPolicyPage() {
                   <h3 className="text-xl sm:text-2xl font-oswald text-[#ffe300] uppercase mb-3">3.3 Refund Process</h3>
                   <ul className="list-disc pl-5 space-y-3 text-sm sm:text-base md:text-lg leading-relaxed text-gray-200 marker:text-[#ffe300]">
                     <li>Approved refunds will be processed within 10–15 working days using the same payment method.</li>
-                    <li>IMAGICITY will not be responsible for external bank or gateway delays.</li>
+                    <li>INEVITA ESPORTS PRIVATE LIMITED will not be responsible for external bank or gateway delays.</li>
                   </ul>
                 </div>
               </div>
@@ -108,7 +108,7 @@ export default function CancellationRefundPolicyPage() {
                 <div>
                   <h3 className="text-xl sm:text-2xl font-oswald text-[#ffe300] uppercase mb-3">4.1 Cancellation and Refund Eligibility</h3>
                   <ul className="list-disc pl-5 space-y-3 text-sm sm:text-base md:text-lg leading-relaxed text-gray-200 marker:text-[#ffe300]">
-                    <li>Cancellation requests must be emailed to madooza@imagicity.in from the registered email ID.</li>
+                    <li>Cancellation requests must be emailed to contact@madooza.com from the registered email ID.</li>
                     <li>The email should clearly mention the participant&apos;s full name, registration ID, and valid reason for withdrawal.</li>
                     <li>Cancellations will only be accepted before the event day. Once the event day begins, no refund will be applicable.</li>
                   </ul>
@@ -150,7 +150,7 @@ export default function CancellationRefundPolicyPage() {
                 <li>If rescheduling is not possible, partial refunds may be processed after deducting unavoidable setup and marketing costs.</li>
               </ul>
               <p className="text-sm sm:text-base md:text-lg leading-relaxed text-gray-200 mt-4">
-                IMAGICITY will not be liable for travel, accommodation, or personal expenses incurred by participants or visitors.
+                INEVITA ESPORTS PRIVATE LIMITED will not be liable for travel, accommodation, or personal expenses incurred by participants or visitors.
               </p>
             </section>
 
@@ -165,14 +165,14 @@ export default function CancellationRefundPolicyPage() {
             <section>
               <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-4">7. Force Majeure</h2>
               <p className="text-sm sm:text-base md:text-lg leading-relaxed text-gray-200">
-                If Madooza is disrupted by events beyond IMAGICITY&apos;s control (e.g., natural calamities, power failures, lockdowns, or government restrictions), the organizers will not be obligated to issue refunds. Every effort will be made to provide alternative dates or arrangements.
+                If Madooza is disrupted by events beyond INEVITA ESPORTS PRIVATE LIMITED&apos;s control (e.g., natural calamities, power failures, lockdowns, or government restrictions), the organizers will not be obligated to issue refunds. Every effort will be made to provide alternative dates or arrangements.
               </p>
             </section>
 
             <section>
               <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-4">8. Misuse and Refund Abuse Prevention</h2>
               <p className="text-sm sm:text-base md:text-lg leading-relaxed text-gray-200">
-                IMAGICITY reserves the right to reject any refund request that appears fraudulent, repetitive, or unreasonable.
+                INEVITA ESPORTS PRIVATE LIMITED reserves the right to reject any refund request that appears fraudulent, repetitive, or unreasonable.
               </p>
             </section>
 
@@ -186,8 +186,9 @@ export default function CancellationRefundPolicyPage() {
             <section className="bg-[#ffe300]/10 border border-[#ffe300]/30 rounded-2xl p-6 sm:p-8">
               <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-4">10. Contact</h2>
               <div className="space-y-2 text-sm sm:text-base md:text-lg text-gray-100 leading-relaxed">
-                <p>📧 madooza@imagicity.in</p>
-                <p>📍 IMAGICITY, Hazaribagh, Jharkhand, India</p>
+                <p>📧 contact@madooza.com</p>
+                <p>📍 Hazaribagh, Jharkhand, India</p>
+                <p>Registered business: INEVITA ESPORTS PRIVATE LIMITED</p>
               </div>
             </section>
           </article>
