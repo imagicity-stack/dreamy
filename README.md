@@ -59,6 +59,7 @@ Each form type writes to its own collection:
 - `ticketPayments`
 - `cosplayPayments`
 - `stallPayments`
+- `performerPayments`
 
 Each document includes: `paymentId`, `orderId`, `signature`, `amount`, `currency`, `details`, `createdAt`, and `formType`.
 
@@ -81,6 +82,11 @@ service cloud.firestore {
       allow update, delete: if false;
     }
     match /stallPayments/{docId} {
+      allow read: if false;
+      allow create: if true;
+      allow update, delete: if false;
+    }
+    match /performerPayments/{docId} {
       allow read: if false;
       allow create: if true;
       allow update, delete: if false;

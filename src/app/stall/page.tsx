@@ -16,8 +16,8 @@ import { recordPayment } from "@/lib/payment-records";
 
 const stallHighlights = [
   "10×10 ft canopy (table + chair provided)",
-  "₹2500 per stall (1-day) with ₹500 refundable deposit",
-  "Electricity access available on request (extra ₹300)",
+  "₹3600 per stall (1-day), including tax",
+  "Electricity access available on request",
   "Setup Time: 7:00 AM – 9:30 AM | Event Hours: 10:00 AM – 7:00 PM",
 ];
 
@@ -55,8 +55,8 @@ export default function StallPage() {
     const powerChoice = getValue("power");
     setSelectedPower(powerChoice || null);
     const requiresPower = powerChoice === "yes";
-    const baseAmount = 2500;
-    const additionalPowerFee = requiresPower ? 300 : 0;
+    const baseAmount = 3600;
+    const additionalPowerFee = 0;
     const totalAmount = baseAmount + additionalPowerFee;
 
     const stallDetails = {
@@ -158,7 +158,7 @@ export default function StallPage() {
     }
   };
 
-  const displayedTotal = selectedPower === "yes" ? 2800 : 2500;
+  const displayedTotal = 3600;
 
   return (
     <div className="bg-black text-white">
@@ -288,7 +288,7 @@ export default function StallPage() {
                       No Power Needed
                     </option>
                     <option value="yes" className="bg-white text-black">
-                      Yes (₹300)
+                      Yes
                     </option>
                   </select>
                 </label>

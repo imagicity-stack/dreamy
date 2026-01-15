@@ -7,6 +7,13 @@ import { useRouter } from "next/navigation";
 import ContactUs from "@/components/ContactUs";
 import Footer from "@/components/Footer";
 import ScrollingBanner from "@/components/ScrollingBanner";
+import {
+  createPaymentOrder,
+  loadRazorpayScript,
+  RazorpayOptions,
+  RazorpaySuccessResponse,
+} from "@/lib/razorpay";
+import { recordPayment } from "@/lib/payment-records";
 
 const categories = [
   { title: "Music", description: "Band / Solo / DJ" },
@@ -34,11 +41,43 @@ const formFieldClasses =
 const formLabelClasses =
   "flex flex-col gap-2 text-sm font-montserrat font-medium text-white";
 
+const PERFORMER_FEE = 240;
+
 export default function PerformerPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [submitStatus, setSubmitStatus] = useState<null | "success" | "error">(null);
+
+  const submitPerformerForm = async (data: Record<string, unknown>, form: HTMLFormElement) => {
+    try {
+      const response = await fetch("/api/performers", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setSubmitStatus("success");
+        form.reset();
+
+        setTimeout(() => {
+          router.push("/");
+        }, 2000);
+      } else {
+        setSubmitStatus("error");
+        setError("Unable to submit entry. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error submitting form:", err);
+      setSubmitStatus("error");
+      setError("There was an error submitting the form. Please try again later.");
+    }
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -75,6 +114,9 @@ export default function PerformerPage() {
           .join(", ")
       : "None";
 
+    const termsAccepted =
+      form.querySelector<HTMLInputElement>("#performer-terms")?.checked ?? false;
+
     const data = {
       formType: "performer" as const,
       nameGroup: getValueById("performer-name"),
@@ -84,36 +126,84 @@ export default function PerformerPage() {
       emailId: getValueById("performer-email"),
       sampleVideoLink: getValueById("performer-link"),
       equipmentRequirements: formattedEquipment,
+      termsAccepted,
+      fee: PERFORMER_FEE.toString(),
     };
 
     console.log(data);
 
     try {
-      const response = await fetch("/api/performers", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const orderConfig = await createPaymentOrder("performer", PERFORMER_FEE, data);
+
+      const scriptLoaded = await loadRazorpayScript();
+
+      if (!scriptLoaded || typeof window === "undefined" || !window.Razorpay) {
+        throw new Error("Unable to load payment gateway. Please refresh and try again.");
+      }
+
+      let paymentCompleted = false;
+
+      const options: RazorpayOptions = {
+        key: orderConfig.razorpayKeyId,
+        amount: orderConfig.amount,
+        currency: orderConfig.currency,
+        name: "Madooza Performers",
+        description: "Performer Registration",
+        prefill: {
+          name: data.nameGroup,
+          email: data.emailId,
+          contact: data.contactNumber,
         },
-        body: JSON.stringify(data),
+        notes: {
+          formType: "performer",
+          category: data.category,
+          duration: data.performanceDuration,
+          equipment: formattedEquipment,
+          totalAmount: PERFORMER_FEE.toString(),
+          displayName: "Madooza Performers",
+        },
+        handler: async (response: RazorpaySuccessResponse) => {
+          paymentCompleted = true;
+          void recordPayment({
+            formType: "performer",
+            paymentId: response.razorpay_payment_id,
+            orderId: response.razorpay_order_id,
+            signature: response.razorpay_signature,
+            amount: orderConfig.amount,
+            currency: orderConfig.currency,
+            details: data,
+          }).catch((error) => {
+            console.error("Failed to record performer payment:", error);
+          });
+          await submitPerformerForm(data, form);
+        },
+        modal: {
+          ondismiss: () => {
+            if (!paymentCompleted) {
+              setSubmitStatus("error");
+              setError("Payment popup closed before completion. Please try again.");
+            }
+          },
+        },
+      };
+
+      if (orderConfig.orderId) {
+        options.order_id = orderConfig.orderId;
+      }
+
+      const razorpay = new window.Razorpay(options);
+
+      razorpay.on("payment.failed", () => {
+        paymentCompleted = false;
+        setSubmitStatus("error");
+        setError("Payment failed. Please try again.");
       });
 
-      const result = await response.json();
-
-      if (result.success) {
-        setSubmitStatus("success");
-        form.reset();
-
-        setTimeout(() => {
-          router.push("/");
-        }, 2000);
-      } else {
-        setSubmitStatus("error");
-        setError("Unable to submit entry. Please try again.");
-      }
+      razorpay.open();
     } catch (err) {
       console.error("Error submitting form:", err);
       setSubmitStatus("error");
-      setError("There was an error submitting the form. Please try again later.");
+      setError(err instanceof Error ? err.message : "There was an error submitting the form. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -133,6 +223,12 @@ export default function PerformerPage() {
             Are you a singer, dancer, poet, or performer who can set the stage on fire? Madooza is calling creators who bring the
             crowd to life. From solo acts to group showcases, this is your moment.
           </p>
+          <a
+            href="#performer-form"
+            className="mt-2 inline-flex items-center justify-center bg-[#ffe300] px-6 py-3 font-montserrat text-sm uppercase tracking-[0.3em] text-black transition-transform hover:scale-[1.03]"
+          >
+            Apply Now
+          </a>
         </div>
       </section>
 
@@ -197,10 +293,13 @@ export default function PerformerPage() {
           <p className="mt-4 text-sm sm:text-base">
             Fill out the form below and we&apos;ll get in touch with timings, setup, and promotion guidelines.
           </p>
+          <p className="mt-2 text-sm font-semibold uppercase tracking-[0.3em] text-black/80">
+            Registration fee: ₹{PERFORMER_FEE}
+          </p>
         </div>
       </section>
 
-      <section className="bg-black py-16">
+      <section id="performer-form" className="bg-black py-16 scroll-mt-24">
         <div className="mx-auto max-w-4xl px-4">
           <div className="relative">
             <div className="pointer-events-none absolute -inset-6 -z-10 bg-[#00f5ff]/50 blur-3xl" aria-hidden />
@@ -279,7 +378,14 @@ export default function PerformerPage() {
                 </div>
               </div>
               <label className="flex items-start gap-3 text-sm font-montserrat text-white/80">
-                <input type="checkbox" name="terms" value="accepted" required className="mt-1 h-5 w-5 accent-[#e22154]" />
+                <input
+                  id="performer-terms"
+                  type="checkbox"
+                  name="terms"
+                  value="accepted"
+                  required
+                  className="mt-1 h-5 w-5 accent-[#e22154]"
+                />
                 <span className="text-left">
                   I accept the{" "}
                   <Link href="/terms-and-conditions" className="text-[#00f5ff] underline-offset-4 hover:underline">
@@ -292,7 +398,7 @@ export default function PerformerPage() {
                 disabled={loading}
                 className="w-full bg-[#e22154] px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {loading ? "Submitting..." : "Submit Performance Entry"}
+                {loading ? "Processing Payment..." : `Pay ₹${PERFORMER_FEE} & Submit Entry`}
               </button>
               {submitStatus === "success" && (
                 <p className="bg-[#00f5ff]/20 px-4 py-3 text-center text-sm text-white">

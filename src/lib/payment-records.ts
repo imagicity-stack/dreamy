@@ -1,12 +1,13 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { getFirestoreDb, isFirebaseConfigured } from "@/lib/firebase";
 
-export type PaymentFormType = "ticket" | "cosplay" | "stall";
+export type PaymentFormType = "ticket" | "cosplay" | "stall" | "performer";
 
 const COLLECTION_BY_FORM: Record<PaymentFormType, string> = {
   ticket: "ticketPayments",
   cosplay: "cosplayPayments",
   stall: "stallPayments",
+  performer: "performerPayments",
 };
 
 export interface PaymentRecordPayload {
