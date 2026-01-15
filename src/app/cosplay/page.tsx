@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import type { CSSProperties } from "react";
 import { X } from "lucide-react";
 
@@ -14,6 +14,7 @@ import {
   RazorpayOptions,
   RazorpaySuccessResponse,
 } from "@/lib/razorpay";
+import { recordPayment } from "@/lib/payment-records";
 
 const eventFormat = [
   {
@@ -30,7 +31,7 @@ const eventFormat = [
 
 const participationDetails = [
   "Open for students and local youth participants.",
-  "₹299 entry for externals.",
+  "₹420 entry per participant.",
   "Costumes can be from anime, gaming, movies, pop culture, or pure imagination.",
   "Limited slots — registration on the website.",
 ];
@@ -82,12 +83,16 @@ const highlights = [
 const formFieldClasses =
   "w-full bg-white px-4 py-3 text-base text-black/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-black/50";
 
+const COSPLAY_UNIT_PRICE = 420;
+
 export default function CosplayPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [paymentId, setPaymentId] = useState<string | null>(null);
+  const [additionalMembers, setAdditionalMembers] = useState<Array<{ id: number }>>([]);
+  const memberIdRef = useRef(0);
 
   useEffect(() => {
     if (typeof document === "undefined") {
@@ -126,6 +131,17 @@ export default function CosplayPage() {
     setPaymentId(null);
     setSubmitted(false);
     setIsModalOpen(false);
+    setAdditionalMembers([]);
+  };
+
+  const addMember = () => {
+    const nextId = memberIdRef.current;
+    memberIdRef.current += 1;
+    setAdditionalMembers((prev) => [...prev, { id: nextId }]);
+  };
+
+  const removeMember = (id: number) => {
+    setAdditionalMembers((prev) => prev.filter((member) => member.id !== id));
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -140,18 +156,32 @@ export default function CosplayPage() {
     const formData = new FormData(form);
     const getValue = (key: string) => formData.get(key)?.toString().trim() ?? "";
 
+    const extraParticipants = additionalMembers.map((member) => ({
+      name: getValue(`cosplay-member-name-${member.id}`),
+      character: getValue(`cosplay-member-character-${member.id}`),
+      email: getValue(`cosplay-member-email-${member.id}`),
+      phone: getValue(`cosplay-member-phone-${member.id}`),
+      notes: getValue(`cosplay-member-notes-${member.id}`),
+    }));
+    const totalParticipants = 1 + extraParticipants.length;
+    const totalAmount = totalParticipants * COSPLAY_UNIT_PRICE;
+
     const cosplayDetails = {
       name: getValue("name"),
       character: getValue("character"),
       email: getValue("email"),
       phone: getValue("phone"),
       notes: getValue("notes"),
+      additionalParticipants: extraParticipants,
+      participantCount: totalParticipants.toString(),
+      totalAmount,
       termsAccepted: formData.get("terms") === "accepted",
       timestamp: new Date().toISOString(),
+      unitPrice: COSPLAY_UNIT_PRICE,
     };
 
     try {
-      const orderConfig = await createPaymentOrder("cosplay", 299, cosplayDetails);
+      const orderConfig = await createPaymentOrder("cosplay", totalAmount, cosplayDetails);
 
       const scriptLoaded = await loadRazorpayScript();
 
@@ -167,7 +197,6 @@ export default function CosplayPage() {
         currency: orderConfig.currency,
         name: "Madooza Cosplay",
         description: "Cosplay Registration",
-        order_id: orderConfig.orderId,
         prefill: {
           name: cosplayDetails.name,
           email: cosplayDetails.email,
@@ -176,6 +205,8 @@ export default function CosplayPage() {
         notes: {
           formType: "cosplay",
           character: cosplayDetails.character,
+          participantCount: totalParticipants.toString(),
+          totalAmount: totalAmount.toString(),
           displayName: "Madooza Cosplay",
         },
         config: {
@@ -190,6 +221,17 @@ export default function CosplayPage() {
           setSubmitted(true);
           setError("");
           form.reset();
+          void recordPayment({
+            formType: "cosplay",
+            paymentId: response.razorpay_payment_id,
+            orderId: response.razorpay_order_id,
+            signature: response.razorpay_signature,
+            amount: orderConfig.amount,
+            currency: orderConfig.currency,
+            details: cosplayDetails,
+          }).catch((error) => {
+            console.error("Failed to record cosplay payment:", error);
+          });
         },
         modal: {
           ondismiss: () => {
@@ -201,6 +243,10 @@ export default function CosplayPage() {
           },
         },
       };
+
+      if (orderConfig.orderId) {
+        options.order_id = orderConfig.orderId;
+      }
 
       const razorpay = new window.Razorpay(options);
 
@@ -217,6 +263,9 @@ export default function CosplayPage() {
       setLoading(false);
     }
   };
+
+  const cosplayCount = 1 + additionalMembers.length;
+  const cosplayTotal = cosplayCount * COSPLAY_UNIT_PRICE;
 
   return (
     <div className="bg-black text-white">
@@ -268,7 +317,7 @@ export default function CosplayPage() {
               </ul>
             </div>
             <div className="bg-black px-4 py-3 text-sm text-white">
-              ₹299 entry covers arena access, stage participation, and certification for all registered cosplayers.
+              ₹420 entry covers arena access, stage participation, and certification for all registered cosplayers.
             </div>
           </div>
         </div>
@@ -413,6 +462,94 @@ export default function CosplayPage() {
                       placeholder="Share performance cues or prop details"
                     />
                   </label>
+
+                  <div className="flex flex-col gap-3 rounded border border-[#00f5ff]/40 bg-black/40 px-4 py-4 text-sm text-white/90">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <span>Add another participant</span>
+                      <button
+                        type="button"
+                        onClick={addMember}
+                        className="mobile-tap inline-flex items-center justify-center border border-[#00f5ff] px-3 py-1 text-xs uppercase tracking-[0.2em] text-[#00f5ff] transition-transform hover:scale-[1.02]"
+                      >
+                        Add Member
+                      </button>
+                    </div>
+                    {additionalMembers.length === 0 ? (
+                      <p className="text-xs text-white/60">
+                        Additional members require full details (name, character, email, phone, and notes).
+                      </p>
+                    ) : (
+                      <div className="space-y-5">
+                        {additionalMembers.map((member, index) => (
+                          <div key={member.id} className="space-y-3 rounded border border-white/10 p-3">
+                            <div className="flex items-center justify-between gap-3">
+                              <span className="text-xs uppercase tracking-[0.3em] text-[#00f5ff]">
+                                Member {index + 2}
+                              </span>
+                              <button
+                                type="button"
+                                onClick={() => removeMember(member.id)}
+                                className="mobile-tap border border-white/50 px-3 py-1 text-xs uppercase tracking-[0.2em] text-white transition-transform hover:scale-[1.02]"
+                              >
+                                Remove
+                              </button>
+                            </div>
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                              <input
+                                id={`cosplay-member-name-${member.id}`}
+                                name={`cosplay-member-name-${member.id}`}
+                                type="text"
+                                required
+                                className={formFieldClasses}
+                                placeholder="Full Name"
+                              />
+                              <input
+                                id={`cosplay-member-character-${member.id}`}
+                                name={`cosplay-member-character-${member.id}`}
+                                type="text"
+                                required
+                                className={formFieldClasses}
+                                placeholder="Character Name"
+                              />
+                              <input
+                                id={`cosplay-member-email-${member.id}`}
+                                name={`cosplay-member-email-${member.id}`}
+                                type="email"
+                                required
+                                className={formFieldClasses}
+                                placeholder="Email ID"
+                              />
+                              <input
+                                id={`cosplay-member-phone-${member.id}`}
+                                name={`cosplay-member-phone-${member.id}`}
+                                type="tel"
+                                required
+                                inputMode="numeric"
+                                pattern="[0-9]{10}"
+                                maxLength={10}
+                                minLength={10}
+                                title="Enter a 10-digit phone number"
+                                className={formFieldClasses}
+                                placeholder="Phone Number"
+                              />
+                            </div>
+                            <textarea
+                              id={`cosplay-member-notes-${member.id}`}
+                              name={`cosplay-member-notes-${member.id}`}
+                              rows={2}
+                              required
+                              className={`${formFieldClasses} resize-none`}
+                              placeholder="Notes / props / cues"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="rounded border border-[#00f5ff]/40 bg-black/40 px-4 py-3 text-sm text-white/90">
+                    Total: ₹{cosplayTotal} for {cosplayCount} {cosplayCount === 1 ? "participant" : "participants"}.
+                  </div>
                   <label className="flex items-start gap-3 text-sm font-montserrat text-white/80">
                     <input
                       type="checkbox"
@@ -433,7 +570,7 @@ export default function CosplayPage() {
                     disabled={loading}
                     className="mobile-tap w-full bg-[#e22154] px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    {loading ? "Processing Payment..." : "Pay ₹299 & Register"}
+                    {loading ? "Processing Payment..." : `Pay ₹${cosplayTotal} & Register`}
                   </button>
                   {error && (
                     <p className="bg-[#e22154]/40 px-4 py-3 text-center text-sm text-white">

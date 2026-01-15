@@ -34,3 +34,65 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+## Firebase setup (payments logging)
+
+This project logs successful Razorpay transactions to Firestore, storing each form type in a dedicated collection.
+
+### Environment variables
+
+Set the following environment variables (all are required for logging):
+
+```bash
+NEXT_PUBLIC_FIREBASE_API_KEY=...
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=...
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=...
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
+NEXT_PUBLIC_FIREBASE_APP_ID=...
+```
+
+### Firestore collections
+
+Each form type writes to its own collection:
+
+- `ticketPayments`
+- `cosplayPayments`
+- `stallPayments`
+- `performerPayments`
+
+Each document includes: `paymentId`, `orderId`, `signature`, `amount`, `currency`, `details`, `createdAt`, and `formType`.
+
+### Firestore rules
+
+If you want client-side writes for payment logging, you can start with rules like:
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /ticketPayments/{docId} {
+      allow read: if false;
+      allow create: if true;
+      allow update, delete: if false;
+    }
+    match /cosplayPayments/{docId} {
+      allow read: if false;
+      allow create: if true;
+      allow update, delete: if false;
+    }
+    match /stallPayments/{docId} {
+      allow read: if false;
+      allow create: if true;
+      allow update, delete: if false;
+    }
+    match /performerPayments/{docId} {
+      allow read: if false;
+      allow create: if true;
+      allow update, delete: if false;
+    }
+  }
+}
+```
+
+> Note: These rules allow unauthenticated creates, which is suitable only if you trust the front-end environment. For production, consider adding App Check or authenticated writes.

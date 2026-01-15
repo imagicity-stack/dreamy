@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { FormEvent, useEffect, useState } from "react";
+import { FormEvent, useEffect, useRef, useState } from "react";
 import Footer from "@/components/Footer";
 import ScrollingBanner from "@/components/ScrollingBanner";
 import AboutSection from "@/components/AboutSection";
@@ -14,6 +14,7 @@ import {
   RazorpayOptions,
   RazorpaySuccessResponse,
 } from "@/lib/razorpay";
+import { recordPayment } from "@/lib/payment-records";
 
 const involvementOptions = [
   {
@@ -81,22 +82,14 @@ const highlights = [
 
 const HERO_TITLE = "HAZARIBAGH";
 
-const TICKET_UNIT_PRICE = 30;
-
-const resolveTicketQuantity = (value: string): number => {
-  const parsed = Number.parseInt(value, 10);
-
-  if (Number.isFinite(parsed) && parsed > 0) {
-    return Math.min(parsed, 5);
-  }
-
-  return 1;
-};
+const TICKET_UNIT_PRICE = 480;
 
 export default function Home() {
   const [active, setActive] = useState(involvementOptions[0].name);
   const [isTicketModalOpen, setIsTicketModalOpen] = useState(false);
   const [ticketProcessing, setTicketProcessing] = useState(false);
+  const [additionalTickets, setAdditionalTickets] = useState<Array<{ id: number }>>([]);
+  const ticketIdRef = useRef(0);
 
   useEffect(() => {
     if (typeof document === "undefined") {
@@ -131,6 +124,17 @@ export default function Home() {
   const closeTicketModal = () => {
     setIsTicketModalOpen(false);
     setTicketProcessing(false);
+    setAdditionalTickets([]);
+  };
+
+  const addTicketHolder = () => {
+    const nextId = ticketIdRef.current;
+    ticketIdRef.current += 1;
+    setAdditionalTickets((prev) => [...prev, { id: nextId }]);
+  };
+
+  const removeTicketHolder = (id: number) => {
+    setAdditionalTickets((prev) => prev.filter((ticket) => ticket.id !== id));
   };
 
   const handleTicketSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -146,20 +150,24 @@ export default function Home() {
     const formData = new FormData(form);
     const getValue = (key: string) => formData.get(key)?.toString().trim() ?? "";
 
-    const quantityValue = getValue("quantity");
-    const quantity = resolveTicketQuantity(quantityValue);
-    const totalAmount = quantity * TICKET_UNIT_PRICE;
+    const additionalTicketNames = additionalTickets
+      .map((ticket) => getValue(`additionalTicketName-${ticket.id}`))
+      .filter((name) => name.length > 0);
+    const ticketCount = 1 + additionalTicketNames.length;
+    const totalAmount = ticketCount * TICKET_UNIT_PRICE;
 
     const ticketDetails = {
       name: getValue("name"),
       email: getValue("email"),
       phone: getValue("phone"),
-      quantity: quantity.toString(),
+      ticketCount: ticketCount.toString(),
+      ticketHolders: [getValue("name"), ...additionalTicketNames],
       totalAmount,
       message: getValue("message"),
       termsAccepted: formData.get("terms") === "accepted",
       timestamp: new Date().toISOString(),
       unitPrice: TICKET_UNIT_PRICE,
+      additionalTicketNames,
     };
 
     try {
@@ -179,7 +187,6 @@ export default function Home() {
         currency: orderConfig.currency,
         name: "Madooza Event Pass",
         description: "Ticket Purchase",
-        order_id: orderConfig.orderId,
         prefill: {
           name: ticketDetails.name,
           email: ticketDetails.email,
@@ -187,7 +194,7 @@ export default function Home() {
         },
         notes: {
           formType: "ticket",
-          quantity: quantity.toString(),
+          quantity: ticketCount.toString(),
           unitPrice: TICKET_UNIT_PRICE.toString(),
           totalAmount: totalAmount.toString(),
           displayName: "Madooza Event Pass",
@@ -202,14 +209,25 @@ export default function Home() {
           paymentCompleted = true;
           form.reset();
           closeTicketModal();
+          void recordPayment({
+            formType: "ticket",
+            paymentId: response.razorpay_payment_id,
+            orderId: response.razorpay_order_id,
+            signature: response.razorpay_signature,
+            amount: orderConfig.amount,
+            currency: orderConfig.currency,
+            details: ticketDetails,
+          }).catch((error) => {
+            console.error("Failed to record ticket payment:", error);
+          });
           const reference = response.razorpay_payment_id
             ? ` Reference: ${response.razorpay_payment_id}`
             : "";
           alert(
             `Payment successful! Your ${
-              quantity === 1
+              ticketCount === 1
                 ? "event pass is confirmed."
-                : `${quantity} event passes are confirmed.`
+                : `${ticketCount} event passes are confirmed.`
             }${reference}`,
           );
         },
@@ -221,6 +239,10 @@ export default function Home() {
           },
         },
       };
+
+      if (orderConfig.orderId) {
+        options.order_id = orderConfig.orderId;
+      }
 
       const razorpay = new window.Razorpay(options);
 
@@ -237,6 +259,9 @@ export default function Home() {
       setTicketProcessing(false);
     }
   };
+
+  const ticketCount = 1 + additionalTickets.length;
+  const ticketTotal = ticketCount * TICKET_UNIT_PRICE;
 
   return (
     <div className="w-full bg-black text-white">
@@ -493,84 +518,99 @@ export default function Home() {
                       placeholder="9876543210"
                     />
                   </label>
-                  <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
-                    Number of Tickets *
-                    <select
-                      id="ticket-quantity"
-                      name="quantity"
-                      required
-                      className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black cursor-pointer"
-                    >
-                      <option value="" className="bg-white text-[#1f1f1f]">
-                        Select quantity
-                      </option>
-                      <option value="1" className="bg-white text-[#1f1f1f]">
-                        1 Ticket
-                      </option>
-                      <option value="2" className="bg-white text-[#1f1f1f]">
-                        2 Tickets
-                      </option>
-                      <option value="3" className="bg-white text-[#1f1f1f]">
-                        3 Tickets
-                      </option>
-                      <option value="4" className="bg-white text-[#1f1f1f]">
-                        4 Tickets
-                      </option>
-                      <option value="5" className="bg-white text-[#1f1f1f]">
-                        5 Tickets
-                      </option>
-                    </select>
-                  </label>
+                  <div className="flex flex-col gap-3 text-sm font-montserrat font-medium text-white sm:col-span-2">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <span>Additional Tickets</span>
+                      <button
+                        type="button"
+                        onClick={addTicketHolder}
+                        className="mobile-tap inline-flex items-center justify-center border border-[#00f5ff] px-3 py-1 text-xs uppercase tracking-[0.2em] text-[#00f5ff] transition-transform hover:scale-[1.02]"
+                      >
+                        Add Ticket
+                      </button>
+                    </div>
+                    {additionalTickets.length === 0 ? (
+                      <p className="text-xs text-white/60">
+                        The primary ticket uses the full name above. Add extra tickets for additional attendees.
+                      </p>
+                    ) : (
+                      <div className="space-y-3">
+                        {additionalTickets.map((ticket, index) => (
+                          <div key={ticket.id} className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                            <input
+                              type="text"
+                              id={`additional-ticket-${ticket.id}`}
+                              name={`additionalTicketName-${ticket.id}`}
+                              required
+                              className="w-full bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-[#1f1f1f]/50"
+                              placeholder={`Ticket ${index + 2} Name`}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeTicketHolder(ticket.id)}
+                              className="mobile-tap border border-white/50 px-3 py-2 text-xs uppercase tracking-[0.2em] text-white transition-transform hover:scale-[1.02]"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-              <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
-                Special Requests / Questions *
-                <textarea
-                  id="ticket-message"
-                  name="message"
-                  rows={4}
-                  required
-                  className="w-full resize-none bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-[#1f1f1f]/50"
-                  placeholder="Let us know how we can help"
-                />
-              </label>
+                <label className="flex flex-col gap-2 text-sm font-montserrat font-medium text-white">
+                  Special Requests / Questions *
+                  <textarea
+                    id="ticket-message"
+                    name="message"
+                    rows={4}
+                    required
+                    className="w-full resize-none bg-white px-4 py-3 text-base text-[#1f1f1f]/80 focus:outline-none focus:ring-2 focus:ring-[#00f5ff] focus:ring-offset-2 focus:ring-offset-black placeholder:text-[#1f1f1f]/50"
+                    placeholder="Let us know how we can help"
+                  />
+                </label>
 
-              <label className="flex items-start gap-3 text-sm font-montserrat text-white/80">
-                <input
-                  type="checkbox"
-                  id="ticket-terms"
-                  name="terms"
-                  value="accepted"
-                  required
-                  className="mt-1 h-5 w-5 accent-[#00f5ff]"
-                />
-                <span>
-                  I accept the{" "}
-                  <Link
-                    href="/terms-and-conditions"
-                    className="text-[#FFFF00] underline-offset-4 hover:underline"
+                <div className="rounded border border-[#00f5ff]/40 bg-black/40 px-4 py-3 text-sm text-white/90">
+                  Total: ₹{ticketTotal} for {ticketCount} {ticketCount === 1 ? "pass" : "passes"}.
+                </div>
+
+                <label className="flex items-start gap-3 text-sm font-montserrat text-white/80">
+                  <input
+                    type="checkbox"
+                    id="ticket-terms"
+                    name="terms"
+                    value="accepted"
+                    required
+                    className="mt-1 h-5 w-5 accent-[#00f5ff]"
+                  />
+                  <span>
+                    I accept the{" "}
+                    <Link
+                      href="/terms-and-conditions"
+                      className="text-[#FFFF00] underline-offset-4 hover:underline"
+                    >
+                      terms and conditions
+                    </Link>
+                  </span>
+                </label>
+
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <button
+                    type="submit"
+                    disabled={ticketProcessing}
+                    className="mobile-tap flex-1 bg-[#FFFF00] px-6 py-3 text-base font-montserrat font-semibold text-[#1f1f1f] transition-transform hover:scale-[1.02] hover:bg-[#fffd66] disabled:cursor-not-allowed disabled:opacity-60"
                   >
-                    terms and conditions
-                  </Link>
-                </span>
-              </label>
-
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <button
-                  type="submit"
-                  disabled={ticketProcessing}
-                  className="mobile-tap flex-1 bg-[#FFFF00] px-6 py-3 text-base font-montserrat font-semibold text-[#1f1f1f] transition-transform hover:scale-[1.02] hover:bg-[#fffd66] disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {ticketProcessing ? "Processing Payment..." : "Request Tickets"}
-                </button>
-                <button
-                  type="button"
-                  onClick={closeTicketModal}
-                  className="mobile-tap border border-white/40 px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02] hover:border-white hover:bg-white/10"
-                >
-                  Cancel
-                </button>
-              </div>
+                    {ticketProcessing ? "Processing Payment..." : `Pay ₹${ticketTotal} & Book Passes`}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={closeTicketModal}
+                    className="mobile-tap border border-white/40 px-6 py-3 text-base font-montserrat font-semibold text-white transition-transform hover:scale-[1.02] hover:border-white hover:bg-white/10"
+                  >
+                    Cancel
+                  </button>
+                </div>
             </form>
           </div>
         </div>
