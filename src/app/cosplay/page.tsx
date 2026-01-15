@@ -75,7 +75,7 @@ const rules = [
 
 const highlights = [
   "Neon photo booths & selfie zones.",
-  "Professional photos + aftermovie coverage by Imagicity.",
+  "Professional photos + aftermovie coverage by the team.",
   "Crowd interactions, live music, and anchor-led energy.",
   "Winning entries featured on the official MADOOZA Instagram.",
 ];
@@ -355,7 +355,7 @@ export default function CosplayPage() {
               <div className="bg-[#e22154] p-6 text-white shadow-[0_0_30px_rgba(226,33,84,0.2)]">
                 <h3 className="font-travel-sans text-xl uppercase">Judging Panel</h3>
                 <p className="mt-3 text-sm sm:text-base text-white/80">
-                  1 creative representative from Imagicity, 1 faculty member, and 1 local artist or influencer.
+                  1 creative representative from the team, 1 faculty member, and 1 local artist or influencer.
                 </p>
                 <p className="mt-4 text-sm sm:text-base text-white">
                   Audience cheers will be counted live before the final verdict.

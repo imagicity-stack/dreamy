@@ -28,7 +28,7 @@ export default function PrivacyPolicyPage() {
             <section>
               <h2 className="text-2xl sm:text-3xl font-oswald text-[#ffe300] uppercase mb-4">1. Introduction</h2>
               <p className="text-sm sm:text-base md:text-lg leading-relaxed text-gray-200">
-                Welcome to Madooza, organized by IMAGICITY. We value your privacy and are committed to protecting your personal
+                Welcome to Madooza, organized by INEVITA ESPORTS PRIVATE LIMITED. We value your privacy and are committed to protecting your personal
                 information. This Privacy Policy explains how we collect, use, and safeguard your data when you visit our website or
                 register for the event.
               </p>
@@ -109,8 +109,8 @@ export default function PrivacyPolicyPage() {
               </ul>
               <p className="text-sm sm:text-base md:text-lg leading-relaxed text-gray-200 mt-4">
                 To exercise these rights, email us at
-                <a href="mailto:contact@imagicity.in" className="ml-2 text-[#ffe300] underline-offset-4 hover:underline">
-                  contact@imagicity.in
+                <a href="mailto:contact@madooza.com" className="ml-2 text-[#ffe300] underline-offset-4 hover:underline">
+                  contact@madooza.com
                 </a>
                 .
               </p>
@@ -136,7 +136,8 @@ export default function PrivacyPolicyPage() {
                 For any questions or concerns regarding this Privacy Policy, contact:
               </p>
               <div className="mt-4 space-y-2 text-sm sm:text-base md:text-lg text-gray-100">
-                <p>📧 contact@imagicity.in</p>
+                <p>📧 contact@madooza.com</p>
+                <p>Registered business: INEVITA ESPORTS PRIVATE LIMITED</p>
                 <p>📍 Hazaribagh, Jharkhand, India</p>
               </div>
             </section>
