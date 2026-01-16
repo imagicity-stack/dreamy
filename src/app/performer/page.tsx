@@ -12,8 +12,8 @@ import {
   loadRazorpayScript,
   RazorpayOptions,
   RazorpaySuccessResponse,
+  verifyPayment,
 } from "@/lib/razorpay";
-import { recordPayment } from "@/lib/payment-records";
 
 const categories = [
   { title: "Music", description: "Band / Solo / DJ" },
@@ -133,7 +133,14 @@ export default function PerformerPage() {
     console.log(data);
 
     try {
-      const orderConfig = await createPaymentOrder("performer", PERFORMER_FEE, data);
+      const orderConfig = await createPaymentOrder(
+        "performer",
+        {
+          ...data,
+          formType: "performer",
+        },
+        1,
+      );
 
       const scriptLoaded = await loadRazorpayScript();
 
@@ -164,17 +171,24 @@ export default function PerformerPage() {
         },
         handler: async (response: RazorpaySuccessResponse) => {
           paymentCompleted = true;
-          void recordPayment({
-            formType: "performer",
-            paymentId: response.razorpay_payment_id,
-            orderId: response.razorpay_order_id,
-            signature: response.razorpay_signature,
-            amount: orderConfig.amount,
-            currency: orderConfig.currency,
-            details: data,
-          }).catch((error) => {
-            console.error("Failed to record performer payment:", error);
+          const verification = await verifyPayment({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            formData: {
+              ...data,
+              formType: "performer",
+              quantity: 1,
+            },
           });
+
+          if (!verification.success) {
+            paymentCompleted = false;
+            setSubmitStatus("error");
+            setError(verification.message ?? "Payment verification failed. Please contact support.");
+            return;
+          }
+
           await submitPerformerForm(data, form);
         },
         modal: {

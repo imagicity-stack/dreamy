@@ -89,6 +89,18 @@ export interface PaymentOrderConfig {
   currency: string;
 }
 
+export interface PaymentVerificationPayload {
+  razorpay_payment_id: string;
+  razorpay_order_id: string;
+  razorpay_signature: string;
+  formData: Record<string, unknown>;
+}
+
+export interface PaymentVerificationResult {
+  success: boolean;
+  message?: string;
+}
+
 function normalizeCurrency(currency: unknown, fallback = "INR"): string {
   if (typeof currency === "string" && currency.trim().length > 0) {
     return currency.toUpperCase();
@@ -98,29 +110,17 @@ function normalizeCurrency(currency: unknown, fallback = "INR"): string {
 
 export async function createPaymentOrder(
   formType: string,
-  amount: number,
-  formData: Record<string, unknown>
+  formData: Record<string, unknown>,
+  quantity = 1,
 ): Promise<PaymentOrderConfig> {
-  if (!PAYMENT_API_BASE_URL) {
-    if (!FALLBACK_RAZORPAY_KEY_ID) {
-      throw new Error("Razorpay key ID is not configured.");
-    }
-
-    return {
-      orderId: undefined,
-      razorpayKeyId: FALLBACK_RAZORPAY_KEY_ID,
-      amount,
-      currency: "INR",
-    };
-  }
-
-  const response = await fetch(`${PAYMENT_API_BASE_URL}/api/orders/${formType}`, {
+  const apiBaseUrl = PAYMENT_API_BASE_URL || "";
+  const response = await fetch(`${apiBaseUrl}/api/orders/${formType}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      amount,
+      quantity,
       formData,
     }),
   });
@@ -171,15 +171,15 @@ export async function createPaymentOrder(
   const rawAmount =
     extractAmount((data as { amount?: unknown })?.amount) ??
     extractAmount((data as { order?: { amount?: unknown } })?.order?.amount) ??
-    amount;
+    null;
 
-  const normalizedAmount = Number.isFinite(rawAmount) ? rawAmount : amount;
+  const normalizedAmount = Number.isFinite(rawAmount) ? rawAmount : 0;
   const currency = normalizeCurrency(
     (data as { currency?: string })?.currency ??
       (data as { order?: { currency?: string } })?.order?.currency,
   );
 
-  if (!orderId || !razorpayKeyId) {
+  if (!orderId || !razorpayKeyId || !normalizedAmount) {
     throw new Error("Invalid payment configuration returned from server.");
   }
 
@@ -189,4 +189,34 @@ export async function createPaymentOrder(
     amount: normalizedAmount,
     currency,
   };
+}
+
+export async function verifyPayment(
+  payload: PaymentVerificationPayload,
+): Promise<PaymentVerificationResult> {
+  const response = await fetch(`/api/payments/verify`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(payload),
+  });
+
+  let data: Record<string, unknown> | null = null;
+
+  try {
+    data = (await response.json()) as Record<string, unknown>;
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const message =
+      (typeof data?.message === "string" && data.message.trim().length > 0
+        ? data.message
+        : "Payment verification failed. Please contact support.");
+    return { success: false, message };
+  }
+
+  return { success: true };
 }

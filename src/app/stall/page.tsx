@@ -11,8 +11,8 @@ import {
   loadRazorpayScript,
   RazorpayOptions,
   RazorpaySuccessResponse,
+  verifyPayment,
 } from "@/lib/razorpay";
-import { recordPayment } from "@/lib/payment-records";
 
 const stallHighlights = [
   "10×10 ft canopy (table + chair provided)",
@@ -74,7 +74,14 @@ export default function StallPage() {
     };
 
     try {
-      const orderConfig = await createPaymentOrder("stall", totalAmount, stallDetails);
+      const orderConfig = await createPaymentOrder(
+        "stall",
+        {
+          ...stallDetails,
+          formType: "stall",
+        },
+        1,
+      );
 
       const scriptLoaded = await loadRazorpayScript();
 
@@ -110,24 +117,30 @@ export default function StallPage() {
             company_name: "Madooza Stall Setup",
           },
         },
-        handler: (response: RazorpaySuccessResponse) => {
+        handler: async (response: RazorpaySuccessResponse) => {
           paymentCompleted = true;
+          const verification = await verifyPayment({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            formData: {
+              ...stallDetails,
+              formType: "stall",
+              quantity: 1,
+            },
+          });
+
+          if (!verification.success) {
+            paymentCompleted = false;
+            setError(verification.message ?? "Payment verification failed. Please contact support.");
+            return;
+          }
+
           setPaymentId(response.razorpay_payment_id ?? null);
           setSubmitted(true);
           setError("");
           form.reset();
           setSelectedPower(null);
-          void recordPayment({
-            formType: "stall",
-            paymentId: response.razorpay_payment_id,
-            orderId: response.razorpay_order_id,
-            signature: response.razorpay_signature,
-            amount: orderConfig.amount,
-            currency: orderConfig.currency,
-            details: stallDetails,
-          }).catch((error) => {
-            console.error("Failed to record stall payment:", error);
-          });
         },
         modal: {
           ondismiss: () => {
