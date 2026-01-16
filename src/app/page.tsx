@@ -13,8 +13,8 @@ import {
   loadRazorpayScript,
   RazorpayOptions,
   RazorpaySuccessResponse,
+  verifyPayment,
 } from "@/lib/razorpay";
-import { recordPayment } from "@/lib/payment-records";
 
 const involvementOptions = [
   {
@@ -171,7 +171,14 @@ export default function Home() {
     };
 
     try {
-      const orderConfig = await createPaymentOrder("ticket", totalAmount, ticketDetails);
+      const orderConfig = await createPaymentOrder(
+        "ticket",
+        {
+          ...ticketDetails,
+          formType: "ticket",
+        },
+        ticketCount,
+      );
 
       const scriptLoaded = await loadRazorpayScript();
 
@@ -205,21 +212,27 @@ export default function Home() {
             company_name: "Madooza Event Pass",
           },
         },
-        handler: (response: RazorpaySuccessResponse) => {
+        handler: async (response: RazorpaySuccessResponse) => {
           paymentCompleted = true;
+          const verification = await verifyPayment({
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_signature: response.razorpay_signature,
+            formData: {
+              ...ticketDetails,
+              formType: "ticket",
+              quantity: ticketCount,
+            },
+          });
+
+          if (!verification.success) {
+            paymentCompleted = false;
+            alert(verification.message ?? "Payment verification failed. Please contact support.");
+            return;
+          }
+
           form.reset();
           closeTicketModal();
-          void recordPayment({
-            formType: "ticket",
-            paymentId: response.razorpay_payment_id,
-            orderId: response.razorpay_order_id,
-            signature: response.razorpay_signature,
-            amount: orderConfig.amount,
-            currency: orderConfig.currency,
-            details: ticketDetails,
-          }).catch((error) => {
-            console.error("Failed to record ticket payment:", error);
-          });
           const reference = response.razorpay_payment_id
             ? ` Reference: ${response.razorpay_payment_id}`
             : "";
