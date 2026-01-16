@@ -25,9 +25,9 @@ const extractQuantity = (payload: Record<string, unknown>): number => {
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { formType: string } },
+  { params }: { params: Promise<{ formType: string }> },
 ) {
-  const { formType } = params;
+  const { formType } = await params;
 
   if (!isPaymentFormType(formType)) {
     return NextResponse.json(
