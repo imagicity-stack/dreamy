@@ -37,11 +37,19 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 
 ## Firebase setup (payments logging)
 
-This project logs successful Razorpay transactions to Firestore, storing each form type in a dedicated collection.
+This project logs successful Razorpay transactions to Firestore from the server only, storing each form type in a dedicated collection.
 
 ### Environment variables
 
-Set the following environment variables (all are required for logging):
+Set the following environment variables for Firebase Admin (server-side logging):
+
+```bash
+FIREBASE_ADMIN_PROJECT_ID=...
+FIREBASE_ADMIN_CLIENT_EMAIL=...
+FIREBASE_ADMIN_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+```
+
+If you also need the client-side Firebase SDK for other features, keep the public config values:
 
 ```bash
 NEXT_PUBLIC_FIREBASE_API_KEY=...
@@ -65,34 +73,27 @@ Each document includes: `paymentId`, `orderId`, `signature`, `amount`, `currency
 
 ### Firestore rules
 
-If you want client-side writes for payment logging, you can start with rules like:
+Because payment records are written from the server, lock down client writes:
 
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /ticketPayments/{docId} {
+    match /{document=**} {
       allow read: if false;
-      allow create: if true;
-      allow update, delete: if false;
-    }
-    match /cosplayPayments/{docId} {
-      allow read: if false;
-      allow create: if true;
-      allow update, delete: if false;
-    }
-    match /stallPayments/{docId} {
-      allow read: if false;
-      allow create: if true;
-      allow update, delete: if false;
-    }
-    match /performerPayments/{docId} {
-      allow read: if false;
-      allow create: if true;
-      allow update, delete: if false;
+      allow write: if false;
     }
   }
 }
 ```
 
-> Note: These rules allow unauthenticated creates, which is suitable only if you trust the front-end environment. For production, consider adding App Check or authenticated writes.
+> Note: If you still have client-driven Firestore features, add the minimum required rules for those collections only.
+
+## Razorpay setup
+
+The server creates orders and verifies signatures, so configure these environment variables:
+
+```bash
+RAZORPAY_KEY_ID=...
+RAZORPAY_SECRET=...
+```
