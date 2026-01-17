@@ -26,3 +26,6 @@ export const calculateTotalAmount = (
   formType: PaymentFormType,
   quantity: number,
 ): number => UNIT_PRICES[formType] * quantity;
+
+export const toPaiseAmount = (amountInRupees: number): number =>
+  Math.round(amountInRupees * 100);
