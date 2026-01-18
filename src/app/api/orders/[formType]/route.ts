@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { calculateTotalAmount, normalizeQuantity, UNIT_PRICES } from "@/lib/payment-utils";
+import {
+  calculateTotalAmount,
+  normalizeQuantity,
+  toPaiseAmount,
+  UNIT_PRICES,
+} from "@/lib/payment-utils";
 import type { PaymentFormType } from "@/lib/payment-records-shared";
 
 const RAZORPAY_KEY_ID =
@@ -53,6 +58,7 @@ export async function POST(
 
   const quantity = extractQuantity(payload);
   const amount = calculateTotalAmount(formType, quantity);
+  const razorpayAmount = toPaiseAmount(amount);
   const currency = "INR";
 
   try {
@@ -65,7 +71,7 @@ export async function POST(
         ).toString("base64")}`,
       },
       body: JSON.stringify({
-        amount,
+        amount: razorpayAmount,
         currency,
         receipt: `receipt_${formType}_${Date.now()}`,
         notes: {
@@ -95,7 +101,7 @@ export async function POST(
     return NextResponse.json({
       orderId: data.id,
       razorpayKeyId: RAZORPAY_KEY_ID,
-      amount: data.amount ?? amount,
+      amount: data.amount ?? razorpayAmount,
       currency: data.currency ?? currency,
     });
   } catch (error) {
