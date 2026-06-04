@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import {
   Geist,
   Geist_Mono,
@@ -44,9 +44,19 @@ const leagueGothic = League_Gothic({
 });
 
 export const metadata: Metadata = {
-  title: "Madooza 2025 | Hazaribagh's Youth Fusion Fest",
+  title: "MADOOZA · The Sound of Pure Madness · Hazaribagh 2025",
   description:
-    "Discover MADOOZA Festival 2024 in Hazaribagh – a high-energy celebration of cosplay, music, art, food, and creator culture.",
+    "MADOOZA — Hazaribagh's first creative explosion. 12 hours of music, cosplay, food, art, and pure madness. 13 December 2025.",
+  openGraph: {
+    title: "MADOOZA · The Sound of Pure Madness",
+    description:
+      "Hazaribagh, 13 December 2025 — music, cosplay, stalls, art and madness.",
+    type: "website",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0a0014",
 };
 
 export default function RootLayout({
@@ -57,11 +67,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${oswald.variable} ${quicksand.variable} ${montserrat.variable} ${leagueGothic.variable} antialiased font-quicksand`}
+        className={`${geistSans.variable} ${geistMono.variable} ${oswald.variable} ${quicksand.variable} ${montserrat.variable} ${leagueGothic.variable} antialiased font-quicksand grain`}
       >
-        <Header/>
-
-        <main className="pt-16">
+        <Header />
+        <main className="relative z-[2]">
           {children}
         </main>
       </body>

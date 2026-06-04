@@ -8,6 +8,13 @@ const ROUTES: Array<{
   priority: MetadataRoute.Sitemap[number]["priority"];
 }> = [
   { path: "/", changeFrequency: "weekly", priority: 1 },
+  { path: "/about", changeFrequency: "weekly", priority: 0.9 },
+  { path: "/lineup", changeFrequency: "weekly", priority: 0.95 },
+  { path: "/schedule", changeFrequency: "weekly", priority: 0.9 },
+  { path: "/venue", changeFrequency: "weekly", priority: 0.8 },
+  { path: "/gallery", changeFrequency: "weekly", priority: 0.7 },
+  { path: "/sponsors", changeFrequency: "weekly", priority: 0.7 },
+  { path: "/tickets", changeFrequency: "weekly", priority: 1 },
   { path: "/cosplay", changeFrequency: "weekly", priority: 0.9 },
   { path: "/stall", changeFrequency: "weekly", priority: 0.9 },
   { path: "/performer", changeFrequency: "monthly", priority: 0.7 },

@@ -1,44 +1,41 @@
 "use client";
 
-const items = ["COSPLAY", "MUSIC", "DANCE", "STALLS", "FOOD"];
+import Marquee from "./Marquee";
 
-export default function ScrollingBanner() {
-  return (
-    <div className="bg-black py-6 md:py-10 px-4 overflow-hidden relative shadow-[0_0_25px_rgba(0,0,0,0.25)]">
-      <div className="marquee inline-flex whitespace-nowrap">
-        {[0, 1].map((loop) => (
-          <div
-            key={loop}
-            className="flex items-center gap-6 md:gap-10 flex-shrink-0 px-4"
-            aria-hidden={loop === 1}
-          >
-            {items.map((item) => (
-              <span
-                key={`${loop}-${item}`}
-                className="text-[#ffe300] font-montserrat text-2xl sm:text-3xl md:text-4xl tracking-[0.3em]"
-              >
-                {item}
-              </span>
-            ))}
-          </div>
-        ))}
-      </div>
+interface ScrollingBannerProps {
+  variant?: "default" | "magenta" | "cyan" | "acid" | "stripe";
+  tilt?: "left" | "right" | "none";
+}
 
-      <style jsx>{`
-        @keyframes scroll {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
+const defaultItems = [
+  "MADOOZA",
+  "13 · DEC · 25",
+  "HAZARIBAGH",
+  "MUSIC · COSPLAY · STALLS",
+  "SOUND OF PURE MADNESS",
+  "THE MAD PARADE",
+  "FOOD · ART · VIBES",
+];
 
-        .marquee {
-          animation: scroll 30s linear infinite;
-          width: max-content;
-        }
-      `}</style>
-    </div>
-  );
+const altItems = [
+  "GRAB YOUR PASS",
+  "12 HOURS · ZERO CHILL",
+  "ONE CITY · ONE MOVEMENT",
+  "BRING YOUR CREW",
+];
+
+export default function ScrollingBanner({ variant = "default", tilt = "none" }: ScrollingBannerProps) {
+  if (variant === "magenta") {
+    return <Marquee items={altItems} tone="magenta" tilt={tilt} speed="normal" />;
+  }
+  if (variant === "cyan") {
+    return <Marquee items={altItems} tone="cyan" tilt={tilt} speed="normal" />;
+  }
+  if (variant === "acid") {
+    return <Marquee items={defaultItems} tone="acid" tilt={tilt} speed="fast" reverse />;
+  }
+  if (variant === "stripe") {
+    return <Marquee items={defaultItems} tone="stripe-magenta" tilt={tilt} speed="normal" />;
+  }
+  return <Marquee items={defaultItems} tone="ink" tilt={tilt} speed="normal" />;
 }
