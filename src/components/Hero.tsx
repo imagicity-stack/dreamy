@@ -112,7 +112,7 @@ export default function Hero({ onOpenTickets }: HeroProps) {
           ))}
         </div>
 
-        <p className="mt-2 text-white/95 font-montserrat text-sm sm:text-base md:text-lg lg:text-xl tracking-[0.32em] uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
+        <p className="mt-3 text-white/95 font-bungee text-base sm:text-lg md:text-xl lg:text-2xl tracking-[0.18em] uppercase drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
           The Sound of Pure Madness
         </p>
 

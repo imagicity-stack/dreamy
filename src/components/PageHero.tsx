@@ -30,7 +30,7 @@ export default function PageHero({
         } gap-5`}
       >
         <span className="sticker sticker-magenta">{eyebrow}</span>
-        <h1 className="font-quaron text-6xl sm:text-7xl md:text-8xl lg:text-9xl uppercase leading-[0.88]">
+        <h1 className="font-bowlby text-6xl sm:text-7xl md:text-8xl lg:text-9xl uppercase leading-[0.88]">
           <span className="text-rainbow">{title}</span>
         </h1>
         {blurb && (

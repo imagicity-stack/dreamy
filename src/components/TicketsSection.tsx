@@ -28,7 +28,7 @@ export default function TicketsSection({ onOpenTickets }: TicketsSectionProps) {
         <ScrollReveal>
           <div className="flex flex-col items-center text-center gap-4 mb-14">
             <span className="sticker sticker-magenta pulse-magenta">Live now</span>
-            <h2 className="font-quaron text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">
+            <h2 className="font-bowlby text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">
               <span className="text-rainbow">Grab Your Pass</span>
             </h2>
             <p className="max-w-2xl text-sm sm:text-base text-white/70">
@@ -66,7 +66,7 @@ export default function TicketsSection({ onOpenTickets }: TicketsSectionProps) {
                     </p>
                     <div className="mt-2 flex items-baseline gap-2">
                       <span
-                        className="font-quaron text-5xl md:text-6xl leading-none"
+                        className="font-bowlby text-5xl md:text-6xl leading-none"
                         style={{ color: accent }}
                       >
                         ₹{tier.price}

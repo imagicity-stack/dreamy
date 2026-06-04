@@ -51,7 +51,7 @@ export default function Footer() {
               height={60}
               className="w-[180px] h-auto"
             />
-            <p className="mt-6 font-quaron text-3xl text-rainbow leading-tight">
+            <p className="mt-6 font-bowlby text-3xl text-rainbow leading-tight">
               The Sound of Pure Madness.
             </p>
             <p className="mt-4 text-sm text-white/65 max-w-sm">

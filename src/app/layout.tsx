@@ -1,41 +1,36 @@
 import type { Metadata, Viewport } from "next";
 import {
-  Geist,
-  Geist_Mono,
+  Bowlby_One,
+  Bungee,
   League_Gothic,
-  Montserrat,
-  Oswald,
-  Quicksand,
+  Plus_Jakarta_Sans,
+  Space_Grotesk,
 } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/Header";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
-const oswald = Oswald({
-  variable: "--font-oswald",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const quicksand = Quicksand({
-  variable: "--font-quicksand",
-  subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-});
-
-const montserrat = Montserrat({
-  variable: "--font-montserrat",
+const jakarta = Plus_Jakarta_Sans({
+  variable: "--font-jakarta",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700", "800"],
+});
+
+const grotesk = Space_Grotesk({
+  variable: "--font-grotesk",
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const bowlby = Bowlby_One({
+  variable: "--font-bowlby",
+  subsets: ["latin"],
+  weight: "400",
+});
+
+const bungee = Bungee({
+  variable: "--font-bungee",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 const leagueGothic = League_Gothic({
@@ -67,7 +62,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${oswald.variable} ${quicksand.variable} ${montserrat.variable} ${leagueGothic.variable} antialiased font-quicksand grain`}
+        className={`${jakarta.variable} ${grotesk.variable} ${bowlby.variable} ${bungee.variable} ${leagueGothic.variable} antialiased grain`}
       >
         <Header />
         <main className="relative z-[2]">

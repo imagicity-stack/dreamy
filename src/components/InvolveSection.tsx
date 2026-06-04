@@ -60,7 +60,7 @@ export default function InvolveSection() {
         <ScrollReveal>
           <div className="flex flex-col items-center text-center gap-4 mb-12">
             <span className="sticker sticker-violet">Join In</span>
-            <h2 className="font-quaron text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">
+            <h2 className="font-bowlby text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">
               <span className="text-rainbow">Involve With Us</span>
             </h2>
             <p className="max-w-2xl text-sm sm:text-base text-white/70">
@@ -108,7 +108,7 @@ export default function InvolveSection() {
                 Currently viewing
               </p>
               <h3
-                className="mt-3 font-quaron text-4xl md:text-5xl lg:text-6xl uppercase leading-[0.95]"
+                className="mt-3 font-bowlby text-4xl md:text-5xl lg:text-6xl uppercase leading-[0.95]"
                 style={{ color: current.accent }}
               >
                 {current.name}

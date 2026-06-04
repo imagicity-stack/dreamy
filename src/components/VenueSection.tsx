@@ -25,7 +25,7 @@ export default function VenueSection() {
         <ScrollReveal>
           <div className="flex flex-col items-center text-center gap-4 mb-12">
             <span className="sticker sticker-cyan">The Venue</span>
-            <h2 className="font-quaron text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">
+            <h2 className="font-bowlby text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">
               <span className="text-rainbow">Find The Madness</span>
             </h2>
             <p className="max-w-2xl text-sm sm:text-base text-white/70">
@@ -63,7 +63,7 @@ export default function VenueSection() {
               <p className="font-montserrat text-xs tracking-[0.4em] uppercase text-[var(--acid)]">
                 Saturday · 13 December 2025
               </p>
-              <h3 className="mt-3 font-quaron text-4xl md:text-5xl text-white leading-[0.95]">
+              <h3 className="mt-3 font-bowlby text-4xl md:text-5xl text-white leading-[0.95]">
                 Hazaribagh,
                 <br />
                 <span className="text-[var(--cyan)]">Jharkhand</span>

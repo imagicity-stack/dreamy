@@ -52,7 +52,7 @@ export default function Marquee({
             {items.map((item, idx) => (
               <span
                 key={`${loop}-${idx}`}
-                className={`font-quaron text-3xl sm:text-5xl md:text-6xl tracking-wide flex items-center gap-8 md:gap-12 ${textClassName}`}
+                className={`font-bungee text-2xl sm:text-4xl md:text-5xl tracking-wide flex items-center gap-8 md:gap-12 ${textClassName}`}
               >
                 {item}
                 {separator ?? (

@@ -55,7 +55,7 @@ export default function AboutSection() {
         <ScrollReveal>
           <div className="flex flex-col items-center text-center gap-4">
             <span className="sticker sticker-magenta">Why Madooza</span>
-            <h2 className="font-quaron text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase text-rainbow leading-[0.95]">
+            <h2 className="font-bowlby text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase text-rainbow leading-[0.95]">
               About The Madness
             </h2>
             <p className="max-w-3xl text-sm sm:text-base md:text-lg text-white/80">
@@ -70,7 +70,7 @@ export default function AboutSection() {
           <ScrollReveal mode="left" className="flex flex-col gap-6">
             <div className="relative overflow-hidden border-2 border-black bg-[var(--ink-2)] p-8 md:p-10 poster-card poster-card-cyan">
               <div className="absolute -top-3 left-6 sticker sticker-magenta">Manifesto</div>
-              <h3 className="mt-4 font-quaron text-3xl md:text-4xl uppercase text-[var(--acid)]">
+              <h3 className="mt-4 font-bowlby text-3xl md:text-4xl uppercase text-[var(--acid)]">
                 The Sound of Pure Madness
               </h3>
               <p className="mt-4 text-sm md:text-base text-white/85 leading-relaxed">
@@ -92,7 +92,7 @@ export default function AboutSection() {
                     style={{ boxShadow: `6px 6px 0 ${f.color}` }}
                   >
                     <div
-                      className="font-quaron text-2xl mb-2"
+                      className="font-bowlby text-2xl mb-2"
                       style={{ color: f.color }}
                     >
                       {f.icon}
@@ -118,7 +118,7 @@ export default function AboutSection() {
                     style={{ boxShadow: `5px 5px 0 ${s.c}` }}
                   >
                     <p
-                      className="font-quaron text-3xl md:text-4xl leading-none"
+                      className="font-bowlby text-3xl md:text-4xl leading-none"
                       style={{ color: s.c }}
                     >
                       {s.v}
@@ -151,7 +151,7 @@ export default function AboutSection() {
                 <p className="font-montserrat text-[0.65rem] uppercase tracking-[0.5em] text-[var(--acid)]">
                   This is Madooza
                 </p>
-                <p className="font-quaron text-3xl md:text-4xl text-white leading-tight">
+                <p className="font-bowlby text-3xl md:text-4xl text-white leading-tight">
                   Built for the dreamers turning Hazaribagh into a creative capital.
                 </p>
               </div>

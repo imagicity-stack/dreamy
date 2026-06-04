@@ -33,7 +33,7 @@ export default function ScheduleSection({ full = false }: ScheduleSectionProps) 
         <ScrollReveal>
           <div className="flex flex-col items-center text-center gap-4 mb-14">
             <span className="sticker sticker-magenta">Saturday · 13 December</span>
-            <h2 className="font-quaron text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">
+            <h2 className="font-bowlby text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">
               <span className="text-rainbow">The Schedule</span>
             </h2>
             <p className="max-w-2xl text-sm sm:text-base text-white/70">
@@ -59,7 +59,7 @@ export default function ScheduleSection({ full = false }: ScheduleSectionProps) 
                   >
                     <div className="hidden md:flex flex-col items-end justify-center pr-2">
                       <span
-                        className="font-quaron text-2xl md:text-3xl leading-none"
+                        className="font-bowlby text-2xl md:text-3xl leading-none"
                         style={{ color: accent }}
                       >
                         {s.start}
@@ -78,7 +78,7 @@ export default function ScheduleSection({ full = false }: ScheduleSectionProps) 
                       style={{ boxShadow: `5px 5px 0 ${accent}` }}
                     >
                       <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <span className="md:hidden inline-flex items-center gap-1 font-quaron text-xl" style={{ color: accent }}>
+                        <span className="md:hidden inline-flex items-center gap-1 font-bowlby text-xl" style={{ color: accent }}>
                           <Clock size={14} />
                           {s.start}
                         </span>
@@ -92,7 +92,7 @@ export default function ScheduleSection({ full = false }: ScheduleSectionProps) 
                           {s.zone}
                         </span>
                       </div>
-                      <p className="font-quaron text-2xl md:text-3xl text-white leading-tight">
+                      <p className="font-bowlby text-2xl md:text-3xl text-white leading-tight">
                         {s.title}
                       </p>
                       {s.desc && (

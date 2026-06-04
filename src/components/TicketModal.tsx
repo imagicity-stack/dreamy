@@ -193,7 +193,7 @@ export default function TicketModal({ open, onClose }: TicketModalProps) {
           >
             <div className="text-center">
               <span className="sticker sticker-cyan">Step into Madooza</span>
-              <h2 className="mt-3 font-quaron text-4xl sm:text-5xl uppercase text-[var(--acid)]">
+              <h2 className="mt-3 font-bowlby text-4xl sm:text-5xl uppercase text-[var(--acid)]">
                 Get Your Passes
               </h2>
               <p className="mt-3 text-sm text-white/75">
@@ -295,7 +295,7 @@ export default function TicketModal({ open, onClose }: TicketModalProps) {
                 <p className="font-montserrat text-[0.65rem] uppercase tracking-[0.3em] text-white/60">
                   Total
                 </p>
-                <p className="font-quaron text-3xl text-[var(--acid)]">
+                <p className="font-bowlby text-3xl text-[var(--acid)]">
                   ₹{total}
                 </p>
               </div>
