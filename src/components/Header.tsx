@@ -143,7 +143,7 @@ export default function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`group flex items-baseline justify-between border-b border-white/10 py-4 font-quaron text-3xl uppercase transition-all hover:pl-2 ${
+                  className={`group flex items-baseline justify-between border-b border-white/10 py-4 font-bowlby text-3xl uppercase transition-all hover:pl-2 ${
                     isActive(link.href)
                       ? "text-[var(--acid)]"
                       : "text-white hover:text-[var(--cyan)]"

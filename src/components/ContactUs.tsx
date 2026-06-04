@@ -33,7 +33,7 @@ export default function ContactUs() {
             <div className="absolute inset-0 bg-stripe-magenta opacity-5 pointer-events-none" />
             <div className="relative">
               <span className="sticker sticker-magenta">Get In Touch</span>
-              <h2 className="mt-4 font-quaron text-5xl md:text-6xl lg:text-7xl uppercase text-[var(--acid)] leading-[0.9]">
+              <h2 className="mt-4 font-bowlby text-5xl md:text-6xl lg:text-7xl uppercase text-[var(--acid)] leading-[0.9]">
                 Contact Us
               </h2>
               <p className="mt-4 text-sm md:text-base text-white/75 max-w-md">

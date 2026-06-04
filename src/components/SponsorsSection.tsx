@@ -32,7 +32,7 @@ export default function SponsorsSection({ full = false }: SponsorsSectionProps) 
         <ScrollReveal>
           <div className="flex flex-col items-center text-center gap-4 mb-12">
             <span className="sticker sticker-lime">Powered By</span>
-            <h2 className="font-quaron text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">
+            <h2 className="font-bowlby text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">
               <span className="text-rainbow">Our Partners</span>
             </h2>
             <p className="max-w-2xl text-sm sm:text-base text-white/70">
@@ -51,7 +51,7 @@ export default function SponsorsSection({ full = false }: SponsorsSectionProps) 
                 <ScrollReveal key={tier}>
                   <div>
                     <div className="flex items-center gap-3 mb-6">
-                      <span className="font-quaron text-3xl md:text-4xl text-[var(--acid)]">
+                      <span className="font-bowlby text-3xl md:text-4xl text-[var(--acid)]">
                         {tier}
                       </span>
                       <div className="flex-1 h-px bg-gradient-to-r from-white/40 to-transparent" />
@@ -64,7 +64,7 @@ export default function SponsorsSection({ full = false }: SponsorsSectionProps) 
                             style={{ boxShadow: `6px 6px 0 ${accentMap[s.accent]}` }}
                           >
                             <p
-                              className="text-center font-quaron text-2xl leading-tight"
+                              className="text-center font-bowlby text-2xl leading-tight"
                               style={{ color: accentMap[s.accent] }}
                             >
                               {s.name}
@@ -92,7 +92,7 @@ export default function SponsorsSection({ full = false }: SponsorsSectionProps) 
                   style={{ boxShadow: `6px 6px 0 ${accentMap[s.accent]}` }}
                 >
                   <p
-                    className="text-center font-quaron text-2xl leading-tight"
+                    className="text-center font-bowlby text-2xl leading-tight"
                     style={{ color: accentMap[s.accent] }}
                   >
                     {s.name}

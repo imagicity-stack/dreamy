@@ -36,7 +36,7 @@ function ArtistCard({ a, idx }: { a: Artist; idx: number }) {
               className="object-cover transition-transform duration-700 group-hover:scale-110"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center font-quaron text-5xl text-white/20">
+            <div className="flex h-full w-full items-center justify-center font-bowlby text-5xl text-white/20">
               {a.category[0]}
             </div>
           )}
@@ -57,7 +57,7 @@ function ArtistCard({ a, idx }: { a: Artist; idx: number }) {
               {a.day}
             </p>
             <p
-              className="mt-1 font-quaron text-2xl md:text-3xl leading-tight"
+              className="mt-1 font-bowlby text-2xl md:text-3xl leading-tight"
               style={{ color: accent }}
             >
               {a.name}
@@ -90,7 +90,7 @@ export default function LineupSection({ full = false }: LineupSectionProps) {
         <ScrollReveal>
           <div className="flex flex-col items-center text-center gap-4 mb-12 md:mb-16">
             <span className="sticker sticker-cyan">The Lineup</span>
-            <h2 className="font-quaron text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">
+            <h2 className="font-bowlby text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">
               <span className="text-rainbow">Who&apos;s Playing</span>
             </h2>
             <p className="max-w-2xl text-sm sm:text-base text-white/70">

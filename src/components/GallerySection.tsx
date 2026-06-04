@@ -25,7 +25,7 @@ export default function GallerySection({ full = false }: GallerySectionProps) {
         <ScrollReveal>
           <div className="flex flex-col items-center text-center gap-4 mb-14">
             <span className="sticker sticker-violet">From The Field</span>
-            <h2 className="font-quaron text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">
+            <h2 className="font-bowlby text-5xl sm:text-6xl md:text-7xl lg:text-8xl uppercase leading-[0.9]">
               <span className="text-rainbow">Madness in Motion</span>
             </h2>
             <p className="max-w-2xl text-sm sm:text-base text-white/70">

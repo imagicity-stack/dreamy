@@ -19,7 +19,7 @@ export default function FAQSection() {
         <ScrollReveal>
           <div className="flex flex-col items-center text-center gap-4 mb-12">
             <span className="sticker sticker-cyan">Quick Answers</span>
-            <h2 className="font-quaron text-5xl sm:text-6xl md:text-7xl uppercase leading-[0.9]">
+            <h2 className="font-bowlby text-5xl sm:text-6xl md:text-7xl uppercase leading-[0.9]">
               <span className="text-rainbow">FAQ</span>
             </h2>
           </div>
@@ -41,7 +41,7 @@ export default function FAQSection() {
                     className="w-full flex items-center justify-between gap-4 p-5 text-left"
                     onClick={() => setOpen(isOpen ? null : i)}
                   >
-                    <span className="font-quaron text-xl md:text-2xl text-white">
+                    <span className="font-bowlby text-xl md:text-2xl text-white">
                       {f.q}
                     </span>
                     <Plus
