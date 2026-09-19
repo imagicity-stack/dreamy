@@ -1,0 +1,240 @@
+:root {
+  --ink: #150331;
+  --bg: #26084a;
+  --purple: #4a1382;
+  --teal: #35c6d4;
+  --teal-light: #6fe0ea;
+  --pink: #ff4f7e;
+  --crimson: #df025c;
+  --hot-pink: #ff3d70;
+  --paper: #f7f2fb;
+  --lilac: #efe3fb;
+  --lilac-text: #eadcf6;
+  --violet-text: #c0a6ec;
+  --muted-lilac: #b79bd8;
+  --near-black: #0a0118;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+}
+
+body {
+  font-family: var(--font-body), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  color: var(--lilac);
+}
+
+a {
+  color: var(--teal);
+  text-decoration: none;
+}
+a:hover {
+  color: var(--teal-light);
+}
+
+img {
+  max-width: 100%;
+}
+
+input,
+select,
+textarea,
+button {
+  font-family: inherit;
+}
+
+::selection {
+  background: var(--teal);
+  color: var(--ink);
+}
+
+.font-display {
+  font-family: var(--font-display), cursive;
+}
+
+@keyframes mzslide {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+@keyframes mzspin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+@keyframes mzfloat {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-9px);
+  }
+}
+@keyframes mzhalo {
+  0%,
+  100% {
+    transform: scale(0.96);
+    opacity: 0.55;
+  }
+  50% {
+    transform: scale(1.22);
+    opacity: 0.12;
+  }
+}
+@keyframes mzpulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.09);
+  }
+}
+@keyframes mzclue {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes mzdrift {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 26px 39px;
+  }
+}
+@keyframes mzsheen {
+  0% {
+    left: -45%;
+  }
+  62%,
+  100% {
+    left: 130%;
+  }
+}
+@keyframes mzflick {
+  0%,
+  88%,
+  100% {
+    opacity: 1;
+  }
+  91% {
+    opacity: 0.3;
+  }
+  94% {
+    opacity: 1;
+  }
+  97% {
+    opacity: 0.55;
+  }
+}
+
+a,
+button {
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* Generic sticker-shadow hover/press lift. Set --mz-shadow / --mz-lift
+   per element to reuse across the many button/card variants. */
+.mz-pop {
+  --mz-lift: 2px;
+  transition:
+    transform 0.18s ease,
+    box-shadow 0.18s ease,
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+.mz-pop:hover {
+  transform: translate(calc(var(--mz-lift) * -1), calc(var(--mz-lift) * -1));
+  box-shadow: calc(var(--mz-shadow) + 3px) calc(var(--mz-shadow) + 3px) 0 var(--ink);
+}
+.mz-pop:active {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--ink) !important;
+}
+
+.mz-nav-link {
+  color: var(--lilac);
+  padding: 7px 9px;
+  border: 2px solid transparent;
+}
+.mz-nav-link:hover {
+  color: var(--ink);
+  background: var(--lilac);
+  border-color: var(--ink);
+}
+
+.mz-input {
+  width: 100%;
+  padding: 13px 14px;
+  font-size: 15px;
+  background: #ffffff;
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  border-radius: 20px;
+  outline: none;
+}
+.mz-input:focus {
+  box-shadow: 0 0 0 3px var(--teal);
+}
+
+.mz-footer-link {
+  color: var(--muted-lilac);
+}
+.mz-footer-link:hover {
+  color: var(--pink);
+}
+
+.mz-badge-logo {
+  animation: mzpulse 2.8s ease-in-out infinite;
+}
+.mz-badge-logo:hover {
+  animation: mzspin 1.1s linear infinite;
+}
+
+.mz-teal-btn {
+  background: var(--teal);
+}
+.mz-teal-btn:hover {
+  background: var(--teal-light) !important;
+}
+
+@media print {
+  .mz-noprint {
+    display: none !important;
+  }
+}
