@@ -1,0 +1,191 @@
+"use client";
+
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { FEST, lineup, supportActs } from "@/data/fest";
+
+export default function LineupPage() {
+  const [peeked, setPeeked] = useState<Record<string, boolean>>({});
+
+  return (
+    <main>
+      <section
+        style={{
+          background: "var(--purple)",
+          borderBottom: "3px solid var(--ink)",
+          padding: "54px 20px 46px",
+          position: "relative",
+          overflow: "hidden",
+        }}
+      >
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            backgroundImage: "radial-gradient(#150331 1.4px, transparent 1.5px)",
+            backgroundSize: "11px 11px",
+            opacity: 0.16,
+            animation: "mzdrift 34s linear infinite",
+            pointerEvents: "none",
+          }}
+        />
+        <div style={{ position: "relative", maxWidth: 1180, margin: "0 auto" }}>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.24em", color: "var(--teal)" }}>01 / THE VAULT</div>
+          <h1 className="font-display" style={{ fontSize: "clamp(30px, 6vw, 60px)", lineHeight: 1.02, margin: "14px 0 16px", color: "var(--lilac)" }}>
+            LINEUP &amp; REVEAL
+          </h1>
+          <p style={{ fontSize: 17, lineHeight: 1.6, color: "#F0E4FA", maxWidth: "60ch", margin: 0 }}>
+            Three headline slots are sealed. Each card holds a clue written by the council &mdash; tap one to peek,
+            then argue about it with your friends. Names go public on the dates below, no earlier.
+          </p>
+        </div>
+      </section>
+
+      <section style={{ background: "var(--bg)", padding: "56px 20px 64px" }}>
+        <div style={{ maxWidth: 1180, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(290px, 1fr))", gap: 22 }}>
+          {lineup.map((card) => {
+            const open = FEST.lineupUnlocked || !!peeked[card.id];
+            return (
+              <div
+                key={card.id}
+                style={{
+                  background: "var(--paper)",
+                  color: "var(--ink)",
+                  border: "3px solid var(--ink)",
+                  borderRadius: 20,
+                  boxShadow: "9px 9px 0 var(--ink)",
+                  padding: "24px 22px 22px",
+                  display: "flex",
+                  flexDirection: "column",
+                  minHeight: 380,
+                }}
+              >
+                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.16em", color: "var(--purple)" }}>{card.kicker}</div>
+                  <Image src="/assets/madooza-badge.png" alt="" width={26} height={26} style={{ display: "block" }} />
+                </div>
+                <h2 className="font-display" style={{ fontSize: 27, margin: "12px 0 18px", lineHeight: 1.08 }}>{card.slot}</h2>
+
+                {!open && (
+                  <div
+                    style={{
+                      flex: 1,
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "center",
+                      textAlign: "center",
+                      background: "var(--bg)",
+                      border: "2px solid var(--ink)",
+                      borderRadius: 14,
+                      padding: "26px 18px",
+                      gap: 14,
+                    }}
+                  >
+                    <div
+                      className="font-display"
+                      style={{
+                        width: 46,
+                        height: 46,
+                        border: "3px solid var(--hot-pink)",
+                        borderRadius: "50%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        color: "var(--hot-pink)",
+                        fontSize: 20,
+                        animation: "mzpulse 2.4s ease-in-out infinite",
+                      }}
+                    >
+                      <span style={{ animation: "mzflick 4.5s steps(1,end) infinite" }}>?</span>
+                    </div>
+                    <div style={{ fontSize: 12, letterSpacing: "0.16em", color: "var(--muted-lilac)" }}>SEALED UNTIL FURTHER NOTICE</div>
+                  </div>
+                )}
+
+                {open && (
+                  <div
+                    style={{
+                      flex: 1,
+                      background: "var(--purple)",
+                      border: "2px solid var(--ink)",
+                      borderRadius: 14,
+                      padding: "20px 18px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 14,
+                      animation: "mzclue .45s cubic-bezier(.2,.7,.3,1) both",
+                    }}
+                  >
+                    <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal)" }}>CLUE</div>
+                    <p style={{ fontSize: 15.5, lineHeight: 1.55, color: "var(--paper)", margin: 0 }}>{card.clue}</p>
+                    <div style={{ borderTop: "1px dashed var(--muted-lilac)", paddingTop: 12, marginTop: "auto" }}>
+                      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal)", marginBottom: 6 }}>EXTRA CRUMBS</div>
+                      <p style={{ fontSize: 13.5, lineHeight: 1.5, color: "#F0E4FA", margin: 0 }}>{card.hint}</p>
+                    </div>
+                  </div>
+                )}
+
+                <button
+                  onClick={() => setPeeked((p) => ({ ...p, [card.id]: !p[card.id] }))}
+                  className="font-display mz-pop"
+                  style={{
+                    marginTop: 16,
+                    fontSize: 13,
+                    letterSpacing: "0.02em",
+                    color: "var(--ink)",
+                    background: "var(--teal)",
+                    border: "3px solid var(--ink)",
+                    borderRadius: 20,
+                    boxShadow: "5px 5px 0 var(--ink)",
+                    padding: "13px 14px",
+                    cursor: "pointer",
+                    width: "100%",
+                    ["--mz-shadow" as string]: "5px",
+                    ["--mz-lift" as string]: "1px",
+                  }}
+                >
+                  TAP TO PEEK
+                </button>
+                <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.16em", color: "var(--purple)", marginTop: 12, textAlign: "center" }}>
+                  {card.reveal}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section style={{ background: "var(--paper)", color: "var(--ink)", borderTop: "3px solid var(--ink)", borderBottom: "3px solid var(--ink)", padding: "56px 20px" }}>
+        <div style={{ maxWidth: 1180, margin: "0 auto" }}>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.24em", color: "var(--purple)" }}>ALREADY CONFIRMED</div>
+          <h2 className="font-display" style={{ fontSize: "clamp(24px, 3.6vw, 38px)", margin: "12px 0 26px" }}>THE REST OF THE STAGE</h2>
+          <div style={{ display: "grid", gap: 0, borderTop: "2px solid var(--ink)" }}>
+            {supportActs.map((act) => (
+              <div
+                key={act.name}
+                style={{ display: "grid", gridTemplateColumns: "90px minmax(0,1fr)", gap: 18, alignItems: "baseline", padding: "18px 4px", borderBottom: "2px solid var(--ink)" }}
+              >
+                <div className="font-display" style={{ fontSize: 15, color: "var(--purple)" }}>{act.when}</div>
+                <div>
+                  <div style={{ fontWeight: 700, fontSize: 19 }}>{act.name}</div>
+                  <div style={{ fontSize: 15, color: "#453063", marginTop: 3 }}>{act.note}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginTop: 30 }}>
+            <Link
+              href="/tickets"
+              className="mz-pop font-display"
+              style={{ fontSize: 15, color: "var(--ink)", background: "var(--teal)", border: "3px solid var(--ink)", borderRadius: 999, boxShadow: "6px 6px 0 var(--ink)", padding: "16px 28px", ["--mz-shadow" as string]: "6px" }}
+            >
+              GET A PASS BEFORE THE REVEAL
+            </Link>
+          </div>
+        </div>
+      </section>
+    </main>
+  );
+}
