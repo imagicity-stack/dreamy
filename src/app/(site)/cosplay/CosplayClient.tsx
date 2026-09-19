@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { openRazorpayCheckout } from "@/lib/razorpayClient";
+import { formatInr } from "@/data/fest";
+import type { FestSettings } from "@/lib/settings";
 
 const CATEGORIES = [
   { value: "Anime", label: "Anime & Manga" },
@@ -29,7 +31,7 @@ type Entry = {
   mode: "solo" | "team"; team: string; members: string;
 };
 
-export default function CosplayPage() {
+export default function CosplayClient({ settings }: { settings: FestSettings }) {
   const [entry, setEntry] = useState<Entry>({
     name: "", school: "", phone: "", character: "", category: "Anime", mode: "solo", team: "", members: "",
   });
@@ -110,8 +112,8 @@ export default function CosplayPage() {
           <h1 className="font-display" style={{ fontSize: "clamp(30px, 6vw, 60px)", lineHeight: 1.02, margin: "14px 0 16px" }}>COSPLAY CONTEST</h1>
           <p style={{ fontSize: 17, lineHeight: 1.6, maxWidth: "60ch", margin: 0 }}>
             Four categories. Solo or squad. A stage walk in front of the whole field at 2:30 PM, and &#8377;40,000
-            split across the winners. Registration is &#8377;400 an entry, solo or squad, and closes 14 November or
-            when 120 entries fill up.
+            split across the winners. Registration is {formatInr(settings.cosplayFee)} an entry, solo or squad, and
+            closes two weeks before gates open &mdash; or when 120 entries fill up, whichever lands first.
           </p>
         </div>
       </section>
@@ -210,7 +212,7 @@ export default function CosplayPage() {
                   )}
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", background: "var(--lilac)", border: "3px solid var(--ink)", borderRadius: 20, padding: "14px 17px" }}>
                     <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--purple)" }}>{entryLabel} FEE</div>
-                    <div className="font-display" style={{ fontSize: 24 }}>&#8377;400</div>
+                    <div className="font-display" style={{ fontSize: 24 }}>{formatInr(settings.cosplayFee)}</div>
                   </div>
                   <button
                     onClick={submitCos}
@@ -218,11 +220,11 @@ export default function CosplayPage() {
                     className="font-display mz-pop"
                     style={{ fontSize: 15, color: "var(--lilac)", background: "var(--purple)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "6px 6px 0 var(--ink)", padding: "16px 18px", cursor: canSubmit ? "pointer" : "not-allowed", width: "100%", opacity: canSubmit ? 1 : 0.6, ["--mz-shadow" as string]: "6px" }}
                   >
-                    {status === "processing" ? "OPENING PAYMENT…" : "PAY ₹400 · PUT ME IN THE ARENA"}
+                    {status === "processing" ? "OPENING PAYMENT…" : `PAY ${formatInr(settings.cosplayFee)} · PUT ME IN THE ARENA`}
                   </button>
                   {status === "error" && <div style={{ fontSize: 13, color: "var(--crimson)" }}>{error}</div>}
                   <div style={{ fontSize: 10.5, lineHeight: 1.6, letterSpacing: "0.06em", color: "#7D63A8" }}>
-                    &#8377;400 PER ENTRY &middot; A FETE OR CONCERT PASS IS STILL NEEDED &middot; PROPS UNDER 1.2M
+                    {formatInr(settings.cosplayFee)} PER ENTRY &middot; A FETE OR CONCERT PASS IS STILL NEEDED &middot; PROPS UNDER 1.2M
                     &middot; NOTHING SHARP, NOTHING THAT FIRES
                   </div>
                 </div>
@@ -236,8 +238,8 @@ export default function CosplayPage() {
                   science block; stage walk starts at 2:30. We&apos;ll message the exact slot the week before.
                 </p>
                 <div style={{ background: "var(--purple)", color: "var(--lilac)", border: "3px solid var(--ink)", borderRadius: 20, padding: "15px 16px", fontSize: 14.5, lineHeight: 1.55, marginBottom: 12 }}>
-                  <strong style={{ color: "var(--teal)" }}>&#8377;400 entry fee received.</strong> Your slot is held; the
-                  fee is non-refundable but transferable to another entrant until 14 November.
+                  <strong style={{ color: "var(--teal)" }}>{formatInr(settings.cosplayFee)} entry fee received.</strong> Your
+                  slot is held; the fee is non-refundable but transferable to another entrant until entries close.
                 </div>
                 <div style={{ background: "var(--paper)", border: "3px solid var(--ink)", borderRadius: 20, padding: 16, fontSize: 14.5, lineHeight: 1.55 }}>
                   Bring a repair kit. Every year somebody&apos;s armour gives up in the queue and the Art Club runs

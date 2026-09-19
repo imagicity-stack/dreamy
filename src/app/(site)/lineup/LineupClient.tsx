@@ -3,9 +3,10 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { FEST, lineup, supportActs } from "@/data/fest";
+import { lineup, supportActs } from "@/data/fest";
+import type { FestSettings } from "@/lib/settings";
 
-export default function LineupPage() {
+export default function LineupClient({ settings }: { settings: FestSettings }) {
   const [peeked, setPeeked] = useState<Record<string, boolean>>({});
 
   return (
@@ -45,7 +46,7 @@ export default function LineupPage() {
       <section style={{ background: "var(--bg)", padding: "56px 20px 64px" }}>
         <div style={{ maxWidth: 1180, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(290px, 1fr))", gap: 22 }}>
           {lineup.map((card) => {
-            const open = FEST.lineupUnlocked || !!peeked[card.id];
+            const open = settings.lineupUnlocked || !!peeked[card.id];
             return (
               <div
                 key={card.id}

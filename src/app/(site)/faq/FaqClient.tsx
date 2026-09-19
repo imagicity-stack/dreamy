@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { faqs } from "@/data/fest";
 
-export default function FaqPage() {
+
+export default function FaqClient({ faqs }: { faqs: { q: string; a: string }[] }) {
   const [open, setOpen] = useState<number | null>(null);
 
   return (

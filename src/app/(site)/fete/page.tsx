@@ -60,7 +60,7 @@ export default function FetePage() {
               <h3 className="font-display" style={{ fontSize: 21, margin: "0 0 10px", color: "var(--teal)" }}>WANT A STALL?</h3>
               <p style={{ fontSize: 15, lineHeight: 1.55, color: "#F0E4FA", margin: 0 }}>
                 Clubs, classes and outside vendors can still apply. Fifteen slots left, and the council reviews
-                applications every Friday until 10 November.
+                applications every Friday until the stall list closes, three weeks before gates.
               </p>
             </div>
             <Link

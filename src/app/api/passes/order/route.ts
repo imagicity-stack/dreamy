@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getRazorpay } from "@/lib/razorpay";
-import { FEST } from "@/data/fest";
+import { getSettings } from "@/lib/settings";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -9,7 +11,9 @@ export async function POST(req: NextRequest) {
   if (!Number.isInteger(qty) || qty < 1 || qty > 10) {
     return NextResponse.json({ error: "Invalid quantity" }, { status: 400 });
   }
-  if (FEST.soldOut) {
+
+  const settings = await getSettings();
+  if (settings.soldOut) {
     return NextResponse.json({ error: "Sold out" }, { status: 409 });
   }
 
@@ -18,7 +22,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Payments are not configured yet" }, { status: 503 });
   }
 
-  const amount = qty * FEST.fetePrice * 100;
+  // The price always comes from the server's settings, never from the request.
+  const amount = qty * settings.fetePrice * 100;
   const order = await razorpay.orders.create({
     amount,
     currency: "INR",

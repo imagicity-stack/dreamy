@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/firebaseAdmin";
-import { merchItems } from "@/data/fest";
+import { getSettings, merchWithPrices } from "@/lib/settings";
 import { FieldValue } from "firebase-admin/firestore";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -11,9 +13,12 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
+  // Prices come from the server's settings; the cart only names items.
+  const catalogue = merchWithPrices(await getSettings());
+
   const lines = Object.entries(cart)
-    .map(([id, qty]) => ({ item: merchItems.find((m) => m.id === id), qty: Number(qty) }))
-    .filter((l): l is { item: (typeof merchItems)[number]; qty: number } => !!l.item && l.qty > 0);
+    .map(([id, qty]) => ({ item: catalogue.find((m) => m.id === id), qty: Number(qty) }))
+    .filter((l): l is { item: (typeof catalogue)[number]; qty: number } => !!l.item && l.qty > 0);
 
   if (lines.length === 0) {
     return NextResponse.json({ error: "Empty cart" }, { status: 400 });
