@@ -1,6 +1,7 @@
-import { cert, getApps, initializeApp } from "firebase-admin/app";
+import { cert, getApps, initializeApp, type App } from "firebase-admin/app";
 import { getFirestore, type Firestore } from "firebase-admin/firestore";
 
+let app: App | null = null;
 let db: Firestore | null = null;
 
 /**
@@ -9,8 +10,8 @@ let db: Firestore | null = null;
  * Firebase yet, so routes can degrade to "not configured" responses
  * rather than crashing the whole request.
  */
-export function getDb(): Firestore | null {
-  if (db) return db;
+export function getAdminApp(): App | null {
+  if (app) return app;
 
   const projectId = process.env.FIREBASE_PROJECT_ID;
   const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
@@ -18,12 +19,19 @@ export function getDb(): Firestore | null {
 
   if (!projectId || !clientEmail || !privateKey) return null;
 
-  const app =
+  app =
     getApps()[0] ??
     initializeApp({
       credential: cert({ projectId, clientEmail, privateKey }),
     });
 
-  db = getFirestore(app);
+  return app;
+}
+
+export function getDb(): Firestore | null {
+  if (db) return db;
+  const adminApp = getAdminApp();
+  if (!adminApp) return null;
+  db = getFirestore(adminApp);
   return db;
 }

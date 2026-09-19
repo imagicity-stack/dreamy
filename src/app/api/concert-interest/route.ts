@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/firebaseAdmin";
-import { FEST } from "@/data/fest";
+import { getSettings } from "@/lib/settings";
 import { FieldValue } from "firebase-admin/firestore";
+
+export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
@@ -15,14 +17,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
+  const settings = await getSettings();
   const db = getDb();
-  let queueNumber = FEST.interestBase + 1;
+  let queueNumber = settings.interestBase + 1;
 
   if (db) {
     const counterRef = db.collection("counters").doc("concertInterest");
     queueNumber = await db.runTransaction(async (tx) => {
       const snap = await tx.get(counterRef);
-      const current = snap.exists ? Number(snap.data()?.count ?? FEST.interestBase) : FEST.interestBase;
+      const current = snap.exists ? Number(snap.data()?.count ?? settings.interestBase) : settings.interestBase;
       const next = current + 1;
       tx.set(counterRef, { count: next }, { merge: true });
       return next;

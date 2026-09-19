@@ -1,5 +1,10 @@
 import Image from "next/image";
 import Link from "next/link";
+import { DATE_REVEAL, formatInr } from "@/data/fest";
+import { getSettings } from "@/lib/settings";
+import { SealedDateTiles } from "@/components/SealedDate";
+
+export const dynamic = "force-dynamic";
 
 const STATS = [
   { value: "40+", note: "stalls, booths and questionable games", bg: "var(--purple)", fg: "var(--lilac)", accent: "var(--teal)", rotate: "-1.4deg" },
@@ -8,15 +13,20 @@ const STATS = [
   { value: "3", note: "names still locked in the vault", bg: "var(--bg)", fg: "var(--lilac)", accent: "var(--teal)", rotate: "-0.9deg" },
 ];
 
-const CHAOS_CARDS = [
-  { href: "/lineup", kicker: "01 / STAGE", kickerColor: "var(--teal)", title: "THE REVEAL", body: "Three locked cards. Cryptic clues. Tap if your nerves can take it.", bg: "var(--purple)", fg: "var(--lilac)" },
-  { href: "/cosplay", kicker: "02 / ARENA", kickerColor: "var(--purple)", title: "COSPLAY CONTEST", body: "Four categories, ₹400 to enter, ₹40,000 on the line. Foam swords allowed.", bg: "var(--teal)", fg: "var(--ink)" },
-  { href: "/fete", kicker: "03 / GROUNDS", kickerColor: "var(--purple)", title: "FETE & CARNIVAL", body: "Ring toss, momo alley, a haunted staff room. Everything runs on coins.", bg: "var(--lilac)", fg: "var(--ink)" },
-  { href: "/merch", kicker: "04 / SHOP", kickerColor: "#1C0540", title: "MERCH DROP", body: "Tees, totes, enamel pins. Pre-order now, collect at the gate.", bg: "var(--violet-text)", fg: "var(--ink)" },
-  { href: "/concert", kicker: "05 / CONCERT", kickerColor: "var(--teal)", title: "GUESS WHO", body: "One silhouette, no name, no price. Tell us who you want and we'll tell you when.", bg: "var(--near-black)", fg: "var(--lilac)", titleColor: "var(--teal)", border: "3px solid var(--teal)" },
-];
+function chaosCards(cosplayFee: number) {
+  return [
+    { href: "/lineup", kicker: "01 / STAGE", kickerColor: "var(--teal)", title: "THE REVEAL", body: "Three locked cards. Cryptic clues. Tap if your nerves can take it.", bg: "var(--purple)", fg: "var(--lilac)" },
+    { href: "/cosplay", kicker: "02 / ARENA", kickerColor: "var(--purple)", title: "COSPLAY CONTEST", body: `Four categories, ${formatInr(cosplayFee)} to enter, ₹40,000 on the line. Foam swords allowed.`, bg: "var(--teal)", fg: "var(--ink)" },
+    { href: "/fete", kicker: "03 / GROUNDS", kickerColor: "var(--purple)", title: "FETE & CARNIVAL", body: "Ring toss, momo alley, a haunted staff room. Everything runs on coins.", bg: "var(--lilac)", fg: "var(--ink)" },
+    { href: "/merch", kicker: "04 / SHOP", kickerColor: "#1C0540", title: "MERCH DROP", body: "Tees, totes, enamel pins. Pre-order now, collect at the gate.", bg: "var(--violet-text)", fg: "var(--ink)" },
+    { href: "/concert", kicker: "05 / CONCERT", kickerColor: "var(--teal)", title: "GUESS WHO", body: "One silhouette, no name, no price. Tell us who you want and we'll tell you when.", bg: "var(--near-black)", fg: "var(--lilac)", titleColor: "var(--teal)", border: "3px solid var(--teal)" },
+  ];
+}
 
-export default function HomePage() {
+export default async function HomePage() {
+  const settings = await getSettings();
+  const CHAOS_CARDS = chaosCards(settings.cosplayFee);
+
   return (
     <main>
       <section style={{ position: "relative", padding: "64px 20px 76px", background: "var(--bg)", overflow: "hidden" }}>
@@ -148,27 +158,23 @@ export default function HomePage() {
           >
             <div style={{ padding: "24px 26px 26px", containerType: "inline-size" }}>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>IT ALL HAPPENS IN</div>
-              <div className="font-display" style={{ fontSize: "clamp(30px, 15cqw, 56px)", lineHeight: 0.94, marginTop: 8 }}>NOVEMBER</div>
-              <div className="font-display" style={{ fontSize: "clamp(22px, 3.4vw, 30px)", color: "var(--crimson)", lineHeight: 1, marginTop: 4 }}>2026</div>
+              <div className="font-display" style={{ fontSize: "clamp(30px, 15cqw, 56px)", lineHeight: 0.94, marginTop: 8 }}>{DATE_REVEAL.year}</div>
+              <div className="font-display" style={{ fontSize: "clamp(18px, 2.8vw, 26px)", color: "var(--crimson)", lineHeight: 1.05, marginTop: 6 }}>
+                ON A DAY WE<br />REFUSE TO NAME
+              </div>
+              <div style={{ fontSize: 12.5, lineHeight: 1.5, color: "var(--purple)", marginTop: 10, maxWidth: "26ch" }}>
+                Yet. The council has picked it. The council is sitting on it.
+              </div>
             </div>
             <div style={{ background: "var(--purple)", color: "var(--lilac)", padding: "24px 26px 26px", display: "flex", flexDirection: "column", gap: 12, justifyContent: "center", borderLeft: "3px solid var(--ink)" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal)" }}>THE EXACT DATE</div>
-              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                <div className="font-display" style={{ background: "var(--ink)", color: "var(--teal)", border: "2px solid var(--teal)", borderRadius: 12, padding: "8px 14px", fontSize: 22, animation: "mzpulse 1.6s ease-in-out infinite" }}>
-                  ??
-                </div>
-                <div className="font-display" style={{ fontSize: 22, color: "var(--violet-text)" }}>&middot;</div>
-                <div className="font-display" style={{ background: "var(--lilac)", color: "var(--ink)", border: "2px solid var(--ink)", borderRadius: 12, padding: "8px 14px", fontSize: 22 }}>
-                  11
-                </div>
-                <div className="font-display" style={{ fontSize: 22, color: "var(--violet-text)" }}>&middot;</div>
-                <div className="font-display" style={{ background: "var(--lilac)", color: "var(--ink)", border: "2px solid var(--ink)", borderRadius: 12, padding: "8px 14px", fontSize: 22 }}>
-                  26
-                </div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal)" }}>{DATE_REVEAL.kicker}</div>
+              <SealedDateTiles />
+              <div style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.16em", color: "var(--teal)" }}>
+                <span style={{ animation: "mzflick 3.4s linear infinite" }}>&#9679;</span>
+                DAY AND MONTH SEALED
               </div>
               <div style={{ fontSize: 14.5, lineHeight: 1.5, color: "var(--lilac-text)" }}>
-                Sealed until the guests are out. The day drops with the final reveal &mdash; and passes open the same
-                hour.
+                {DATE_REVEAL.line}
               </div>
             </div>
           </div>

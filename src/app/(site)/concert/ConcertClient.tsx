@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { FEST } from "@/data/fest";
+import type { FestSettings } from "@/lib/settings";
 
 const SEAT_LABELS: Record<string, string> = {
   "1": "1 seat",
@@ -13,8 +13,8 @@ const SEAT_LABELS: Record<string, string> = {
 
 type Ticket = { name: string; no: string; pick: string; guess: string; seats: string };
 
-export default function ConcertPage() {
-  const [interestCount, setInterestCount] = useState(FEST.interestBase.toLocaleString("en-IN"));
+export default function ConcertClient({ settings }: { settings: FestSettings }) {
+  const [interestCount, setInterestCount] = useState(settings.interestBase.toLocaleString("en-IN"));
   const [form, setForm] = useState({ name: "", contact: "", pick: "", guess: "", seats: "1" });
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [status, setStatus] = useState<"idle" | "submitting" | "error">("idle");
@@ -132,8 +132,8 @@ export default function ConcertPage() {
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 14, fontSize: 15.5, lineHeight: 1.5, color: "#F0E4FA" }}>
                   <div style={{ display: "flex", gap: 11 }}><span style={{ color: "var(--teal)", fontWeight: 700 }}>&#9733;</span><span>Main stage, 4:30 PM, running to the 6:00 PM encore</span></div>
                   <div style={{ display: "flex", gap: 11 }}><span style={{ color: "var(--teal)", fontWeight: 700 }}>&#9733;</span><span>A national touring act, playing a full live set</span></div>
-                  <div style={{ display: "flex", gap: 11 }}><span style={{ color: "var(--teal)", fontWeight: 700 }}>&#9733;</span><span>{FEST.concertCapacity.toLocaleString("en-IN")} seats on the field, front-of-stage pit included</span></div>
-                  <div style={{ display: "flex", gap: 11 }}><span style={{ color: "var(--teal)", fontWeight: 700 }}>&#9733;</span><span>Sometime in November &mdash; the day drops with the name</span></div>
+                  <div style={{ display: "flex", gap: 11 }}><span style={{ color: "var(--teal)", fontWeight: 700 }}>&#9733;</span><span>{settings.concertCapacity.toLocaleString("en-IN")} seats on the field, front-of-stage pit included</span></div>
+                  <div style={{ display: "flex", gap: 11 }}><span style={{ color: "var(--teal)", fontWeight: 700 }}>&#9733;</span><span>A date still under seal &mdash; the day drops with the name</span></div>
                 </div>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 14 }}>
@@ -162,7 +162,7 @@ export default function ConcertPage() {
               <h2 className="font-display" style={{ fontSize: "clamp(24px, 4vw, 38px)", lineHeight: 1.04, margin: "10px 0 10px" }}>PUT YOUR NAME DOWN</h2>
               <p style={{ fontSize: 16, lineHeight: 1.6, margin: "0 0 24px", maxWidth: "54ch" }}>
                 The interest list gets the name, the date and the price one hour before the rest of Hazaribagh, and a
-                48-hour window on the {FEST.concertCapacity.toLocaleString("en-IN")} seats. Tell us who you&apos;re
+                48-hour window on the {settings.concertCapacity.toLocaleString("en-IN")} seats. Tell us who you&apos;re
                 hoping for while you&apos;re here &mdash; the council reads every single one.
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 16 }}>
@@ -262,7 +262,8 @@ export default function ConcertPage() {
             <div style={{ background: "var(--lilac)", color: "var(--ink)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "7px 7px 0 var(--ink)", padding: "22px 20px" }}>
               <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>WHEN IT DROPS</div>
               <p style={{ fontSize: 14.5, lineHeight: 1.55, margin: "11px 0 0" }}>
-                With the final lineup reveal in November. Name, price, date and the pass sale all in the same hour.
+                With the final lineup reveal. Name, price, date and the pass sale all in the same hour &mdash; which
+                is also the hour the rest of Hazaribagh finds out what day to keep free.
               </p>
             </div>
             <div style={{ background: "var(--paper)", color: "var(--ink)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "7px 7px 0 var(--ink)", padding: "22px 20px" }}>

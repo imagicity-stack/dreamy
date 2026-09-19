@@ -1,13 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
+import { DATE_REVEAL, formatInr } from "@/data/fest";
+import type { FestSettings } from "@/lib/settings";
 
-const TICKER_ITEMS = [
-  "NOVEMBER 2026 · DATE DROPS SOON",
-  "THE ELDEN HEIGHTS SCHOOL, HAZARIBAGH",
-  "MUSIC · MOMENTS · MEMORIES",
-  "ONE DAY. ZERO CHILL.",
-  "FETE PASS ₹499 · CONCERT PASS SEALED",
-];
+function tickerItems(settings: FestSettings): string[] {
+  return [
+    DATE_REVEAL.ticker,
+    "THE ELDEN HEIGHTS SCHOOL, HAZARIBAGH",
+    "MUSIC · MOMENTS · MEMORIES",
+    "ONE DAY. ZERO CHILL.",
+    `FETE PASS ${formatInr(settings.fetePrice)} · CONCERT PASS SEALED`,
+  ];
+}
 
 const NAV_LINKS = [
   { href: "/lineup", label: "LINEUP" },
@@ -20,8 +24,9 @@ const NAV_LINKS = [
   { href: "/faq", label: "FAQ + VENUE" },
 ];
 
-function Ticker() {
-  const items = [...TICKER_ITEMS, ...TICKER_ITEMS];
+function Ticker({ settings }: { settings: FestSettings }) {
+  const base = tickerItems(settings);
+  const items = [...base, ...base];
   return (
     <div
       style={{
@@ -55,7 +60,7 @@ function Ticker() {
   );
 }
 
-export default function Header() {
+export default function Header({ settings }: { settings: FestSettings }) {
   return (
     <header
       style={{
@@ -66,7 +71,7 @@ export default function Header() {
         borderBottom: "3px solid var(--ink)",
       }}
     >
-      <Ticker />
+      <Ticker settings={settings} />
       <nav
         style={{
           maxWidth: 1180,

@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { FEST, formatInr } from "@/data/fest";
+import { DATE_REVEAL, formatInr } from "@/data/fest";
+import { SealedDateStamp, SealedDateTiles } from "@/components/SealedDate";
+import type { FestSettings } from "@/lib/settings";
 import { openRazorpayCheckout } from "@/lib/razorpayClient";
 
 type PassResult = {
@@ -12,15 +14,15 @@ type PassResult = {
   totalLabel: string;
 };
 
-export default function TicketsPage() {
+export default function TicketsClient({ settings }: { settings: FestSettings }) {
   const [qty, setQty] = useState(1);
   const [buyer, setBuyer] = useState({ name: "", school: "", phone: "" });
   const [pass, setPass] = useState<PassResult | null>(null);
   const [status, setStatus] = useState<"idle" | "processing" | "error">("idle");
   const [error, setError] = useState("");
 
-  const total = qty * FEST.fetePrice;
-  const canBuy = buyer.name.trim().length > 1 && buyer.phone.trim().length >= 10 && !FEST.soldOut;
+  const total = qty * settings.fetePrice;
+  const canBuy = buyer.name.trim().length > 1 && buyer.phone.trim().length >= 10 && !settings.soldOut;
 
   async function buyPass() {
     if (!canBuy) return;
@@ -91,6 +93,15 @@ export default function TicketsPage() {
             it&apos;s live now. The concert is a ticketed show of its own: the singer and the price are both still
             sealed.
           </p>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", marginTop: 24 }}>
+            <SealedDateStamp />
+            <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+              <SealedDateTiles size="sm" />
+              <span style={{ fontSize: 12.5, lineHeight: 1.5, color: "var(--muted-lilac)", maxWidth: "34ch" }}>
+                Your pass works whatever day it lands on. Gates 9:00 AM either way.
+              </span>
+            </div>
+          </div>
         </div>
       </section>
 
@@ -100,7 +111,7 @@ export default function TicketsPage() {
             <div style={{ background: "var(--paper)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "12px 12px 0 var(--ink)", overflow: "hidden" }}>
               <div style={{ background: "var(--purple)", color: "var(--lilac)", padding: "20px 26px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", borderBottom: "3px solid var(--ink)" }}>
                 <div className="font-display" style={{ fontSize: 20, color: "var(--teal)" }}>YOU&apos;RE IN</div>
-                <div style={{ fontSize: 11, letterSpacing: "0.18em" }}>NOVEMBER 2026 &middot; GATES 9:00 AM</div>
+                <div style={{ fontSize: 11, letterSpacing: "0.18em" }}>{DATE_REVEAL.short} &middot; GATES 9:00 AM</div>
               </div>
               <div style={{ padding: 26, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 22 }}>
                 <div>
@@ -156,7 +167,7 @@ export default function TicketsPage() {
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 14, flexWrap: "wrap" }}>
                   <div>
                     <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>FETE PASS &middot; DAYTIME</div>
-                    <div className="font-display" style={{ fontSize: "clamp(30px, 5vw, 44px)", lineHeight: 1, marginTop: 8 }}>{formatInr(FEST.fetePrice)}</div>
+                    <div className="font-display" style={{ fontSize: "clamp(30px, 5vw, 44px)", lineHeight: 1, marginTop: 8 }}>{formatInr(settings.fetePrice)}</div>
                   </div>
                   <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", color: "var(--ink)", border: "3px solid var(--ink)", borderRadius: 20, padding: "8px 12px", background: "var(--paper)" }}>
                     ON SALE NOW
@@ -196,7 +207,7 @@ export default function TicketsPage() {
                       <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.14em", color: "var(--ink)", border: "3px solid var(--ink)", borderRadius: 20, padding: "8px 12px", background: "var(--teal)" }}>
                         GUESS WHO &rarr;
                       </div>
-                      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--pink)", textAlign: "right" }}>{FEST.concertCapacity.toLocaleString("en-IN")} SEATS ONLY</div>
+                      <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.12em", color: "var(--pink)", textAlign: "right" }}>{settings.concertCapacity.toLocaleString("en-IN")} SEATS ONLY</div>
                     </div>
                   </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 9, margin: "20px 0 0", fontSize: 15, lineHeight: 1.5, color: "#F0E4FA" }}>
@@ -224,7 +235,7 @@ export default function TicketsPage() {
                   <label style={{ display: "block", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--lilac)", marginBottom: 7 }}>YOUR PASS</label>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", background: "var(--teal)", color: "var(--ink)", border: "3px solid var(--ink)", borderRadius: 20, padding: "15px 17px" }}>
                     <div className="font-display" style={{ fontSize: 15 }}>FETE PASS</div>
-                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.12em" }}>{formatInr(FEST.fetePrice)} EACH</div>
+                    <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.12em" }}>{formatInr(settings.fetePrice)} EACH</div>
                   </div>
                   <div style={{ fontSize: 10.5, lineHeight: 1.7, letterSpacing: "0.08em", color: "#DCC9F2", marginTop: 9 }}>
                     CONCERT PASSES OPEN WITH THE REVEAL &mdash; <Link href="/concert" style={{ color: "var(--teal)" }}>REGISTER YOUR INTEREST</Link>
@@ -284,7 +295,7 @@ export default function TicketsPage() {
                   />
                 </div>
 
-                {!FEST.soldOut ? (
+                {!settings.soldOut ? (
                   <button
                     onClick={buyPass}
                     disabled={!canBuy || status === "processing"}

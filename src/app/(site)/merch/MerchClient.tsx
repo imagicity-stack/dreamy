@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { merchItems, formatInr } from "@/data/fest";
+import { formatInr, type MerchItem } from "@/data/fest";
 
-export default function MerchPage() {
+export default function MerchClient({ merchItems }: { merchItems: MerchItem[] }) {
   const [cart, setCart] = useState<Record<string, number>>({});
   const [done, setDone] = useState(false);
   const [placing, setPlacing] = useState(false);

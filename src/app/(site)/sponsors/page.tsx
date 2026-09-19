@@ -53,7 +53,7 @@ const TIERS = [
       "Sound, lights, printing, water, transport, prizes",
       "Food and retail vendors — stall fee, no sponsorship",
       "Credit on the sponsor wall and in the programme",
-      "Setup deadline 10 November",
+      "Setup closes three weeks before gates",
     ],
   },
 ];
