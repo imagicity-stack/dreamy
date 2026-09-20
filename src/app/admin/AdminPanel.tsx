@@ -4,15 +4,17 @@ import { useState } from "react";
 import OverviewTab from "./OverviewTab";
 import SettingsTab from "./SettingsTab";
 import ContentTab from "./ContentTab";
+import WordsTab from "./WordsTab";
 import RecordsTab from "./RecordsTab";
 import * as ui from "./adminUi";
 
-type TabKey = "overview" | "settings" | "content" | "data";
+type TabKey = "overview" | "settings" | "content" | "words" | "data";
 
 const TABS: { key: TabKey; label: string; blurb: string }[] = [
   { key: "overview", label: "OVERVIEW", blurb: "How the fest is selling." },
   { key: "settings", label: "SETTINGS", blurb: "Prices, the date, the countdown and which pages are live." },
   { key: "content", label: "CONTENT", blurb: "Artists, photos, merch, stalls and the FAQ." },
+  { key: "words", label: "WORDS", blurb: "The headings and paragraphs on each page." },
   { key: "data", label: "SIGN-UPS", blurb: "Everyone who has bought, entered or registered." },
 ];
 
@@ -23,10 +25,12 @@ const TABS: { key: TabKey; label: string; blurb: string }[] = [
 export default function AdminPanel({
   collections,
   pages,
+  copyGroups,
   mediaReady,
 }: {
   collections: { key: string; title: string }[];
   pages: { key: string; label: string }[];
+  copyGroups: { key: string; title: string }[];
   mediaReady: boolean;
 }) {
   const [tab, setTab] = useState<TabKey>("overview");
@@ -55,6 +59,7 @@ export default function AdminPanel({
       {tab === "overview" && <OverviewTab />}
       {tab === "settings" && <SettingsTab pages={pages} />}
       {tab === "content" && <ContentTab collections={collections} mediaReady={mediaReady} />}
+      {tab === "words" && <WordsTab groups={copyGroups} />}
       {tab === "data" && <RecordsTab />}
     </>
   );

@@ -12,7 +12,15 @@ export type MerchRecord = {
   image: { path: string; url: string } | null;
 };
 
-export default function MerchClient({ merchItems }: { merchItems: MerchRecord[] }) {
+export default function MerchClient({
+  merchItems,
+  open,
+  closedNote,
+}: {
+  merchItems: MerchRecord[];
+  open: boolean;
+  closedNote: string;
+}) {
   const [cart, setCart] = useState<Record<string, number>>({});
   const [done, setDone] = useState(false);
   const [placing, setPlacing] = useState(false);
@@ -167,14 +175,20 @@ export default function MerchClient({ merchItems }: { merchItems: MerchRecord[] 
                   <span style={{ fontSize: 11, letterSpacing: "0.16em", color: "var(--muted-lilac)" }}>TOTAL</span>
                   <span className="font-display" style={{ fontSize: 24, color: "var(--teal)" }}>{formatInr(cartTotal)}</span>
                 </div>
-                <button
-                  onClick={placeMerch}
-                  disabled={placing}
-                  className="font-display mz-pop"
-                  style={{ fontSize: 14, color: "var(--ink)", background: "var(--teal)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "5px 5px 0 var(--ink)", padding: "15px 16px", cursor: "pointer", width: "100%", ["--mz-shadow" as string]: "5px" }}
-                >
-                  {placing ? "PLACING…" : "PLACE PRE-ORDER"}
-                </button>
+                {open ? (
+                  <button
+                    onClick={placeMerch}
+                    disabled={placing}
+                    className="font-display mz-pop"
+                    style={{ fontSize: 14, color: "var(--ink)", background: "var(--teal)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "5px 5px 0 var(--ink)", padding: "15px 16px", cursor: "pointer", width: "100%", ["--mz-shadow" as string]: "5px" }}
+                  >
+                    {placing ? "PLACING…" : "PLACE PRE-ORDER"}
+                  </button>
+                ) : (
+                  <div style={{ background: "var(--crimson)", color: "var(--lilac)", border: "3px solid var(--ink)", borderRadius: 20, padding: "14px 16px", fontSize: 13.5, lineHeight: 1.5 }}>
+                    {closedNote}
+                  </div>
+                )}
                 {error && <div style={{ fontSize: 12, color: "var(--pink)", marginTop: 10 }}>{error}</div>}
               </>
             )}

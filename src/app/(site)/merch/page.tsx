@@ -17,5 +17,5 @@ export default async function MerchPage() {
     image: (r.image as MerchRecord["image"]) ?? null,
   }));
 
-  return <MerchClient merchItems={items} />;
+  return <MerchClient merchItems={items} open={settings.merchOpen} closedNote={settings.merchClosedNote} />;
 }

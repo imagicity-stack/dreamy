@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { adminGate } from "@/lib/adminAuth";
 import { CONTENT } from "@/lib/content";
+import { COPY_GROUPS } from "@/lib/copyText";
 import { mediaConfigured } from "@/lib/media";
 import { PAGES } from "@/lib/settings";
 import AdminPanel from "./AdminPanel";
@@ -68,6 +69,7 @@ export default async function AdminPage() {
       <AdminPanel
         collections={CONTENT.map((c) => ({ key: c.key, title: c.title }))}
         pages={PAGES.map((p) => ({ key: p.key, label: p.label }))}
+        copyGroups={COPY_GROUPS.map((g) => ({ key: g.key, title: g.title }))}
         mediaReady={mediaConfigured()}
       />
     </Shell>

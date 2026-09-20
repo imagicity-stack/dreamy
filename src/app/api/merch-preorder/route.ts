@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/firebaseAdmin";
 import { publicContent } from "@/lib/content";
+import { getSettings, isPageHidden } from "@/lib/settings";
 import { FieldValue } from "firebase-admin/firestore";
 
 export const dynamic = "force-dynamic";
@@ -11,6 +12,12 @@ export async function POST(req: NextRequest) {
 
   if (!cart || typeof cart !== "object") {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
+  }
+
+  // The shop being shut is decided here, not by whether the page drew a button.
+  const settings = await getSettings();
+  if (!settings.merchOpen || isPageHidden(settings, "merch")) {
+    return NextResponse.json({ error: "Pre-orders are closed." }, { status: 403 });
   }
 
   // Prices come from the merch records on the server; the cart only names items.

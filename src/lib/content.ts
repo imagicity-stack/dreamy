@@ -2,8 +2,9 @@ import { cache } from "react";
 import { FieldValue } from "firebase-admin/firestore";
 import { getDb } from "./firebaseAdmin";
 import { deleteMedia } from "./media";
-import { lineup, supportActs, merchItems, stalls, formatInr } from "@/data/fest";
-import type { FestSettings } from "./festSettings";
+import { lineup, supportActs, merchItems, stalls } from "@/data/fest";
+
+export { applyTokens } from "./festSettings";
 
 /**
  * Editable content collections.
@@ -340,6 +341,133 @@ export const CONTENT: ContentCollectionDef[] = [
     ],
   },
   {
+    key: "chaosCards",
+    title: "Home doors",
+    itemNoun: "door",
+    blurb: "The cards under “PICK YOUR CHAOS”. A card whose page is hidden drops out on its own.",
+    labelField: "title",
+    imageFolder: "home",
+    fields: [
+      { name: "title", label: "Card title", type: "text" },
+      { name: "pageKey", label: "Opens", type: "text", hint: "lineup, concert, cosplay, fete, merch, gallery, sponsors, faq or tickets." },
+      { name: "kicker", label: "Corner label", type: "text", hint: "01 / STAGE" },
+      { name: "body", label: "The pitch", type: "longtext", hint: "{fete}, {cosplay}, {seats} and {date} are replaced with the live values." },
+    ],
+    seed: [
+      { title: "THE REVEAL", pageKey: "lineup", kicker: "01 / STAGE", body: "Three locked cards. Cryptic clues. Tap if your nerves can take it." },
+      { title: "COSPLAY CONTEST", pageKey: "cosplay", kicker: "02 / ARENA", body: "Four categories, {cosplay} to enter, \u20B940,000 on the line. Foam swords allowed." },
+      { title: "FETE & CARNIVAL", pageKey: "fete", kicker: "03 / GROUNDS", body: "Ring toss, momo alley, a haunted staff room. Everything runs on coins." },
+      { title: "MERCH DROP", pageKey: "merch", kicker: "04 / SHOP", body: "Tees, totes, enamel pins. Pre-order now, collect at the gate." },
+      { title: "GUESS WHO", pageKey: "concert", kicker: "05 / CONCERT", body: "One silhouette, no name, no price. Tell us who you want and we'll tell you when." },
+    ],
+  },
+  {
+    key: "coinFacts",
+    title: "Coin rules",
+    itemNoun: "rule",
+    blurb: "The band of coin facts on the fete page.",
+    labelField: "title",
+    imageFolder: "fete",
+    fields: [
+      { name: "title", label: "The headline", type: "text", hint: "\u20B910 = 1 COIN" },
+      { name: "note", label: "The explanation", type: "longtext" },
+    ],
+    seed: [
+      { title: "\u20B910 = 1 COIN", note: "Two coin counters by the main arch. Cards and UPI accepted there." },
+      { title: "5 FREE", note: "Every pass, fete or concert, starts with five coins loaded." },
+      { title: "REFUND TILL 5", note: "Unspent coins go back to cash until 5:00 PM. After that they're souvenirs." },
+      { title: "NO CASH", note: "If a stall asks for money, it isn't one of ours. Tell a volunteer." },
+    ],
+  },
+  {
+    key: "concertPoints",
+    title: "Concert promises",
+    itemNoun: "promise",
+    blurb: "The starred lines under “WHAT WE WILL CONFIRM”.",
+    labelField: "text",
+    imageFolder: "concert",
+    fields: [
+      { name: "text", label: "The line", type: "text", hint: "{seats} and {date} are replaced with the live values." },
+    ],
+    seed: [
+      { text: "Main stage, 4:30 PM, running to the 6:00 PM encore" },
+      { text: "A national touring act, playing a full live set" },
+      { text: "{seats} seats on the field, front-of-stage pit included" },
+      { text: "{date} \u2014 gates 9:00 AM" },
+    ],
+  },
+  {
+    key: "concertInfo",
+    title: "Concert notes",
+    itemNoun: "note",
+    blurb: "The three cards below the interest-list sign-up.",
+    labelField: "title",
+    imageFolder: "concert",
+    fields: [
+      { name: "title", label: "Card label", type: "text" },
+      { name: "body", label: "The note", type: "longtext" },
+    ],
+    seed: [
+      { title: "WHY THE SECRECY", body: "Contracts. The act is booked, the paperwork is not, and the council would rather say nothing than say it twice." },
+      { title: "WHEN IT DROPS", body: "With the final lineup reveal. Name, price, date and the pass sale all in the same hour \u2014 which is also the hour the rest of Hazaribagh finds out what day to keep free." },
+      { title: "CHASING CLUES", body: "There are three on the Lineup page. One of them is about this set. Good luck." },
+    ],
+  },
+  {
+    key: "venueSchedule",
+    title: "Venue times",
+    itemNoun: "time",
+    blurb: "The times across the venue card on the FAQ page.",
+    labelField: "label",
+    imageFolder: "faq",
+    fields: [
+      { name: "label", label: "What it is", type: "text", hint: "GATES" },
+      { name: "time", label: "When", type: "text", hint: "9:00 AM" },
+    ],
+    seed: [
+      { label: "GATES", time: "9:00 AM" },
+      { label: "ARENA", time: "2:30 PM" },
+      { label: "LAST ACT", time: "6:00 PM" },
+    ],
+  },
+  {
+    key: "fetePassIncludes",
+    title: "Fete Pass includes",
+    itemNoun: "line",
+    blurb: "What the Fete Pass card lists. Untick Included for a line that reads as a cross.",
+    labelField: "text",
+    imageFolder: "tickets",
+    fields: [
+      { name: "text", label: "The line", type: "text", hint: "{fete}, {cosplay}, {seats} and {date} are replaced with the live values." },
+      { name: "included", label: "Included", type: "boolean", hint: "Off draws it as a cross in grey." },
+    ],
+    seed: [
+      { text: "Grounds entry 9:00 AM to 4:00 PM", included: true },
+      { text: "All 40+ fete and carnival stalls", included: true },
+      { text: "Cosplay arena, day stages and every competition", included: true },
+      { text: "5 MADOOZA coins + free parking", included: true },
+      { text: "Does not include the concert", included: false },
+    ],
+  },
+  {
+    key: "concertPassIncludes",
+    title: "Concert Pass includes",
+    itemNoun: "line",
+    blurb: "What the Concert Pass card lists.",
+    labelField: "text",
+    imageFolder: "tickets",
+    fields: [
+      { name: "text", label: "The line", type: "text", hint: "{fete}, {cosplay}, {seats} and {date} are replaced with the live values." },
+    ],
+    seed: [
+      { text: "Everything in the Fete Pass, all day" },
+      { text: "Entry to the concert \u2014 the sealed singer, 4:30 PM" },
+      { text: "Standing access to the front-of-stage pit" },
+      { text: "Stays till the 6:00 PM encore, no re-entry queue" },
+      { text: "Name and price drop together \u2014 the interest list opens now" },
+    ],
+  },
+  {
     key: "ticker",
     title: "Header ticker",
     itemNoun: "line",
@@ -532,9 +660,3 @@ export async function seedCollection(key: string): Promise<number> {
 }
 
 /** Replaces {fete}, {cosplay} and {seats} in copy with the live settings. */
-export function applyTokens(text: string, settings: FestSettings): string {
-  return text
-    .replace(/\{fete\}/g, formatInr(settings.fetePrice))
-    .replace(/\{cosplay\}/g, formatInr(settings.cosplayFee))
-    .replace(/\{seats\}/g, settings.concertCapacity.toLocaleString("en-IN"));
-}

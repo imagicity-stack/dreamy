@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { publicContent } from "@/lib/content";
+import { getCopy } from "@/lib/copy";
 import { getSettings, isPageHidden } from "@/lib/settings";
 import LineupClient, { type ArtistCard, type SupportAct } from "./LineupClient";
 
@@ -8,6 +9,8 @@ export const dynamic = "force-dynamic";
 export default async function LineupPage() {
   const settings = await getSettings();
   if (isPageHidden(settings, "lineup")) notFound();
+
+  const words = await getCopy("lineup");
 
   const lineup: ArtistCard[] = (await publicContent("lineup")).map((r) => ({
     id: r.id,
@@ -29,5 +32,5 @@ export default async function LineupPage() {
     note: String(r.note ?? ""),
   }));
 
-  return <LineupClient settings={settings} lineup={lineup} supportActs={supportActs} />;
+  return <LineupClient settings={settings} words={words} lineup={lineup} supportActs={supportActs} />;
 }
