@@ -27,7 +27,7 @@ export async function GET(
   req: Request,
   { params }: { params: Promise<{ collection: string }> },
 ) {
-  const check = await requireAdmin(req);
+  const check = await requireAdmin();
   if ("response" in check) return check.response;
 
   const { collection } = await params;

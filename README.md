@@ -14,8 +14,8 @@ passes, cosplay entries, the concert interest list, and merch pre-orders.
   sensitive touches the client.
 - **Firebase Admin / Firestore** — server-only, written to from API routes after a payment verifies (or,
   for the concert interest list and merch pre-orders, directly — no payment involved there).
-- **Firebase Auth** — sign-in for the `/admin` control room, verified server-side against an admin
-  allowlist.
+- **Firebase Auth** — the account store for the `/admin` control room. Sign-in runs entirely on the
+  server: no Firebase SDK, key or token ever reaches the browser.
 
 ## Pages
 
@@ -27,18 +27,30 @@ Gallery, Sponsors &amp; Press Kit, FAQ + Venue.
 Copy `.env.example` to `.env.local` for local development, and set the same keys in the Vercel project
 settings for deployment:
 
-- `NEXT_PUBLIC_RAZORPAY_KEY_ID` / `RAZORPAY_KEY_SECRET` — from your Razorpay dashboard.
+**Exposed to the browser** (one, and it has to be):
+
+- `NEXT_PUBLIC_RAZORPAY_KEY_ID` — Razorpay's checkout runs in the browser, so its key id is public by
+  design. It is a publishable key and cannot take a payment on its own.
+
+**Server-only** — these never reach the browser:
+
+- `RAZORPAY_KEY_SECRET` — from your Razorpay dashboard. Creates orders and verifies payment signatures.
 - `FIREBASE_PROJECT_ID` / `FIREBASE_CLIENT_EMAIL` / `FIREBASE_PRIVATE_KEY` — from a Firebase service
   account JSON (Project settings → Service accounts → Generate new private key). Keep the `\n` sequences
-  in `FIREBASE_PRIVATE_KEY` literally as they appear in the JSON file. The service account is server-only
-  and never reaches the browser.
-- `NEXT_PUBLIC_FIREBASE_API_KEY` / `NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN` / `NEXT_PUBLIC_FIREBASE_PROJECT_ID` —
-  the public web config (Project settings → Your apps → Web app), used only so `/admin` can sign in.
+  in `FIREBASE_PRIVATE_KEY` literally as they appear in the JSON file.
+- `FIREBASE_API_KEY` — the project's Web API key (Project settings → General). Used only on the server,
+  to check an admin's password against Firebase Auth; the Admin SDK can mint tokens but cannot verify a
+  password, so this one call goes through the Identity Toolkit REST API.
 - `ADMIN_EMAILS` — comma-separated emails allowed into `/admin`.
 
+All of the server-only ones are read at request time, so changing them takes effect on the next request
+rather than needing a rebuild. `NEXT_PUBLIC_RAZORPAY_KEY_ID` is compiled into the bundle, so that one
+does need a redeploy.
+
 Until these are set, the site still runs: checkout routes return a "not configured" error instead of
-opening Razorpay, and Firestore writes are silently skipped (the concert interest counter falls back to
-its static default). Nothing crashes — it just isn't persisting yet.
+opening Razorpay, Firestore writes are silently skipped (the concert interest counter falls back to its
+static default), and `/admin` lists exactly which variables it is still waiting on. Nothing crashes — it
+just isn't persisting yet.
 
 ## Admin panel
 
@@ -47,9 +59,15 @@ collected. It is not linked from the site and is marked `noindex`.
 
 **Getting in.** Create the account in Firebase console → Authentication → Users (enable the
 Email/Password provider first), then put that address in `ADMIN_EMAILS`. An account can also be admitted
-with an `admin: true` custom claim instead of the allowlist. Every admin API call carries a Firebase ID
-token that the server verifies with the Admin SDK before checking the allowlist — the browser only hides
-UI, it never grants access.
+with an `admin: true` custom claim instead of the allowlist.
+
+**How the sign-in works.** The browser posts the email and password to `/api/admin/login`. The server
+checks them against Firebase Auth, confirms the account is on the admin list, and mints a session cookie
+with the Admin SDK (`createSessionCookie`), returned `HttpOnly`, `Secure` and `SameSite=Lax` and good for
+12 hours. Every later request re-verifies that cookie server-side with `verifySessionCookie(…, true)`, so
+a disabled or signed-out account loses access at once. `/admin` itself is a server component behind the
+same check: a visitor who isn't an admin is never sent the panel's markup, let alone its data. There is
+no Firebase SDK in the browser bundle and no token in JavaScript for a script to steal.
 
 **What it does.**
 

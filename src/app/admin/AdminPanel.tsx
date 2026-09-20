@@ -1,14 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
-import Link from "next/link";
-import {
-  onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut,
-  type User,
-} from "firebase/auth";
-import { firebaseClientReady, getClientAuth } from "@/lib/firebaseClient";
+import { useEffect, useMemo, useState } from "react";
 import { formatInr } from "@/data/fest";
 import type { FestSettings } from "@/lib/settings";
 import { RECORD_VIEWS, toCsv, type RecordView, type Row } from "./records";
@@ -36,114 +28,27 @@ const TABS: { key: Tab; label: string }[] = [
   ...RECORD_VIEWS.map((v) => ({ key: v.key as Tab, label: v.title.toUpperCase() })),
 ];
 
+/**
+ * The session cookie rides along on every one of these calls and the server
+ * re-checks it each time, so this file holds no tokens and no credentials.
+ * The API returns loosely typed JSON; each caller narrows what it needs.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function api(url: string, init?: RequestInit): Promise<any> {
+  const res = await fetch(url, {
+    ...init,
+    headers: { "Content-Type": "application/json", ...(init?.headers ?? {}) },
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data?.error ?? "Something went wrong");
+  return data;
+}
+
 export default function AdminPanel() {
-  const [user, setUser] = useState<User | null>(null);
-  const [checking, setChecking] = useState(true);
-  const [adminEmail, setAdminEmail] = useState<string | null>(null);
-  const [authError, setAuthError] = useState("");
   const [tab, setTab] = useState<Tab>("overview");
 
-  /** Every admin call carries a fresh Firebase ID token; the server decides. */
-  const authedFetch = useCallback(
-    async (url: string, init?: RequestInit) => {
-      const auth = getClientAuth();
-      const current = auth?.currentUser;
-      if (!current) throw new Error("Not signed in");
-      const token = await current.getIdToken();
-      const res = await fetch(url, {
-        ...init,
-        headers: {
-          ...(init?.headers ?? {}),
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data?.error ?? "Something went wrong");
-      return data;
-    },
-    [],
-  );
-
-  useEffect(() => {
-    const auth = getClientAuth();
-    if (!auth) {
-      setChecking(false);
-      return;
-    }
-    return onAuthStateChanged(auth, async (next) => {
-      setUser(next);
-      setAdminEmail(null);
-      setAuthError("");
-      if (!next) {
-        setChecking(false);
-        return;
-      }
-      // Signed in is not the same as allowed in — ask the server.
-      setChecking(true);
-      try {
-        const data = await authedFetch("/api/admin/session");
-        setAdminEmail(data.email ?? next.email ?? "");
-      } catch (e) {
-        setAuthError(e instanceof Error ? e.message : "Could not verify this account");
-      } finally {
-        setChecking(false);
-      }
-    });
-  }, [authedFetch]);
-
-  if (!firebaseClientReady) {
-    return (
-      <Shell>
-        <div style={ui.card}>
-          <div style={ui.kicker}>NOT CONFIGURED</div>
-          <h2 className="font-display" style={{ fontSize: 22, margin: "10px 0 12px" }}>
-            FIREBASE ISN&apos;T WIRED UP YET
-          </h2>
-          <p style={{ fontSize: 15, lineHeight: 1.6, margin: 0 }}>
-            Set <code>NEXT_PUBLIC_FIREBASE_API_KEY</code>, <code>NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN</code> and{" "}
-            <code>NEXT_PUBLIC_FIREBASE_PROJECT_ID</code> in the deployment, alongside the service account and{" "}
-            <code>ADMIN_EMAILS</code>, then redeploy.
-          </p>
-        </div>
-      </Shell>
-    );
-  }
-
-  if (checking) {
-    return (
-      <Shell>
-        <div style={{ ...ui.card, textAlign: "center" }}>
-          <div className="font-display" style={{ fontSize: 18 }}>CHECKING THE GUEST LIST…</div>
-        </div>
-      </Shell>
-    );
-  }
-
-  if (!user) return <Shell><SignIn /></Shell>;
-
-  if (!adminEmail) {
-    return (
-      <Shell>
-        <div style={ui.card}>
-          <div style={ui.kicker}>NO ENTRY</div>
-          <h2 className="font-display" style={{ fontSize: 22, margin: "10px 0 12px" }}>
-            {authError || "This account is not on the admin list"}
-          </h2>
-          <p style={{ fontSize: 15, lineHeight: 1.6, margin: "0 0 18px" }}>
-            Signed in as {user.email}. Add that address to <code>ADMIN_EMAILS</code>, or sign in with one that&apos;s
-            already on the list.
-          </p>
-          <button style={ui.quietButton} onClick={() => signOut(getClientAuth()!)}>
-            SIGN OUT
-          </button>
-        </div>
-      </Shell>
-    );
-  }
-
   return (
-    <Shell email={adminEmail}>
+    <>
       <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 22 }}>
         {TABS.map((t) => (
           <button
@@ -161,130 +66,24 @@ export default function AdminPanel() {
         ))}
       </div>
 
-      {tab === "overview" && <Overview authedFetch={authedFetch} />}
-      {tab === "prices" && <Prices authedFetch={authedFetch} />}
+      {tab === "overview" && <Overview />}
+      {tab === "prices" && <Prices />}
       {RECORD_VIEWS.filter((v) => v.key === tab).map((view) => (
-        <Records key={view.key} view={view} authedFetch={authedFetch} />
+        <Records key={view.key} view={view} />
       ))}
-    </Shell>
+    </>
   );
 }
 
-// The API returns loosely typed JSON; each caller narrows what it needs.
-type Fetcher = (url: string, init?: RequestInit) => Promise<any>; // eslint-disable-line @typescript-eslint/no-explicit-any
-
-function Shell({ children, email }: { children: React.ReactNode; email?: string }) {
-  return (
-    <main style={{ minHeight: "100vh", background: "var(--bg)", padding: "28px 20px 70px" }}>
-      <div style={{ maxWidth: 1180, margin: "0 auto" }}>
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            gap: 14,
-            flexWrap: "wrap",
-            marginBottom: 26,
-          }}
-        >
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.24em", color: "var(--teal)" }}>
-              MADOOZA &middot; STAFF ONLY
-            </div>
-            <h1 className="font-display" style={{ fontSize: "clamp(26px, 5vw, 40px)", margin: "10px 0 0", color: "var(--lilac)" }}>
-              THE CONTROL ROOM
-            </h1>
-          </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
-            <Link href="/" style={{ fontSize: 11.5, fontWeight: 700, letterSpacing: "0.14em", color: "var(--muted-lilac)" }}>
-              &larr; BACK TO THE SITE
-            </Link>
-            {email && (
-              <>
-                <span style={{ fontSize: 12.5, color: "var(--muted-lilac)" }}>{email}</span>
-                <button style={ui.quietButton} onClick={() => signOut(getClientAuth()!)}>
-                  SIGN OUT
-                </button>
-              </>
-            )}
-          </div>
-        </div>
-        {children}
-      </div>
-    </main>
-  );
-}
-
-function SignIn() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  async function submit(e: React.FormEvent) {
-    e.preventDefault();
-    const auth = getClientAuth();
-    if (!auth) return;
-    setBusy(true);
-    setError("");
-    try {
-      await signInWithEmailAndPassword(auth, email.trim(), password);
-    } catch {
-      // Deliberately vague: don't confirm which half was wrong.
-      setError("That email and password don't match an account.");
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  return (
-    <form onSubmit={submit} style={{ ...ui.card, maxWidth: 440 }}>
-      <div style={ui.kicker}>COUNCIL ACCESS</div>
-      <h2 className="font-display" style={{ fontSize: 24, margin: "10px 0 6px" }}>SIGN IN</h2>
-      <p style={{ fontSize: 14.5, lineHeight: 1.55, margin: "0 0 18px", color: "#5B4480" }}>
-        Firebase account, same one that&apos;s on the admin list.
-      </p>
-      <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-        <div>
-          <label style={ui.label}>EMAIL</label>
-          <input
-            className="mz-input"
-            type="email"
-            autoComplete="username"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
-        <div>
-          <label style={ui.label}>PASSWORD</label>
-          <input
-            className="mz-input"
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
-        {error && <div style={{ fontSize: 13.5, color: "var(--crimson)" }}>{error}</div>}
-        <button type="submit" className="font-display mz-pop" style={ui.primaryButton} disabled={busy}>
-          {busy ? "CHECKING…" : "OPEN THE PANEL"}
-        </button>
-      </div>
-    </form>
-  );
-}
-
-function Overview({ authedFetch }: { authedFetch: Fetcher }) {
+function Overview() {
   const [summary, setSummary] = useState<Summary | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    authedFetch("/api/admin/summary")
+    api("/api/admin/summary")
       .then(setSummary)
       .catch((e) => setError(e instanceof Error ? e.message : "Could not load the numbers"));
-  }, [authedFetch]);
+  }, []);
 
   if (error) return <Notice text={error} />;
   if (!summary) return <Notice text="Counting…" />;
@@ -311,27 +110,27 @@ function Overview({ authedFetch }: { authedFetch: Fetcher }) {
   );
 }
 
-function Prices({ authedFetch }: { authedFetch: Fetcher }) {
+function Prices() {
   const [settings, setSettings] = useState<FestSettings | null>(null);
   const [merch, setMerch] = useState<MerchMeta[]>([]);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [error, setError] = useState("");
 
   useEffect(() => {
-    authedFetch("/api/admin/settings")
+    api("/api/admin/settings")
       .then((data) => {
         setSettings(data.settings);
         setMerch(data.merch ?? []);
       })
       .catch((e) => setError(e instanceof Error ? e.message : "Could not load the settings"));
-  }, [authedFetch]);
+  }, []);
 
   async function save() {
     if (!settings) return;
     setStatus("saving");
     setError("");
     try {
-      const data = await authedFetch("/api/admin/settings", {
+      const data = await api("/api/admin/settings", {
         method: "PUT",
         body: JSON.stringify(settings),
       });
@@ -469,17 +268,17 @@ function Toggle({
   );
 }
 
-function Records({ view, authedFetch }: { view: RecordView; authedFetch: Fetcher }) {
+function Records({ view }: { view: RecordView }) {
   const [rows, setRows] = useState<Row[] | null>(null);
   const [error, setError] = useState("");
 
   useEffect(() => {
     setRows(null);
     setError("");
-    authedFetch(`/api/admin/records/${view.key}?limit=500`)
+    api(`/api/admin/records/${view.key}?limit=500`)
       .then((data) => setRows(data.rows ?? []))
       .catch((e) => setError(e instanceof Error ? e.message : "Could not load these records"));
-  }, [authedFetch, view.key]);
+  }, [view.key]);
 
   const csvHref = useMemo(() => {
     if (!rows?.length) return null;
