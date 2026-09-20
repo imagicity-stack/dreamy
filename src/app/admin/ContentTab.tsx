@@ -76,14 +76,16 @@ function CollectionEditor({ collectionKey }: { collectionKey: string }) {
     load();
   }, [load]);
 
-  async function run(fn: () => Promise<unknown>) {
+  async function run(fn: () => Promise<unknown>): Promise<boolean> {
     setBusy(true);
     setError("");
     try {
       await fn();
       await load();
+      return true;
     } catch (e) {
       setError(message(e, "That didn't work"));
+      return false;
     } finally {
       setBusy(false);
     }
@@ -222,7 +224,9 @@ function RecordCard({
   const [values, setValues] = useState<Record<string, unknown>>(record);
   const [confirming, setConfirming] = useState(false);
 
-  useEffect(() => setValues(record), [record]);
+  // Keyed on the id, not the object: a reload hands back a fresh object for the
+  // same record, and re-syncing on that would discard unsaved edits.
+  useEffect(() => setValues(record), [record.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const label = String(record[def.labelField] ?? "Untitled") || "Untitled";
   const hidden = record.visible === false;
@@ -294,7 +298,7 @@ function NewRecord({
 }: {
   def: ContentCollectionDef;
   busy: boolean;
-  onCreate: (values: Record<string, unknown>) => void;
+  onCreate: (values: Record<string, unknown>) => Promise<boolean>;
 }) {
   const [open, setOpen] = useState(false);
   const [values, setValues] = useState<Record<string, unknown>>({});
@@ -326,10 +330,13 @@ function NewRecord({
             className="font-display mz-pop"
             style={ui.primaryButton}
             disabled={busy}
-            onClick={() => {
-              onCreate(values);
-              setValues({});
-              setOpen(false);
+            onClick={async () => {
+              // Only clear once it is actually saved, so a failure leaves the
+              // typing intact to retry.
+              if (await onCreate(values)) {
+                setValues({});
+                setOpen(false);
+              }
             }}
           >
             {busy ? "ADDING…" : "ADD IT"}

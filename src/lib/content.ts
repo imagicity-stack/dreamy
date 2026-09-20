@@ -406,6 +406,35 @@ function seedRecords(def: ContentCollectionDef): ContentRecord[] {
  * values when Firebase isn't configured or nothing has been saved yet, so the
  * site looks the same on day one as it did before any of this existed.
  */
+/**
+ * Marks a collection as having been taken over by the panel. Emptiness alone
+ * cannot say this: an admin who deletes every row means the list to be empty,
+ * and inferring "never seeded" from that would put the seed content straight
+ * back on the site.
+ */
+const SEED_MARKER = "content_meta";
+
+async function markSeeded(key: string): Promise<void> {
+  const db = getDb();
+  if (!db) return;
+  await db.collection(SEED_MARKER).doc(key).set({ seededAt: FieldValue.serverTimestamp() }, { merge: true });
+}
+
+/** Whether the panel has taken this list over, seed rows or not. */
+export async function isSeeded(key: string): Promise<boolean> {
+  const db = getDb();
+  if (!db) return false;
+  try {
+    const marker = await db.collection(SEED_MARKER).doc(key).get();
+    if (marker.exists) return true;
+    // Lists taken over before the marker existed have rows but no marker.
+    const snap = await db.collection(`content_${key}`).limit(1).get();
+    return !snap.empty;
+  } catch {
+    return false;
+  }
+}
+
 export const listContent = cache(async (key: string): Promise<ContentRecord[]> => {
   const def = collectionDef(key);
   if (!def) return [];
@@ -415,7 +444,10 @@ export const listContent = cache(async (key: string): Promise<ContentRecord[]> =
 
   try {
     const snap = await db.collection(`content_${def.key}`).get();
-    if (snap.empty) return seedRecords(def);
+    if (snap.empty) {
+      // Deliberately emptied stays empty; never touched falls back to the seed.
+      return (await isSeeded(def.key)) ? [] : seedRecords(def);
+    }
     return snap.docs
       .map((doc) => ({ id: doc.id, ...(doc.data() as object) }) as ContentRecord)
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
@@ -430,17 +462,6 @@ export async function publicContent(key: string): Promise<ContentRecord[]> {
 }
 
 /** True when the collection is still showing seed values rather than saved ones. */
-export async function isSeeded(key: string): Promise<boolean> {
-  const db = getDb();
-  if (!db) return false;
-  try {
-    const snap = await db.collection(`content_${key}`).limit(1).get();
-    return !snap.empty;
-  } catch {
-    return false;
-  }
-}
-
 export async function createRecord(key: string, raw: unknown): Promise<ContentRecord | null> {
   const def = collectionDef(key);
   const db = getDb();
@@ -453,6 +474,9 @@ export async function createRecord(key: string, raw: unknown): Promise<ContentRe
 
   const data = normalizeRecord(def, { ...(raw as object), order: nextOrder });
   const ref = await db.collection(`content_${key}`).add({ ...data, createdAt: FieldValue.serverTimestamp() });
+  // A list built by hand is just as taken over as a seeded one, so emptying it
+  // later must not bring the seed back either.
+  await markSeeded(key);
   return { id: ref.id, ...data } as ContentRecord;
 }
 
@@ -503,6 +527,7 @@ export async function seedCollection(key: string): Promise<number> {
     });
   });
   await batch.commit();
+  await markSeeded(key);
   return def.seed.length;
 }
 

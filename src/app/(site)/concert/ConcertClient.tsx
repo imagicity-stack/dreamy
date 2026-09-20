@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { describeDate, type FestSettings } from "@/lib/festSettings";
+import { describeDate, isPageHidden, type FestSettings } from "@/lib/festSettings";
 
 const SEAT_LABELS: Record<string, string> = {
   "1": "1 seat",
@@ -232,6 +232,7 @@ export default function ConcertClient({ settings }: { settings: FestSettings }) 
                 </div>
               </div>
               <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 22 }}>
+                {!isPageHidden(settings, "tickets") && (
                 <Link
                   href="/tickets"
                   className="mz-pop font-display"
@@ -239,6 +240,7 @@ export default function ConcertClient({ settings }: { settings: FestSettings }) 
                 >
                   GRAB A FETE PASS MEANWHILE
                 </Link>
+                )}
                 <button
                   onClick={() => {
                     setTicket(null);
@@ -270,8 +272,9 @@ export default function ConcertClient({ settings }: { settings: FestSettings }) 
             <div style={{ background: "var(--paper)", color: "var(--ink)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "7px 7px 0 var(--ink)", padding: "22px 20px" }}>
               <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>CHASING CLUES</div>
               <p style={{ fontSize: 14.5, lineHeight: 1.55, margin: "11px 0 0" }}>
-                There are three on the <Link href="/lineup">Lineup page</Link>. One of them is about this set. Good
-                luck.
+                There are three on the{" "}
+                {isPageHidden(settings, "lineup") ? "Lineup page" : <Link href="/lineup">Lineup page</Link>}. One of
+                them is about this set. Good luck.
               </p>
             </div>
           </div>
