@@ -31,6 +31,15 @@ const PRIZE_SKINS = [
   { bg: "var(--paper)", fg: "var(--ink)", amountColor: "var(--purple)" },
 ];
 
+/** The confirmation line names the character and the category the entrant chose, in bold. */
+function fillEntryTokens(text: string, values: { character: string; entryCategory: string }) {
+  return text.split(/(\{character\}|\{entryCategory\})/).map((part, i) => {
+    if (part === "{character}") return <strong key={i}>{values.character}</strong>;
+    if (part === "{entryCategory}") return <strong key={i}>{values.entryCategory}</strong>;
+    return part;
+  });
+}
+
 type Entry = {
   name: string; school: string; phone: string; character: string; category: string;
   mode: "solo" | "team"; team: string; members: string;
@@ -38,10 +47,12 @@ type Entry = {
 
 export default function CosplayClient({
   settings,
+  words,
   categories,
   prizes,
 }: {
   settings: FestSettings;
+  words: Record<string, string>;
   categories: Category[];
   prizes: Prize[];
 }) {
@@ -51,6 +62,11 @@ export default function CosplayClient({
   const [done, setDone] = useState(false);
   const [status, setStatus] = useState<"idle" | "processing" | "error">("idle");
   const [error, setError] = useState("");
+
+  // The fee note opens with a bold teal sentence and runs on in plain text.
+  const feeBreak = words.doneFeeNote.indexOf(". ");
+  const feeLead = feeBreak === -1 ? words.doneFeeNote : words.doneFeeNote.slice(0, feeBreak + 1);
+  const feeRest = feeBreak === -1 ? "" : words.doneFeeNote.slice(feeBreak + 1);
 
   const canSubmit = entry.name.trim().length > 1 && entry.character.trim().length > 1 && entry.phone.trim().length >= 10;
   const entryLabel = entry.mode === "team" ? "SQUAD ENTRY" : "SOLO ENTRY";
@@ -121,12 +137,10 @@ export default function CosplayClient({
           }}
         />
         <div style={{ position: "relative", maxWidth: 1180, margin: "0 auto" }}>
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.24em", color: "var(--purple)" }}>03 / THE ARENA</div>
-          <h1 className="font-display" style={{ fontSize: "clamp(30px, 6vw, 60px)", lineHeight: 1.02, margin: "14px 0 16px" }}>COSPLAY CONTEST</h1>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.24em", color: "var(--purple)" }}>{words.heroEyebrow}</div>
+          <h1 className="font-display" style={{ fontSize: "clamp(30px, 6vw, 60px)", lineHeight: 1.02, margin: "14px 0 16px" }}>{words.heroTitle}</h1>
           <p style={{ fontSize: 17, lineHeight: 1.6, maxWidth: "60ch", margin: 0 }}>
-            Four categories. Solo or squad. A stage walk in front of the whole field at 2:30 PM, and &#8377;40,000
-            split across the winners. Registration is {formatInr(settings.cosplayFee)} an entry, solo or squad, and
-            closes two weeks before gates open &mdash; or when 120 entries fill up, whichever lands first.
+            {words.heroIntro}
           </p>
         </div>
       </section>
@@ -139,7 +153,7 @@ export default function CosplayClient({
               return (
                 <div key={c.id} style={{ background: skin.bg, color: skin.fg, border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "7px 7px 0 var(--ink)", padding: "22px 20px" }}>
                   <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: skin.nColor }}>
-                    CATEGORY {String(i + 1).padStart(2, "0")}
+                    {words.categoryCardKicker} {String(i + 1).padStart(2, "0")}
                   </div>
                   {c.image?.url && (
                     <div style={{ position: "relative", height: 130, margin: "12px 0 4px", border: "2px solid var(--ink)", borderRadius: 14, overflow: "hidden" }}>
@@ -155,10 +169,9 @@ export default function CosplayClient({
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 26, alignItems: "start" }}>
             <div>
-              <h2 className="font-display" style={{ fontSize: "clamp(24px, 3.6vw, 36px)", margin: "0 0 8px", color: "var(--lilac)" }}>THE PRIZE POOL</h2>
+              <h2 className="font-display" style={{ fontSize: "clamp(24px, 3.6vw, 36px)", margin: "0 0 8px", color: "var(--lilac)" }}>{words.prizesTitle}</h2>
               <p style={{ fontSize: 16, lineHeight: 1.6, color: "var(--lilac-text)", margin: "0 0 22px", maxWidth: "46ch" }}>
-                Cash, trophies, and the merch drop before it goes on sale. Judged by the guest panel &mdash; one of
-                whom is still in the vault.
+                {words.prizesIntro}
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                 {prizes.map((p, i) => {
@@ -180,7 +193,7 @@ export default function CosplayClient({
             {!done ? (
               <div style={{ background: "var(--paper)", color: "var(--ink)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "10px 10px 0 var(--ink)", padding: "28px 26px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 10, flexWrap: "wrap" }}>
-                  <h2 className="font-display" style={{ fontSize: 22, margin: 0 }}>REGISTER</h2>
+                  <h2 className="font-display" style={{ fontSize: 22, margin: 0 }}>{words.registerTitle}</h2>
                   <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.16em", color: "var(--purple)" }}>{entryLabel}</div>
                 </div>
                 <div style={{ display: "flex", gap: 0, margin: "20px 0 22px", border: "3px solid var(--ink)", borderRadius: 999, overflow: "hidden" }}>
@@ -250,30 +263,29 @@ export default function CosplayClient({
                     className="font-display mz-pop"
                     style={{ fontSize: 15, color: "var(--lilac)", background: "var(--purple)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "6px 6px 0 var(--ink)", padding: "16px 18px", cursor: canSubmit ? "pointer" : "not-allowed", width: "100%", opacity: canSubmit ? 1 : 0.6, ["--mz-shadow" as string]: "6px" }}
                   >
-                    {status === "processing" ? "OPENING PAYMENT…" : `PAY ${formatInr(settings.cosplayFee)} · PUT ME IN THE ARENA`}
+                    {status === "processing" ? words.submitProcessingLabel : words.submitLabel}
                   </button>
                   {status === "error" && <div style={{ fontSize: 13, color: "var(--crimson)" }}>{error}</div>}
                   <div style={{ fontSize: 10.5, lineHeight: 1.6, letterSpacing: "0.06em", color: "#7D63A8" }}>
-                    {formatInr(settings.cosplayFee)} PER ENTRY &middot; A FETE OR CONCERT PASS IS STILL NEEDED &middot; PROPS UNDER 1.2M
-                    &middot; NOTHING SHARP, NOTHING THAT FIRES
+                    {words.entryFinePrint}
                   </div>
                 </div>
               </div>
             ) : (
               <div style={{ background: "var(--teal)", color: "var(--ink)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "10px 10px 0 var(--ink)", padding: "30px 26px" }}>
-                <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>ENTRY LOGGED</div>
-                <h2 className="font-display" style={{ fontSize: 26, margin: "12px 0 14px", lineHeight: 1.1 }}>SEE YOU AT THE ARENA, {entry.name}</h2>
+                <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>{words.doneEyebrow}</div>
+                <h2 className="font-display" style={{ fontSize: 26, margin: "12px 0 14px", lineHeight: 1.1 }}>{words.doneTitle} {entry.name}</h2>
                 <p style={{ fontSize: 15.5, lineHeight: 1.6, margin: "0 0 18px" }}>
-                  You&apos;re down as <strong>{entry.character}</strong> in <strong>{categories.find((c) => c.value === entry.category)?.title ?? entry.category}</strong>. Backstage call is 1:45 PM near the
-                  science block; stage walk starts at 2:30. We&apos;ll message the exact slot the week before.
+                  {fillEntryTokens(words.doneBody, {
+                    character: entry.character,
+                    entryCategory: categories.find((c) => c.value === entry.category)?.title ?? entry.category,
+                  })}
                 </p>
                 <div style={{ background: "var(--purple)", color: "var(--lilac)", border: "3px solid var(--ink)", borderRadius: 20, padding: "15px 16px", fontSize: 14.5, lineHeight: 1.55, marginBottom: 12 }}>
-                  <strong style={{ color: "var(--teal)" }}>{formatInr(settings.cosplayFee)} entry fee received.</strong> Your
-                  slot is held; the fee is non-refundable but transferable to another entrant until entries close.
+                  <strong style={{ color: "var(--teal)" }}>{feeLead}</strong>{feeRest}
                 </div>
                 <div style={{ background: "var(--paper)", border: "3px solid var(--ink)", borderRadius: 20, padding: 16, fontSize: 14.5, lineHeight: 1.55 }}>
-                  Bring a repair kit. Every year somebody&apos;s armour gives up in the queue and the Art Club runs
-                  out of hot glue by noon.
+                  {words.doneRepairNote}
                 </div>
                 <button
                   onClick={() => {
@@ -282,7 +294,7 @@ export default function CosplayClient({
                   }}
                   style={{ marginTop: 20, fontWeight: 700, fontSize: 12, letterSpacing: "0.14em", background: "transparent", border: "2px solid var(--ink)", borderRadius: 14, padding: "13px 16px", cursor: "pointer", color: "var(--ink)" }}
                 >
-                  REGISTER SOMEONE ELSE
+                  {words.doneResetButton}
                 </button>
               </div>
             )}

@@ -236,5 +236,6 @@ export function applyTokens(text: string, settings: FestSettings): string {
     .replace(/\{fete\}/g, formatInr(settings.fetePrice))
     .replace(/\{cosplay\}/g, formatInr(settings.cosplayFee))
     .replace(/\{seats\}/g, settings.concertCapacity.toLocaleString("en-IN"))
-    .replace(/\{date\}/g, describeDate(settings).short);
+    .replace(/\{date\}/g, describeDate(settings).short)
+    .replace(/\{year\}/g, String(settings.festYear));
 }

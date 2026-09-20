@@ -38,6 +38,9 @@ export default async function HomePage() {
   // A hidden page still had a door on the home page, which landed visitors on a
   // 404. Every link out of here is filtered through the same check now.
   const live = (key: PageKey) => !isPageHidden(settings, key);
+  // The skin is fixed to the card's place in the full list, so hiding one page
+  // does not re-colour the doors after it.
+  const chaosSkin = new Map(doors.map((c, i) => [c.id, CHAOS_SKINS[i % CHAOS_SKINS.length]]));
   const CHAOS_CARDS = doors.filter((c) => live(String(c.pageKey ?? "") as PageKey));
 
   return (
@@ -283,8 +286,8 @@ export default async function HomePage() {
             <span style={{ fontSize: 12, letterSpacing: "0.16em", color: "var(--muted-lilac)" }}>{words.chaosSubtitle}</span>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20 }}>
-            {CHAOS_CARDS.map((c, i) => {
-              const skin = CHAOS_SKINS[i % CHAOS_SKINS.length];
+            {CHAOS_CARDS.map((c) => {
+              const skin = chaosSkin.get(c.id) ?? CHAOS_SKINS[0];
               return (
               <Link
                 key={c.id}

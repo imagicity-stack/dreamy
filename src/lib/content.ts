@@ -383,7 +383,7 @@ export const CONTENT: ContentCollectionDef[] = [
     key: "concertPoints",
     title: "Concert promises",
     itemNoun: "promise",
-    blurb: "The starred lines under “WHAT WE WILL CONFIRM”.",
+    blurb: "The starred lines under “WHAT WE WILL CONFIRM”. The date line is added after these on its own, because its wording changes with how much of the date is out — edit that one under WORDS.",
     labelField: "text",
     imageFolder: "concert",
     fields: [
@@ -393,7 +393,6 @@ export const CONTENT: ContentCollectionDef[] = [
       { text: "Main stage, 4:30 PM, running to the 6:00 PM encore" },
       { text: "A national touring act, playing a full live set" },
       { text: "{seats} seats on the field, front-of-stage pit included" },
-      { text: "{date} \u2014 gates 9:00 AM" },
     ],
   },
   {

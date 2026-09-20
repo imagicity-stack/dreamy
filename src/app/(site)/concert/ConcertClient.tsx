@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { describeDate, isPageHidden, type FestSettings } from "@/lib/festSettings";
+import { isPageHidden, type FestSettings } from "@/lib/festSettings";
 
 const SEAT_LABELS: Record<string, string> = {
   "1": "1 seat",
@@ -11,10 +11,70 @@ const SEAT_LABELS: Record<string, string> = {
   "8": "5+ seats",
 };
 
+/** The three note cards cycle through these colours, whatever the council writes. */
+const INFO_SKINS: { bg: string; fg?: string; label: string; body?: string }[] = [
+  { bg: "var(--purple)", label: "var(--teal)", body: "var(--lilac-text)" },
+  { bg: "var(--lilac)", fg: "var(--ink)", label: "var(--purple)" },
+  { bg: "var(--paper)", fg: "var(--ink)", label: "var(--purple)" },
+];
+
 type Ticket = { name: string; no: string; pick: string; guess: string; seats: string };
 
-export default function ConcertClient({ settings }: { settings: FestSettings }) {
-  const date = describeDate(settings);
+type InfoNote = { title: string; body: string };
+
+/**
+ * The confirmation sentence keeps the queue number and the seat choice in their
+ * own bold spans, so the slot is split on its tokens rather than dropped in as
+ * one flat string.
+ */
+function ticketLine(text: string, queueNo: string, seats: string) {
+  const [lead, rest = ""] = text.split("#{queueNo}");
+  const [middle, tail = ""] = rest.split("{seatChoice}");
+  return (
+    <>
+      {lead}
+      <strong style={{ color: "var(--teal)" }}>#{queueNo}</strong>
+      {middle}
+      <strong>{seats}</strong>
+      {tail}
+    </>
+  );
+}
+
+/**
+ * One of the note cards points at the clues on the lineup page. The body is the
+ * council's to write, so the link is threaded back in wherever the phrase still
+ * appears, and left out entirely when that page is hidden.
+ */
+const LINEUP_PHRASE = "Lineup page";
+
+function noteBody(text: string, lineupLive: boolean) {
+  const at = text.indexOf(LINEUP_PHRASE);
+  if (at < 0 || !lineupLive) return text;
+  return (
+    <>
+      {text.slice(0, at)}
+      <Link href="/lineup" style={{ color: "inherit", textDecoration: "underline" }}>
+        {LINEUP_PHRASE}
+      </Link>
+      {text.slice(at + LINEUP_PHRASE.length)}
+    </>
+  );
+}
+
+export default function ConcertClient({
+  settings,
+  words,
+  points,
+  info,
+  lineupLive,
+}: {
+  settings: FestSettings;
+  words: Record<string, string>;
+  points: string[];
+  info: InfoNote[];
+  lineupLive: boolean;
+}) {
   const [interestCount, setInterestCount] = useState(settings.interestBase.toLocaleString("en-IN"));
   const [form, setForm] = useState({ name: "", contact: "", pick: "", guess: "", seats: "1" });
   const [ticket, setTicket] = useState<Ticket | null>(null);
@@ -38,13 +98,13 @@ export default function ConcertClient({ settings }: { settings: FestSettings }) 
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
       });
-      if (!res.ok) throw new Error("Could not join the list — try again");
+      if (!res.ok) throw new Error(words.formErrorSubmitFailed);
       const data = await res.json();
       setTicket({
         name: form.name.trim().split(" ")[0].toUpperCase(),
         no: data.queueNumber,
         pick: form.pick.trim(),
-        guess: form.guess.trim() || "Kept to yourself",
+        guess: form.guess.trim() || words.ticketGuessFallback,
         seats: SEAT_LABELS[form.seats] || "1 seat",
       });
       if (data.queueNumber) setInterestCount(data.queueNumber);
@@ -52,7 +112,7 @@ export default function ConcertClient({ settings }: { settings: FestSettings }) 
       window.scrollTo(0, 0);
     } catch (e) {
       setStatus("error");
-      setError(e instanceof Error ? e.message : "Something went wrong");
+      setError(e instanceof Error ? e.message : words.formErrorGeneric);
     }
   }
 
@@ -84,13 +144,12 @@ export default function ConcertClient({ settings }: { settings: FestSettings }) 
           }}
         />
         <div style={{ position: "relative", maxWidth: 1180, margin: "0 auto" }}>
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.24em", color: "var(--teal)" }}>05 / THE CONCERT</div>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.24em", color: "var(--teal)" }}>{words.heroEyebrow}</div>
           <h1 className="font-display" style={{ fontSize: "clamp(34px, 7.4vw, 78px)", lineHeight: 0.98, margin: "14px 0 0", color: "var(--teal)", textShadow: "5px 5px 0 var(--ink)" }}>
-            GUESS WHO.
+            {words.heroTitle}
           </h1>
           <p style={{ fontSize: 17.5, lineHeight: 1.6, color: "var(--lilac-text)", maxWidth: "56ch", margin: "18px 0 0" }}>
-            One singer. One 4:30 PM slot on the main stage. No name, no poster, no price &mdash; not until the
-            council is ready. Everything we will say is below.
+            {words.heroIntro}
           </p>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(270px, 1fr))", gap: 30, alignItems: "center", marginTop: 44 }}>
@@ -109,7 +168,7 @@ export default function ConcertClient({ settings }: { settings: FestSettings }) 
                 }}
               />
               <div style={{ position: "absolute", top: 16, left: 18, fontSize: 10, fontWeight: 700, letterSpacing: "0.22em", color: "var(--teal-light)" }}>
-                IDENTITY REDACTED
+                {words.posterRedactedLabel}
               </div>
               <div
                 className="font-display"
@@ -129,26 +188,25 @@ export default function ConcertClient({ settings }: { settings: FestSettings }) 
 
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div style={{ background: "#150331", border: "3px solid var(--teal)", borderRadius: 20, padding: "20px 22px" }}>
-                <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal-light)" }}>WHAT WE WILL CONFIRM</div>
+                <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal-light)" }}>{words.confirmListTitle}</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 10, marginTop: 14, fontSize: 15.5, lineHeight: 1.5, color: "#F0E4FA" }}>
-                  <div style={{ display: "flex", gap: 11 }}><span style={{ color: "var(--teal)", fontWeight: 700 }}>&#9733;</span><span>Main stage, 4:30 PM, running to the 6:00 PM encore</span></div>
-                  <div style={{ display: "flex", gap: 11 }}><span style={{ color: "var(--teal)", fontWeight: 700 }}>&#9733;</span><span>A national touring act, playing a full live set</span></div>
-                  <div style={{ display: "flex", gap: 11 }}><span style={{ color: "var(--teal)", fontWeight: 700 }}>&#9733;</span><span>{settings.concertCapacity.toLocaleString("en-IN")} seats on the field, front-of-stage pit included</span></div>
-                  <div style={{ display: "flex", gap: 11 }}><span style={{ color: "var(--teal)", fontWeight: 700 }}>&#9733;</span><span>{date.sealed ? "A date still under seal — the day drops with the name" : `${date.short} — gates 9:00 AM`}</span></div>
+                  {points.map((point, i) => (
+                    <div key={i} style={{ display: "flex", gap: 11 }}><span style={{ color: "var(--teal)", fontWeight: 700 }}>&#9733;</span><span>{point}</span></div>
+                  ))}
                 </div>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 14 }}>
                 <div style={{ background: "var(--teal)", color: "var(--ink)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "6px 6px 0 var(--ink)", padding: "18px 20px" }}>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--purple)" }}>PASS PRICE</div>
-                  <div className="font-display" style={{ fontSize: 26, marginTop: 7 }}>SEALED</div>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--purple)" }}>{words.priceCardLabel}</div>
+                  <div className="font-display" style={{ fontSize: 26, marginTop: 7 }}>{words.priceCardValue}</div>
                 </div>
                 <div style={{ background: "var(--crimson)", color: "#FFF0F5", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "6px 6px 0 var(--ink)", padding: "18px 20px" }}>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "#FFD3E2" }}>THE NAME</div>
-                  <div className="font-display" style={{ fontSize: 26, marginTop: 7 }}>SOON</div>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "#FFD3E2" }}>{words.nameCardLabel}</div>
+                  <div className="font-display" style={{ fontSize: 26, marginTop: 7 }}>{words.nameCardValue}</div>
                 </div>
               </div>
               <div style={{ fontSize: 11.5, lineHeight: 1.7, letterSpacing: "0.1em", color: "#9E86C6" }}>
-                {interestCount} HAVE ALREADY PUT THEIR NAME DOWN
+                {words.interestCountNote.replace("{count}", interestCount)}
               </div>
             </div>
           </div>
@@ -159,12 +217,10 @@ export default function ConcertClient({ settings }: { settings: FestSettings }) 
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           {!ticket ? (
             <div style={{ background: "var(--paper)", color: "var(--ink)", border: "3px solid var(--ink)", borderRadius: 26, boxShadow: "12px 12px 0 var(--ink)", padding: "30px 28px" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>NO PAYMENT, NO COMMITMENT</div>
-              <h2 className="font-display" style={{ fontSize: "clamp(24px, 4vw, 38px)", lineHeight: 1.04, margin: "10px 0 10px" }}>PUT YOUR NAME DOWN</h2>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>{words.formEyebrow}</div>
+              <h2 className="font-display" style={{ fontSize: "clamp(24px, 4vw, 38px)", lineHeight: 1.04, margin: "10px 0 10px" }}>{words.formTitle}</h2>
               <p style={{ fontSize: 16, lineHeight: 1.6, margin: "0 0 24px", maxWidth: "54ch" }}>
-                The interest list gets the name, the date and the price one hour before the rest of Hazaribagh, and a
-                48-hour window on the {settings.concertCapacity.toLocaleString("en-IN")} seats. Tell us who you&apos;re
-                hoping for while you&apos;re here &mdash; the council reads every single one.
+                {words.formIntro}
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 16 }}>
                 <div>
@@ -201,33 +257,31 @@ export default function ConcertClient({ settings }: { settings: FestSettings }) 
                     className="font-display mz-pop"
                     style={{ fontSize: 16, color: "var(--teal)", background: "var(--near-black)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "6px 6px 0 var(--ink)", padding: "17px 20px", cursor: "pointer", width: "100%", ["--mz-shadow" as string]: "6px" }}
                   >
-                    {status === "submitting" ? "SENDING…" : "TELL ME THE SECOND IT DROPS"}
+                    {status === "submitting" ? "SENDING…" : words.formSubmitLabel}
                   </button>
                   {status === "error" && <div style={{ fontSize: 13, color: "var(--pink)" }}>{error}</div>}
                   <div style={{ fontSize: 10.5, lineHeight: 1.7, letterSpacing: "0.06em", color: "#7D63A8" }}>
-                    NO CARD, NO PAYMENT, NO PASS RESERVED &middot; ONE MESSAGE AT THE REVEAL AND NOTHING ELSE
+                    {words.formFootnote}
                   </div>
                 </div>
               </div>
             </div>
           ) : (
             <div style={{ background: "var(--near-black)", color: "var(--lilac)", border: "3px solid var(--teal)", borderRadius: 26, boxShadow: "12px 12px 0 var(--ink)", padding: "32px 28px" }}>
-              <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal-light)" }}>YOU&apos;RE ON THE LIST</div>
+              <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal-light)" }}>{words.ticketEyebrow}</div>
               <h2 className="font-display" style={{ fontSize: "clamp(24px, 4vw, 36px)", lineHeight: 1.06, margin: "12px 0 16px", color: "var(--teal)" }}>
-                NOTED, {ticket.name}
+                {words.ticketTitle.replace("{name}", ticket.name)}
               </h2>
               <p style={{ fontSize: 16, lineHeight: 1.6, margin: "0 0 20px", maxWidth: "56ch" }}>
-                You&apos;re <strong style={{ color: "var(--teal)" }}>#{ticket.no}</strong> on the interest list, down for{" "}
-                <strong>{ticket.seats}</strong>. When the name and price go up, you hear first &mdash; one hour ahead
-                of the poster.
+                {ticketLine(words.ticketIntro, ticket.no, ticket.seats)}
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(210px, 1fr))", gap: 14 }}>
                 <div style={{ background: "#150331", border: "3px solid var(--purple)", borderRadius: 20, padding: "18px 20px" }}>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--teal)" }}>YOU ASKED FOR</div>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--teal)" }}>{words.ticketPickLabel}</div>
                   <div className="font-display" style={{ fontSize: 19, marginTop: 8, lineHeight: 1.2 }}>{ticket.pick}</div>
                 </div>
                 <div style={{ background: "#150331", border: "3px solid var(--purple)", borderRadius: 20, padding: "18px 20px" }}>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--teal)" }}>YOUR GUESS</div>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--teal)" }}>{words.ticketGuessLabel}</div>
                   <div className="font-display" style={{ fontSize: 19, marginTop: 8, lineHeight: 1.2 }}>{ticket.guess}</div>
                 </div>
               </div>
@@ -238,7 +292,7 @@ export default function ConcertClient({ settings }: { settings: FestSettings }) 
                   className="mz-pop font-display"
                   style={{ fontSize: 14, color: "var(--ink)", background: "var(--teal)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "5px 5px 0 var(--ink)", padding: "14px 18px", ["--mz-shadow" as string]: "5px" }}
                 >
-                  GRAB A FETE PASS MEANWHILE
+                  {words.ticketTicketsCta}
                 </Link>
                 )}
                 <button
@@ -248,35 +302,24 @@ export default function ConcertClient({ settings }: { settings: FestSettings }) 
                   }}
                   style={{ fontWeight: 700, fontSize: 12, letterSpacing: "0.14em", background: "transparent", border: "2px solid var(--teal-light)", borderRadius: 14, padding: "13px 16px", cursor: "pointer", color: "var(--teal-light)" }}
                 >
-                  ADD SOMEONE ELSE
+                  {words.ticketResetLabel}
                 </button>
               </div>
             </div>
           )}
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 18, marginTop: 30 }}>
-            <div style={{ background: "var(--purple)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "7px 7px 0 var(--ink)", padding: "22px 20px" }}>
-              <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal)" }}>WHY THE SECRECY</div>
-              <p style={{ fontSize: 14.5, lineHeight: 1.55, color: "var(--lilac-text)", margin: "11px 0 0" }}>
-                Contracts. The act is booked, the paperwork is not, and the council would rather say nothing than say
-                it twice.
-              </p>
-            </div>
-            <div style={{ background: "var(--lilac)", color: "var(--ink)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "7px 7px 0 var(--ink)", padding: "22px 20px" }}>
-              <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>WHEN IT DROPS</div>
-              <p style={{ fontSize: 14.5, lineHeight: 1.55, margin: "11px 0 0" }}>
-                With the final lineup reveal. Name, price, date and the pass sale all in the same hour &mdash; which
-                is also the hour the rest of Hazaribagh finds out what day to keep free.
-              </p>
-            </div>
-            <div style={{ background: "var(--paper)", color: "var(--ink)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "7px 7px 0 var(--ink)", padding: "22px 20px" }}>
-              <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>CHASING CLUES</div>
-              <p style={{ fontSize: 14.5, lineHeight: 1.55, margin: "11px 0 0" }}>
-                There are three on the{" "}
-                {isPageHidden(settings, "lineup") ? "Lineup page" : <Link href="/lineup">Lineup page</Link>}. One of
-                them is about this set. Good luck.
-              </p>
-            </div>
+            {info.map((note, i) => {
+              const skin = INFO_SKINS[i % INFO_SKINS.length];
+              return (
+                <div key={i} style={{ background: skin.bg, color: skin.fg, border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "7px 7px 0 var(--ink)", padding: "22px 20px" }}>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: skin.label }}>{note.title}</div>
+                  <p style={{ fontSize: 14.5, lineHeight: 1.55, color: skin.body, margin: "11px 0 0" }}>
+                    {noteBody(note.body, lineupLive)}
+                  </p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

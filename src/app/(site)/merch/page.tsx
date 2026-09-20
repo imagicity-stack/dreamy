@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { publicContent } from "@/lib/content";
+import { getCopy } from "@/lib/copy";
 import { getSettings, isPageHidden } from "@/lib/settings";
 import MerchClient, { type MerchRecord } from "./MerchClient";
 
@@ -9,6 +10,8 @@ export default async function MerchPage() {
   const settings = await getSettings();
   if (isPageHidden(settings, "merch")) notFound();
 
+  const words = await getCopy("merch");
+
   const items = (await publicContent("merch")).map((r) => ({
     id: r.id,
     name: String(r.name ?? ""),
@@ -17,5 +20,5 @@ export default async function MerchPage() {
     image: (r.image as MerchRecord["image"]) ?? null,
   }));
 
-  return <MerchClient merchItems={items} open={settings.merchOpen} closedNote={settings.merchClosedNote} />;
+  return <MerchClient merchItems={items} words={words} open={settings.merchOpen} closedNote={settings.merchClosedNote} />;
 }

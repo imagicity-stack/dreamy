@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { publicContent } from "@/lib/content";
+import { getCopy } from "@/lib/copy";
 import { getSettings, isPageHidden } from "@/lib/settings";
 import CosplayClient, { type Category, type Prize } from "./CosplayClient";
 
@@ -8,6 +9,8 @@ export const dynamic = "force-dynamic";
 export default async function CosplayPage() {
   const settings = await getSettings();
   if (isPageHidden(settings, "cosplay")) notFound();
+
+  const words = await getCopy("cosplay");
 
   const [categoryRecords, prizeRecords] = await Promise.all([
     publicContent("cosplayCategories"),
@@ -31,5 +34,5 @@ export default async function CosplayPage() {
     note: String(p.note ?? ""),
   }));
 
-  return <CosplayClient settings={settings} categories={categories} prizes={prizes} />;
+  return <CosplayClient settings={settings} words={words} categories={categories} prizes={prizes} />;
 }

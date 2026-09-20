@@ -2,6 +2,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getSettings, isPageHidden } from "@/lib/settings";
 import { publicContent } from "@/lib/content";
+import { getCopy } from "@/lib/copy";
 
 export const dynamic = "force-dynamic";
 
@@ -23,6 +24,7 @@ function text(record: Record<string, unknown>, key: string): string {
 
 export default async function SponsorsPage() {
   const settings = await getSettings();
+  const words = await getCopy("sponsors");
   if (isPageHidden(settings, "sponsors")) notFound();
 
   const [tierRecords, sponsors] = await Promise.all([
@@ -45,12 +47,10 @@ export default async function SponsorsPage() {
           }}
         />
         <div style={{ position: "relative", maxWidth: 1180, margin: "0 auto" }}>
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.24em", color: "var(--teal)" }}>07 / PARTNERS</div>
-          <h1 className="font-display" style={{ fontSize: "clamp(30px, 6vw, 60px)", lineHeight: 1.02, margin: "14px 0 16px", color: "var(--lilac)" }}>SPONSORS &amp; PRESS KIT</h1>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.24em", color: "var(--teal)" }}>{words.heroEyebrow}</div>
+          <h1 className="font-display" style={{ fontSize: "clamp(30px, 6vw, 60px)", lineHeight: 1.02, margin: "14px 0 16px", color: "var(--lilac)" }}>{words.heroTitle}</h1>
           <p style={{ fontSize: 17, lineHeight: 1.6, color: "#F0E4FA", maxWidth: "62ch", margin: 0 }}>
-            Expected footfall of 4,000 across one day: students from eleven schools, their families, and most of the
-            town&apos;s under-25s. Everything is student-run, which means every rupee is visible and every promise is
-            kept in writing.
+            {words.heroIntro}
           </p>
         </div>
       </section>
@@ -58,8 +58,8 @@ export default async function SponsorsPage() {
       <section style={{ background: "var(--bg)", padding: "54px 20px 60px" }}>
         <div style={{ maxWidth: 1180, margin: "0 auto" }}>
           <div style={{ display: "flex", alignItems: "baseline", gap: 16, flexWrap: "wrap", marginBottom: 24 }}>
-            <h2 className="font-display" style={{ fontSize: "clamp(24px, 3.6vw, 36px)", margin: 0, color: "var(--lilac)" }}>PARTNER TIERS</h2>
-            <span style={{ fontSize: 12, letterSpacing: "0.16em", color: "var(--muted-lilac)" }}>SIX WAYS IN &middot; GST EXTRA &middot; PAID IN TWO INSTALMENTS</span>
+            <h2 className="font-display" style={{ fontSize: "clamp(24px, 3.6vw, 36px)", margin: 0, color: "var(--lilac)" }}>{words.tiersTitle}</h2>
+            <span style={{ fontSize: 12, letterSpacing: "0.16em", color: "var(--muted-lilac)" }}>{words.tiersNote}</span>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
             {tiers.map((t, i) => {
@@ -103,7 +103,7 @@ export default async function SponsorsPage() {
           {signed.length > 0 && (
             <div style={{ marginTop: 46 }}>
               <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.24em", color: "var(--teal)", marginBottom: 16 }}>
-                ALREADY ON BOARD
+                {words.signedEyebrow}
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))", gap: 16 }}>
                 {signed.map((s) => {
@@ -138,10 +138,9 @@ export default async function SponsorsPage() {
 
           <div style={{ marginTop: 46, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 26, alignItems: "start" }}>
             <div style={{ background: "var(--paper)", color: "var(--ink)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "9px 9px 0 var(--ink)", padding: "26px 24px" }}>
-              <h2 className="font-display" style={{ fontSize: 21, margin: "0 0 14px" }}>PRESS KIT</h2>
+              <h2 className="font-display" style={{ fontSize: 21, margin: "0 0 14px" }}>{words.pressKitTitle}</h2>
               <p style={{ fontSize: 15, lineHeight: 1.55, margin: "0 0 20px", color: "#3A1063" }}>
-                Everything a paper, a page or a partner needs. Please don&apos;t stretch the logo &mdash; the council
-                will notice.
+                {words.pressKitIntro}
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
                 <a
@@ -150,37 +149,36 @@ export default async function SponsorsPage() {
                   className="mz-teal-btn"
                   style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", background: "#FFFFFF", border: "3px solid var(--ink)", borderRadius: 20, padding: "14px 16px", color: "var(--ink)", fontWeight: 700, fontSize: 15 }}
                 >
-                  <span>Badge logo &mdash; transparent PNG</span>
-                  <span style={{ fontSize: 11, letterSpacing: "0.1em", color: "var(--purple)" }}>2000PX &darr;</span>
+                  <span>{words.pressKitBadgeLabel}</span>
+                  <span style={{ fontSize: 11, letterSpacing: "0.1em", color: "var(--purple)" }}>{words.pressKitBadgeMeta}</span>
                 </a>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", background: "#FFFFFF", border: "3px solid var(--ink)", borderRadius: 20, padding: "14px 16px", fontWeight: 700, fontSize: 15 }}>
-                  <span>Fact sheet &amp; footfall numbers</span>
-                  <span style={{ fontSize: 11, letterSpacing: "0.1em", color: "var(--purple)" }}>ON REQUEST</span>
+                  <span>{words.pressKitFactSheetLabel}</span>
+                  <span style={{ fontSize: 11, letterSpacing: "0.1em", color: "var(--purple)" }}>{words.pressKitFactSheetMeta}</span>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", gap: 10, alignItems: "center", background: "#FFFFFF", border: "3px solid var(--ink)", borderRadius: 20, padding: "14px 16px", fontWeight: 700, fontSize: 15 }}>
-                  <span>Palette: indigo, teal, crimson</span>
-                  <span style={{ fontSize: 11, letterSpacing: "0.1em", color: "var(--purple)" }}>4A1382 &middot; 35C6D4 &middot; DF025C</span>
+                  <span>{words.pressKitPaletteLabel}</span>
+                  <span style={{ fontSize: 11, letterSpacing: "0.1em", color: "var(--purple)" }}>{words.pressKitPaletteMeta}</span>
                 </div>
               </div>
             </div>
             <div style={{ background: "var(--teal)", color: "var(--ink)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "9px 9px 0 var(--ink)", padding: "26px 24px" }}>
-              <h2 className="font-display" style={{ fontSize: 21, margin: "0 0 14px" }}>TALK TO THE COUNCIL</h2>
+              <h2 className="font-display" style={{ fontSize: 21, margin: "0 0 14px" }}>{words.contactTitle}</h2>
               <p style={{ fontSize: 15, lineHeight: 1.55, margin: "0 0 20px" }}>
-                Sponsorship, stalls, press passes and anything involving a contract. We reply within two days, faster
-                if you mention food.
+                {words.contactIntro}
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 12, fontSize: 15.5, lineHeight: 1.5 }}>
                 <div>
-                  <strong style={{ fontSize: 11, letterSpacing: "0.16em", color: "var(--purple)", display: "block", marginBottom: 3 }}>SPONSORSHIP</strong>
+                  <strong style={{ fontSize: 11, letterSpacing: "0.16em", color: "var(--purple)", display: "block", marginBottom: 3 }}>{words.contactSponsorshipLabel}</strong>
                   <a href={`mailto:${settings.contactEmail}`} style={{ color: "var(--ink)", borderBottom: "2px solid var(--purple)" }}>{settings.contactEmail}</a>
                 </div>
                 <div>
-                  <strong style={{ fontSize: 11, letterSpacing: "0.16em", color: "var(--purple)", display: "block", marginBottom: 3 }}>PRESS</strong>
+                  <strong style={{ fontSize: 11, letterSpacing: "0.16em", color: "var(--purple)", display: "block", marginBottom: 3 }}>{words.contactPressLabel}</strong>
                   <a href={`mailto:${settings.contactEmail}`} style={{ color: "var(--ink)", borderBottom: "2px solid var(--purple)" }}>{settings.contactEmail}</a>
                 </div>
                 <div>
-                  <strong style={{ fontSize: 11, letterSpacing: "0.16em", color: "var(--purple)", display: "block", marginBottom: 3 }}>FEST OFFICE</strong>
-                  {settings.contactPhone} &middot; weekdays 4&ndash;7 PM
+                  <strong style={{ fontSize: 11, letterSpacing: "0.16em", color: "var(--purple)", display: "block", marginBottom: 3 }}>{words.contactOfficeLabel}</strong>
+                  {settings.contactPhone} &middot; {words.contactOfficeHours}
                 </div>
               </div>
             </div>
