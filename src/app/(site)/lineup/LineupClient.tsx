@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import type { FestSettings } from "@/lib/festSettings";
+import { isPageHidden, type FestSettings } from "@/lib/festSettings";
 
 export type ArtistCard = {
   id: string;
@@ -234,6 +234,7 @@ export default function LineupClient({
             ))}
           </div>
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginTop: 30 }}>
+            {!isPageHidden(settings, "tickets") && (
             <Link
               href="/tickets"
               className="mz-pop font-display"
@@ -241,6 +242,7 @@ export default function LineupClient({
             >
               GET A PASS BEFORE THE REVEAL
             </Link>
+            )}
           </div>
         </div>
       </section>

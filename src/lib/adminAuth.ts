@@ -34,9 +34,16 @@ export function missingAdminConfig(): string[] {
   return missing;
 }
 
-function isAdminClaim(claims: { admin?: unknown; email?: string }): boolean {
+function isAdminClaim(claims: { admin?: unknown; email?: string; email_verified?: unknown }): boolean {
+  if (claims.admin === true) return true;
+
+  // The allowlist is a list of addresses, not of people. Anyone can register an
+  // address they don't own, so the address only counts once Firebase has seen
+  // the owner confirm it. A custom claim is granted deliberately and needs no
+  // such proof.
   const email = (claims.email ?? "").toLowerCase();
-  return claims.admin === true || (!!email && adminAllowlist().includes(email));
+  if (!email || claims.email_verified !== true) return false;
+  return adminAllowlist().includes(email);
 }
 
 export type SignInResult =

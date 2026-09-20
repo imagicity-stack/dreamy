@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { formatInr } from "@/data/fest";
 import { SealedDateStamp, SealedDateTiles } from "@/components/SealedDate";
-import type { DateDisplay, FestSettings } from "@/lib/festSettings";
+import { isPageHidden, type DateDisplay, type FestSettings } from "@/lib/festSettings";
 import { openRazorpayCheckout } from "@/lib/razorpayClient";
 
 type PassResult = {
@@ -139,6 +139,7 @@ export default function TicketsClient({ settings, date }: { settings: FestSettin
               </div>
             </div>
             <div style={{ display: "flex", gap: 14, flexWrap: "wrap", marginTop: 26 }}>
+              {!isPageHidden(settings, "cosplay") && (
               <Link
                 href="/cosplay"
                 className="mz-pop font-display"
@@ -146,6 +147,7 @@ export default function TicketsClient({ settings, date }: { settings: FestSettin
               >
                 NOW REGISTER FOR COSPLAY
               </Link>
+              )}
               <button
                 onClick={() => {
                   setPass(null);
@@ -184,6 +186,7 @@ export default function TicketsClient({ settings, date }: { settings: FestSettin
                 </div>
               </div>
 
+              {!isPageHidden(settings, "concert") && (
               <Link
                 href="/concert"
                 style={{ background: "var(--near-black)", color: "var(--lilac)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "10px 10px 0 var(--ink)", padding: "26px 24px", cursor: "pointer", position: "relative", overflow: "hidden", display: "block" }}
@@ -221,10 +224,11 @@ export default function TicketsClient({ settings, date }: { settings: FestSettin
                   </div>
                 </div>
               </Link>
+              )}
 
               <div style={{ fontSize: 13.5, lineHeight: 1.55, color: "#C9B4E0", padding: "0 4px" }}>
                 Cosplay contest entry is &#8377;400 on top of any pass &mdash; register on the{" "}
-                <Link href="/cosplay">Cosplay page</Link>. Under-14s from outside the school need an accompanying
+                {isPageHidden(settings, "cosplay") ? "Cosplay page" : <Link href="/cosplay">Cosplay page</Link>}. Under-14s from outside the school need an accompanying
                 adult pass. Fete Pass holders can upgrade at the gate for the difference, subject to concert
                 capacity.
               </div>
@@ -240,7 +244,10 @@ export default function TicketsClient({ settings, date }: { settings: FestSettin
                     <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.12em" }}>{formatInr(settings.fetePrice)} EACH</div>
                   </div>
                   <div style={{ fontSize: 10.5, lineHeight: 1.7, letterSpacing: "0.08em", color: "#DCC9F2", marginTop: 9 }}>
-                    CONCERT PASSES OPEN WITH THE REVEAL &mdash; <Link href="/concert" style={{ color: "var(--teal)" }}>REGISTER YOUR INTEREST</Link>
+                    CONCERT PASSES OPEN WITH THE REVEAL
+                    {!isPageHidden(settings, "concert") && (
+                      <> &mdash; <Link href="/concert" style={{ color: "var(--teal)" }}>REGISTER YOUR INTEREST</Link></>
+                    )}
                   </div>
                 </div>
                 <div>

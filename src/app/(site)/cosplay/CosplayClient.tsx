@@ -278,7 +278,7 @@ export default function CosplayClient({
                 <button
                   onClick={() => {
                     setDone(false);
-                    setEntry({ name: "", school: "", phone: "", character: "", category: "Anime", mode: "solo", team: "", members: "" });
+                    setEntry({ name: "", school: "", phone: "", character: "", category: categories[0]?.value ?? "", mode: "solo", team: "", members: "" });
                   }}
                   style={{ marginTop: 20, fontWeight: 700, fontSize: 12, letterSpacing: "0.14em", background: "transparent", border: "2px solid var(--ink)", borderRadius: 14, padding: "13px 16px", cursor: "pointer", color: "var(--ink)" }}
                 >

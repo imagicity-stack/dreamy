@@ -78,6 +78,7 @@ export default async function FetePage() {
                 applications every Friday until the stall list closes, three weeks before gates.
               </p>
             </div>
+            {!isPageHidden(settings, "sponsors") && (
             <Link
               href="/sponsors"
               className="mz-pop font-display"
@@ -85,6 +86,7 @@ export default async function FetePage() {
             >
               APPLY FOR A SLOT
             </Link>
+            )}
           </div>
         </div>
       </section>

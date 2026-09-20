@@ -16,7 +16,6 @@ const ALLOWED: Record<string, string> = {
   "image/webp": "webp",
   "image/gif": "gif",
   "image/avif": "avif",
-  "image/svg+xml": "svg",
 };
 
 export type StoredMedia = {
@@ -71,7 +70,7 @@ export async function uploadMedia(file: File, folder: string): Promise<UploadRes
   const contentType = file.type || "application/octet-stream";
   const extension = ALLOWED[contentType];
   if (!extension) {
-    return { ok: false, status: 415, error: "That file type isn't allowed. Use JPEG, PNG, WebP, AVIF, GIF or SVG." };
+    return { ok: false, status: 415, error: "That file type isn't allowed. Use JPEG, PNG, WebP, AVIF or GIF." };
   }
   if (file.size > MAX_BYTES) {
     return { ok: false, status: 413, error: "That image is over 8MB. Shrink it and try again." };
