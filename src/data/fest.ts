@@ -16,18 +16,6 @@ export const FEST = {
  * Every place that would print a date pulls its wording from here, so the
  * real date only has to be typed in one file when it finally drops.
  */
-export const DATE_REVEAL = {
-  unknownDay: "??",
-  unknownMonth: "??",
-  yearShort: "26",
-  year: "2026",
-  stamp: "DATE SEALED",
-  kicker: "THE EXACT DATE",
-  ticker: "2026 · DATE SEALED, DROPS WITH THE FINAL REVEAL",
-  line: "Sealed until the guests are out. The day drops with the final reveal — and passes open the same hour.",
-  short: "DATE TO BE ANNOUNCED",
-};
-
 export function formatInr(n: number): string {
   return "₹" + Number(n).toLocaleString("en-IN");
 }
@@ -103,27 +91,3 @@ export const stalls: Stall[] = [
  * The answers quote live prices, so they're built per request from the
  * settings the admin panel edits rather than frozen into the file.
  */
-export function buildFaqs(prices: {
-  fetePrice: number;
-  cosplayFee: number;
-  concertCapacity: number;
-}): { q: string; a: string }[] {
-  const fete = formatInr(prices.fetePrice);
-  const cosplay = formatInr(prices.cosplayFee);
-  const seats = prices.concertCapacity.toLocaleString("en-IN");
-
-  return [
-    { q: "Do I have to study at Elden Heights to come?", a: "No. MADOOZA is open to every school in Hazaribagh, to families, and to anyone in town with a pass. Outside-school visitors under 14 need an adult with them." },
-    { q: "What is the difference between the two passes?", a: `The ${fete} Fete Pass covers the grounds from 9:00 AM to 4:00 PM — every stall, the cosplay arena, the day stages and all competitions, plus 5 MADOOZA coins and parking. It is on sale now. The Concert Pass adds the 4:30 PM concert and the front-of-stage pit, capped at ${seats} — its price goes up with the singer reveal.` },
-    { q: "Why is the Concert Pass price not announced?", a: `Because the act is not announced. The council is not putting a number on a show it cannot name yet. Put your name on the interest list and you get the name, the date and the price an hour before anyone else, plus 48 hours on the ${seats} seats.` },
-    { q: "How much does the cosplay contest cost?", a: `${cosplay} per entry — the same whether you walk solo or bring a squad of six. That is on top of a Fete or Concert Pass, which you need to be on the grounds at all. Non-refundable, but transferable to another entrant until entries close.` },
-    { q: "Can I upgrade from a Fete Pass once concert passes open?", a: `Yes, at the gate or online, for the difference in price — but only while concert capacity lasts. If the ${seats} go early, the upgrade window closes and no amount of pleading with the council will reopen it.` },
-    { q: "Can I come in cosplay without competing?", a: "Please do. Props under 1.2 metres, nothing sharp, nothing that fires anything. Security will politely confiscate your very cool replica if it looks real." },
-    { q: "How do MADOOZA coins work?", a: "Coins are the only currency inside the grounds. Buy them at the two coin counters near the gate, ₹10 a coin, refunds till 5 PM. No cash changes hands at stalls." },
-    { q: "Is there parking?", a: "Yes, on the far field off the service gate, free with any pass. It fills by 11 AM, so carpool or get dropped at the main gate." },
-    { q: "When are the guests revealed?", a: "Clues drop weekly on the Lineup page, then three full reveals — the third one takes the lid off the date as well. No calendar yet, on purpose: the council will not name a day it might have to move. Nobody will break early either, we tried." },
-    { q: "When exactly is MADOOZA?", a: "A Saturday in 2026 — and that is genuinely all anyone is allowed to tell you. The date is sealed until the last guest reveal, then it goes up everywhere at once, the same hour the concert passes open. Gates 9:00 AM, last encore 6:00 PM, whatever day it lands on. Put your name on the concert interest list and you get the date before the rest of town." },
-    { q: "What if it rains?", a: "The fete and arena move under the assembly canopy and the concert runs in the auditorium. The fest happens regardless." },
-    { q: "Can my company set up a stall?", a: "Yes — sponsor and vendor slots are on the Sponsors page. Stall setup closes three weeks before gates; the exact cut-off goes out with the date." },
-  ];
-}

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import type { FestSettings } from "@/lib/settings";
+import { describeDate, type FestSettings } from "@/lib/festSettings";
 
 const SEAT_LABELS: Record<string, string> = {
   "1": "1 seat",
@@ -14,6 +14,7 @@ const SEAT_LABELS: Record<string, string> = {
 type Ticket = { name: string; no: string; pick: string; guess: string; seats: string };
 
 export default function ConcertClient({ settings }: { settings: FestSettings }) {
+  const date = describeDate(settings);
   const [interestCount, setInterestCount] = useState(settings.interestBase.toLocaleString("en-IN"));
   const [form, setForm] = useState({ name: "", contact: "", pick: "", guess: "", seats: "1" });
   const [ticket, setTicket] = useState<Ticket | null>(null);
@@ -133,7 +134,7 @@ export default function ConcertClient({ settings }: { settings: FestSettings }) 
                   <div style={{ display: "flex", gap: 11 }}><span style={{ color: "var(--teal)", fontWeight: 700 }}>&#9733;</span><span>Main stage, 4:30 PM, running to the 6:00 PM encore</span></div>
                   <div style={{ display: "flex", gap: 11 }}><span style={{ color: "var(--teal)", fontWeight: 700 }}>&#9733;</span><span>A national touring act, playing a full live set</span></div>
                   <div style={{ display: "flex", gap: 11 }}><span style={{ color: "var(--teal)", fontWeight: 700 }}>&#9733;</span><span>{settings.concertCapacity.toLocaleString("en-IN")} seats on the field, front-of-stage pit included</span></div>
-                  <div style={{ display: "flex", gap: 11 }}><span style={{ color: "var(--teal)", fontWeight: 700 }}>&#9733;</span><span>A date still under seal &mdash; the day drops with the name</span></div>
+                  <div style={{ display: "flex", gap: 11 }}><span style={{ color: "var(--teal)", fontWeight: 700 }}>&#9733;</span><span>{date.sealed ? "A date still under seal — the day drops with the name" : `${date.short} — gates 9:00 AM`}</span></div>
                 </div>
               </div>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 14 }}>

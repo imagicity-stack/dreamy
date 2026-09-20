@@ -1,5 +1,8 @@
 import Link from "next/link";
 import { adminGate } from "@/lib/adminAuth";
+import { CONTENT } from "@/lib/content";
+import { mediaConfigured } from "@/lib/media";
+import { PAGES } from "@/lib/settings";
 import AdminPanel from "./AdminPanel";
 import SignInCard from "./SignInCard";
 import SignOutButton from "./SignOutButton";
@@ -58,9 +61,15 @@ export default async function AdminPage() {
     );
   }
 
+  // content.ts and settings.ts both reach for firebase-admin, so the lists are
+  // flattened here on the server and handed to the panel as plain data.
   return (
     <Shell email={gate.user.email}>
-      <AdminPanel />
+      <AdminPanel
+        collections={CONTENT.map((c) => ({ key: c.key, title: c.title }))}
+        pages={PAGES.map((p) => ({ key: p.key, label: p.label }))}
+        mediaReady={mediaConfigured()}
+      />
     </Shell>
   );
 }

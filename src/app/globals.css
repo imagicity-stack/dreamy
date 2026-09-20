@@ -187,6 +187,34 @@ button {
   box-shadow: 2px 2px 0 var(--ink) !important;
 }
 
+/* The full nav stops fitting below ~900px; the drawer takes over there. */
+.mz-nav-desktop {
+  display: flex;
+  align-items: center;
+}
+.mz-nav-toggle {
+  display: none;
+}
+@media (max-width: 899px) {
+  .mz-nav-desktop {
+    display: none;
+  }
+  .mz-nav-toggle {
+    display: flex;
+  }
+}
+
+.mz-drawer-link {
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+.mz-drawer-link:hover,
+.mz-drawer-link:focus-visible {
+  color: var(--ink) !important;
+  background: var(--lilac) !important;
+}
+
 .mz-nav-link {
   color: var(--lilac);
   padding: 7px 9px;

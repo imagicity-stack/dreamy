@@ -69,13 +69,24 @@ a disabled or signed-out account loses access at once. `/admin` itself is a serv
 same check: a visitor who isn't an admin is never sent the panel's markup, let alone its data. There is
 no Firebase SDK in the browser bundle and no token in JavaScript for a script to steal.
 
-**What it does.**
+**What it does.** Four tabs:
 
-- Prices and switches: Fete Pass, cosplay entry, the six merch prices, concert capacity, the interest-list
-  starting number, and the sold-out / lineup-unlocked toggles. Saving writes `settings/fest` in Firestore
-  and the site picks it up on the next request — no deploy needed.
-- Read views of `passes`, `cosplayEntries`, `concertInterest` and `merchOrders`, each with a CSV download,
-  plus an overview of counts and money taken.
+- **Overview** — counts and money taken.
+- **Settings** — Fete Pass and cosplay prices, concert capacity, the interest-list starting number; how
+  much of the date to give away (sealed / month only / full) and the day, month and year behind it; the
+  countdown and what it counts down to; which pages are live; the sold-out and lineup-unlocked switches;
+  the announcement banner; the browser title, search description and the public email and phone. Saving
+  writes `settings/fest` in Firestore and the site picks it up on the next request — no deploy needed.
+- **Content** — every editable list: guest artists (with photos and a per-artist reveal), support acts,
+  gallery shots, merch, fete stalls, FAQ answers, the header ticker, the home stat cards, sponsor logos,
+  sponsor tiers, and the cosplay categories and prizes. Rows can be added, reordered, hidden or deleted,
+  and image fields upload straight to the Firebase storage bucket.
+- **Sign-ups** — read views of `passes`, `cosplayEntries`, `concertInterest` and `merchOrders`, each with
+  a CSV download.
+
+Each list starts from the seed values in `src/data/fest.ts` and `src/lib/content.ts`; the first save
+writes a `content_<key>` collection and the site reads that from then on. Adding a new editable list
+means adding an entry to `CONTENT` in `src/lib/content.ts` — the editor and the API routes are generic.
 
 Prices are always taken from the server. The order routes compute the amount from `settings/fest`, and the
 verify routes read the amount back off the Razorpay order, so a tampered request body can't change what
@@ -89,22 +100,31 @@ gets charged or recorded.
   count used both as the public "X have already put their name down" figure and each signup's queue
   number.
 - `merchOrders` — merch pre-orders (line items, total). Paid on collection, no online payment.
-- `settings/fest` — the live prices, capacities and toggles the admin panel edits. Created on the first
-  save; until then the site uses the seed values in `src/data/fest.ts`.
+- `settings/fest` — the live prices, capacities, date and toggles the admin panel edits. Created on the
+  first save; until then the site uses the seed values in `src/data/fest.ts`.
+- `content_<key>` — one per editable list (`content_lineup`, `content_sponsors`, `content_faqs`, …).
+  Created when that list is first saved; until then the site uses the seeds in `src/lib/content.ts`.
 
 ## Content
 
-Fest copy, lineup clues, merch items, fete stalls and FAQs live in `src/data/fest.ts` — edit there rather
-than in a CMS. The `FEST` object in that file is only the *seed* for the settings document: once
-`settings/fest` exists in Firestore, prices and toggles come from the admin panel instead.
+Everything the council might want to change is edited in the admin panel, not in the source. What lives
+in `src/data/fest.ts` and in the `seed` arrays of `src/lib/content.ts` is only the starting point: once a
+list has been saved once, the site reads `content_<key>` from Firestore instead.
+
+- `src/lib/festSettings.ts` — the shape of the settings, their defaults, and `describeDate()`. It touches
+  no Firestore, so client components can import it; `src/lib/settings.ts` adds the reads and writes and
+  re-exports the rest.
+- `src/lib/content.ts` — the editable lists: their fields, and the values they start from.
+- `src/lib/media.ts` — uploads to the Firebase storage bucket. Files are saved with a download token, so
+  they serve over HTTPS without making the bucket public.
 
 ### The date
 
-MADOOZA's date is deliberately unannounced until the last guest reveal, so no page names a month. The
-wording for that lives in one place, `DATE_REVEAL` in `src/data/fest.ts`, and the sealed `?? · ?? · 26`
-tiles and the "DATE SEALED" stamp are the `SealedDateTiles` / `SealedDateStamp` components in
-`src/components/SealedDate.tsx`. When the date is finally fixed, that constant and those two components
-are what change.
+MADOOZA's date is deliberately unannounced until the last guest reveal, so no page names a month. One
+setting decides how much to give away — sealed, month only, or the full date — and `describeDate()` in
+`src/lib/festSettings.ts` turns it into every form the site needs: the `?? · ?? · 26` tiles, the ticker
+line, the hero headline, the body-copy sentence. Revealing the month is a change in the panel, not a
+deploy, and nothing has to be hunted down page by page.
 
 ## Development
 

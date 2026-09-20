@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { DATE_REVEAL, formatInr } from "@/data/fest";
+import { formatInr } from "@/data/fest";
 import { SealedDateStamp, SealedDateTiles } from "@/components/SealedDate";
-import type { FestSettings } from "@/lib/settings";
+import type { DateDisplay, FestSettings } from "@/lib/festSettings";
 import { openRazorpayCheckout } from "@/lib/razorpayClient";
 
 type PassResult = {
@@ -14,7 +14,7 @@ type PassResult = {
   totalLabel: string;
 };
 
-export default function TicketsClient({ settings }: { settings: FestSettings }) {
+export default function TicketsClient({ settings, date }: { settings: FestSettings; date: DateDisplay }) {
   const [qty, setQty] = useState(1);
   const [buyer, setBuyer] = useState({ name: "", school: "", phone: "" });
   const [pass, setPass] = useState<PassResult | null>(null);
@@ -94,11 +94,13 @@ export default function TicketsClient({ settings }: { settings: FestSettings }) 
             sealed.
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap", marginTop: 24 }}>
-            <SealedDateStamp />
+            <SealedDateStamp date={date} />
             <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
-              <SealedDateTiles size="sm" />
+              <SealedDateTiles date={date} size="sm" />
               <span style={{ fontSize: 12.5, lineHeight: 1.5, color: "var(--muted-lilac)", maxWidth: "34ch" }}>
-                Your pass works whatever day it lands on. Gates 9:00 AM either way.
+                {date.sealed
+                  ? "Your pass works whatever day it lands on. Gates 9:00 AM either way."
+                  : "Gates 9:00 AM. Bring the pass code, we'll do the rest."}
               </span>
             </div>
           </div>
@@ -111,7 +113,7 @@ export default function TicketsClient({ settings }: { settings: FestSettings }) 
             <div style={{ background: "var(--paper)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "12px 12px 0 var(--ink)", overflow: "hidden" }}>
               <div style={{ background: "var(--purple)", color: "var(--lilac)", padding: "20px 26px", display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", borderBottom: "3px solid var(--ink)" }}>
                 <div className="font-display" style={{ fontSize: 20, color: "var(--teal)" }}>YOU&apos;RE IN</div>
-                <div style={{ fontSize: 11, letterSpacing: "0.18em" }}>{DATE_REVEAL.short} &middot; GATES 9:00 AM</div>
+                <div style={{ fontSize: 11, letterSpacing: "0.18em" }}>{date.short} &middot; GATES 9:00 AM</div>
               </div>
               <div style={{ padding: 26, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 22 }}>
                 <div>

@@ -1,8 +1,21 @@
-import { getSettings, merchWithPrices } from "@/lib/settings";
-import MerchClient from "./MerchClient";
+import { notFound } from "next/navigation";
+import { publicContent } from "@/lib/content";
+import { getSettings, isPageHidden } from "@/lib/settings";
+import MerchClient, { type MerchRecord } from "./MerchClient";
 
 export const dynamic = "force-dynamic";
 
 export default async function MerchPage() {
-  return <MerchClient merchItems={merchWithPrices(await getSettings())} />;
+  const settings = await getSettings();
+  if (isPageHidden(settings, "merch")) notFound();
+
+  const items = (await publicContent("merch")).map((r) => ({
+    id: r.id,
+    name: String(r.name ?? ""),
+    price: Number(r.price ?? 0),
+    note: String(r.note ?? ""),
+    image: (r.image as MerchRecord["image"]) ?? null,
+  }));
+
+  return <MerchClient merchItems={items} />;
 }

@@ -1,29 +1,34 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import { openRazorpayCheckout } from "@/lib/razorpayClient";
 import { formatInr } from "@/data/fest";
-import type { FestSettings } from "@/lib/settings";
+import type { FestSettings } from "@/lib/festSettings";
 
-const CATEGORIES = [
-  { value: "Anime", label: "Anime & Manga" },
-  { value: "Comic", label: "Comic & Screen" },
-  { value: "Original", label: "Original Design" },
-  { value: "Group", label: "Group Act" },
+export type Category = {
+  id: string;
+  title: string;
+  value: string;
+  body: string;
+  image: { url: string } | null;
+};
+
+export type Prize = { id: string; amount: string; title: string; note: string };
+
+/** Cycled so a fifth category still looks like it belongs to the set. */
+const CARD_SKINS = [
+  { bg: "var(--purple)", fg: "var(--lilac)", nColor: "var(--teal)" },
+  { bg: "var(--lilac)", fg: "var(--ink)", nColor: "var(--purple)" },
+  { bg: "var(--paper)", fg: "var(--ink)", nColor: "var(--purple)" },
+  { bg: "var(--teal)", fg: "var(--ink)", nColor: "var(--purple)" },
 ];
 
-const CATEGORY_CARDS = [
-  { n: "CATEGORY 01", title: "ANIME & MANGA", body: "Anything from the shelves — shounen, shoujo, that one obscure 90s OVA nobody will recognise.", bg: "var(--purple)", fg: "var(--lilac)", nColor: "var(--teal)" },
-  { n: "CATEGORY 02", title: "COMIC & SCREEN", body: "Capes, villains, sitcom characters, and the entire cast of whatever your family binge-watched.", bg: "var(--lilac)", fg: "var(--ink)", nColor: "var(--purple)" },
-  { n: "CATEGORY 03", title: "ORIGINAL DESIGN", body: "You invented them. Bring a one-line backstory — the judges will absolutely ask.", bg: "var(--paper)", fg: "var(--ink)", nColor: "var(--purple)" },
-  { n: "CATEGORY 04", title: "GROUP ACT", body: "Three to six people, one theme, 90 seconds on stage. Choreography optional but heavily rewarded.", bg: "var(--teal)", fg: "var(--ink)", nColor: "var(--purple)" },
-];
-
-const PRIZES = [
-  { amount: "₹15K", bg: "var(--teal)", fg: "var(--ink)", body: <><strong>Best in Show</strong> &mdash; plus the trophy and a permanent spot on the arena wall</> },
-  { amount: "₹8K", bg: "var(--lilac)", fg: "var(--ink)", amountColor: "var(--purple)", body: <><strong>Category winner &times;4</strong> &mdash; one per category, &#8377;8,000 each</> },
-  { amount: "₹5K", bg: "var(--purple)", fg: "var(--lilac)", amountColor: "var(--teal)", body: <><strong>Best Group Act</strong> &mdash; split however your squad decides</> },
-  { amount: "CROWD", bg: "var(--paper)", fg: "var(--ink)", amountColor: "var(--purple)", small: true, body: <><strong>People&apos;s Choice</strong> &mdash; voted live by the field, wins the full merch box</> },
+const PRIZE_SKINS = [
+  { bg: "var(--teal)", fg: "var(--ink)", amountColor: undefined as string | undefined },
+  { bg: "var(--lilac)", fg: "var(--ink)", amountColor: "var(--purple)" },
+  { bg: "var(--purple)", fg: "var(--lilac)", amountColor: "var(--teal)" },
+  { bg: "var(--paper)", fg: "var(--ink)", amountColor: "var(--purple)" },
 ];
 
 type Entry = {
@@ -31,9 +36,17 @@ type Entry = {
   mode: "solo" | "team"; team: string; members: string;
 };
 
-export default function CosplayClient({ settings }: { settings: FestSettings }) {
+export default function CosplayClient({
+  settings,
+  categories,
+  prizes,
+}: {
+  settings: FestSettings;
+  categories: Category[];
+  prizes: Prize[];
+}) {
   const [entry, setEntry] = useState<Entry>({
-    name: "", school: "", phone: "", character: "", category: "Anime", mode: "solo", team: "", members: "",
+    name: "", school: "", phone: "", character: "", category: categories[0]?.value ?? "", mode: "solo", team: "", members: "",
   });
   const [done, setDone] = useState(false);
   const [status, setStatus] = useState<"idle" | "processing" | "error">("idle");
@@ -121,13 +134,23 @@ export default function CosplayClient({ settings }: { settings: FestSettings }) 
       <section style={{ background: "var(--bg)", padding: "54px 20px 60px" }}>
         <div style={{ maxWidth: 1180, margin: "0 auto" }}>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 18, marginBottom: 46 }}>
-            {CATEGORY_CARDS.map((c) => (
-              <div key={c.n} style={{ background: c.bg, color: c.fg, border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "7px 7px 0 var(--ink)", padding: "22px 20px" }}>
-                <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: c.nColor }}>{c.n}</div>
-                <h3 className="font-display" style={{ fontSize: 20, margin: "10px 0 8px" }}>{c.title}</h3>
-                <p style={{ fontSize: 14, lineHeight: 1.5, margin: 0 }}>{c.body}</p>
-              </div>
-            ))}
+            {categories.map((c, i) => {
+              const skin = CARD_SKINS[i % CARD_SKINS.length];
+              return (
+                <div key={c.id} style={{ background: skin.bg, color: skin.fg, border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "7px 7px 0 var(--ink)", padding: "22px 20px" }}>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: skin.nColor }}>
+                    CATEGORY {String(i + 1).padStart(2, "0")}
+                  </div>
+                  {c.image?.url && (
+                    <div style={{ position: "relative", height: 130, margin: "12px 0 4px", border: "2px solid var(--ink)", borderRadius: 14, overflow: "hidden" }}>
+                      <Image src={c.image.url} alt={c.title} fill sizes="(max-width: 700px) 100vw, 260px" style={{ objectFit: "cover" }} />
+                    </div>
+                  )}
+                  <h3 className="font-display" style={{ fontSize: 20, margin: "10px 0 8px" }}>{c.title}</h3>
+                  <p style={{ fontSize: 14, lineHeight: 1.5, margin: 0 }}>{c.body}</p>
+                </div>
+              );
+            })}
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 26, alignItems: "start" }}>
@@ -138,12 +161,19 @@ export default function CosplayClient({ settings }: { settings: FestSettings }) 
                 whom is still in the vault.
               </p>
               <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {PRIZES.map((p) => (
-                  <div key={p.amount} style={{ display: "flex", alignItems: "center", gap: 16, background: p.bg, color: p.fg, border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "6px 6px 0 var(--ink)", padding: "16px 18px" }}>
-                    <div className="font-display" style={{ fontSize: p.small ? 20 : 26, minWidth: 62, color: p.amountColor }}>{p.amount}</div>
-                    <div style={{ fontSize: 14.5, lineHeight: 1.45 }}>{p.body}</div>
-                  </div>
-                ))}
+                {prizes.map((p, i) => {
+                  const skin = PRIZE_SKINS[i % PRIZE_SKINS.length];
+                  // A word like CROWD needs to be smaller than a figure like ₹15K.
+                  const wordy = p.amount.length > 4;
+                  return (
+                    <div key={p.id} style={{ display: "flex", alignItems: "center", gap: 16, background: skin.bg, color: skin.fg, border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "6px 6px 0 var(--ink)", padding: "16px 18px" }}>
+                      <div className="font-display" style={{ fontSize: wordy ? 20 : 26, minWidth: 62, color: skin.amountColor }}>{p.amount}</div>
+                      <div style={{ fontSize: 14.5, lineHeight: 1.45 }}>
+                        <strong>{p.title}</strong>{p.note ? <> &mdash; {p.note}</> : null}
+                      </div>
+                    </div>
+                  );
+                })}
               </div>
             </div>
 
@@ -193,8 +223,8 @@ export default function CosplayClient({ settings }: { settings: FestSettings }) 
                       value={entry.category}
                       onChange={(e) => setEntry((prev) => ({ ...prev, category: e.target.value }))}
                     >
-                      {CATEGORIES.map((c) => (
-                        <option key={c.value} value={c.value}>{c.label}</option>
+                      {categories.map((c) => (
+                        <option key={c.id} value={c.value}>{c.title}</option>
                       ))}
                     </select>
                   </div>
@@ -234,7 +264,7 @@ export default function CosplayClient({ settings }: { settings: FestSettings }) 
                 <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>ENTRY LOGGED</div>
                 <h2 className="font-display" style={{ fontSize: 26, margin: "12px 0 14px", lineHeight: 1.1 }}>SEE YOU AT THE ARENA, {entry.name}</h2>
                 <p style={{ fontSize: 15.5, lineHeight: 1.6, margin: "0 0 18px" }}>
-                  You&apos;re down as <strong>{entry.character}</strong> in <strong>{CATEGORIES.find((c) => c.value === entry.category)?.label}</strong>. Backstage call is 1:45 PM near the
+                  You&apos;re down as <strong>{entry.character}</strong> in <strong>{categories.find((c) => c.value === entry.category)?.title ?? entry.category}</strong>. Backstage call is 1:45 PM near the
                   science block; stage walk starts at 2:30. We&apos;ll message the exact slot the week before.
                 </p>
                 <div style={{ background: "var(--purple)", color: "var(--lilac)", border: "3px solid var(--ink)", borderRadius: 20, padding: "15px 16px", fontSize: 14.5, lineHeight: 1.55, marginBottom: 12 }}>
