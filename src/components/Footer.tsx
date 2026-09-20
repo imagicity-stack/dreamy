@@ -1,7 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
+import { describeDate, getSettings, isPageHidden, type PageKey } from "@/lib/settings";
 
-export default function Footer() {
+export default async function Footer() {
+  const settings = await getSettings();
+  const date = describeDate(settings);
+
+  // The footer used to carry its own copy of the site map. Hiding a page in the
+  // panel left these links pointing at a 404, so they are filtered now.
+  const live = (key: PageKey) => !isPageHidden(settings, key);
+
   return (
     <footer
       style={{
@@ -50,11 +58,11 @@ export default function Footer() {
             THE FEST
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 14 }}>
-            <Link href="/lineup" className="mz-footer-link">Lineup &amp; reveal</Link>
-            <Link href="/concert" className="mz-footer-link">The concert &middot; guess who</Link>
-            <Link href="/cosplay" className="mz-footer-link">Cosplay contest</Link>
-            <Link href="/fete" className="mz-footer-link">Fete &amp; stalls</Link>
-            <Link href="/gallery" className="mz-footer-link">Gallery</Link>
+            {live("lineup") && <Link href="/lineup" className="mz-footer-link">Lineup &amp; reveal</Link>}
+            {live("concert") && <Link href="/concert" className="mz-footer-link">The concert &middot; guess who</Link>}
+            {live("cosplay") && <Link href="/cosplay" className="mz-footer-link">Cosplay contest</Link>}
+            {live("fete") && <Link href="/fete" className="mz-footer-link">Fete &amp; stalls</Link>}
+            {live("gallery") && <Link href="/gallery" className="mz-footer-link">Gallery</Link>}
           </div>
         </div>
         <div>
@@ -62,10 +70,10 @@ export default function Footer() {
             GET IN
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 14 }}>
-            <Link href="/tickets" className="mz-footer-link">Passes &amp; tickets</Link>
-            <Link href="/merch" className="mz-footer-link">Merch shop</Link>
-            <Link href="/sponsors" className="mz-footer-link">Sponsors &amp; press kit</Link>
-            <Link href="/faq" className="mz-footer-link">FAQ + venue</Link>
+            {live("tickets") && <Link href="/tickets" className="mz-footer-link">Passes &amp; tickets</Link>}
+            {live("merch") && <Link href="/merch" className="mz-footer-link">Merch shop</Link>}
+            {live("sponsors") && <Link href="/sponsors" className="mz-footer-link">Sponsors &amp; press kit</Link>}
+            {live("faq") && <Link href="/faq" className="mz-footer-link">FAQ + venue</Link>}
           </div>
         </div>
         <div>
@@ -77,11 +85,11 @@ export default function Footer() {
             <br />
             Hazaribagh, Jharkhand
             <br />
-            <a href="mailto:contact@madooza.in" style={{ color: "var(--teal)" }}>
-              contact@madooza.in
+            <a href={`mailto:${settings.contactEmail}`} style={{ color: "var(--teal)" }}>
+              {settings.contactEmail}
             </a>
             <br />
-            +91 91222 80578
+            {settings.contactPhone}
           </div>
         </div>
       </div>
@@ -100,8 +108,8 @@ export default function Footer() {
           color: "var(--muted-lilac)",
         }}
       >
-        <span>&copy; 2026 MADOOZA &middot; STUDENT COUNCIL, ELDEN HEIGHTS</span>
-        <span>?? &middot; 11 &middot; 2026</span>
+        <span>&copy; {settings.festYear} MADOOZA &middot; STUDENT COUNCIL, ELDEN HEIGHTS</span>
+        <span>{date.dayTile} &middot; {date.monthTile} &middot; {settings.festYear}</span>
       </div>
     </footer>
   );

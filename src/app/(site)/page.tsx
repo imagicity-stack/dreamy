@@ -1,16 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
-import { DATE_REVEAL, formatInr } from "@/data/fest";
-import { getSettings } from "@/lib/settings";
+import { formatInr } from "@/data/fest";
+import { describeDate, getSettings, isPageHidden, type PageKey } from "@/lib/settings";
+import { publicContent } from "@/lib/content";
 import { SealedDateTiles } from "@/components/SealedDate";
+import Countdown from "@/components/Countdown";
 
 export const dynamic = "force-dynamic";
 
-const STATS = [
-  { value: "40+", note: "stalls, booths and questionable games", bg: "var(--purple)", fg: "var(--lilac)", accent: "var(--teal)", rotate: "-1.4deg" },
-  { value: "9H", note: "of non-stop programming, one field", bg: "var(--teal)", fg: "var(--ink)", accent: "var(--ink)", rotate: "1.2deg" },
-  { value: "₹1.2L", note: "prize money across every contest", bg: "var(--paper)", fg: "var(--ink)", accent: "var(--purple)", rotate: "0.8deg" },
-  { value: "3", note: "names still locked in the vault", bg: "var(--bg)", fg: "var(--lilac)", accent: "var(--teal)", rotate: "-0.9deg" },
+/** The tilt and colours are the set's look, so they stay in code. */
+const STAT_SKINS = [
+  { bg: "var(--purple)", fg: "var(--lilac)", accent: "var(--teal)", rotate: "-1.4deg" },
+  { bg: "var(--teal)", fg: "var(--ink)", accent: "var(--ink)", rotate: "1.2deg" },
+  { bg: "var(--paper)", fg: "var(--ink)", accent: "var(--purple)", rotate: "0.8deg" },
+  { bg: "var(--bg)", fg: "var(--lilac)", accent: "var(--teal)", rotate: "-0.9deg" },
 ];
 
 function chaosCards(cosplayFee: number) {
@@ -25,7 +28,13 @@ function chaosCards(cosplayFee: number) {
 
 export default async function HomePage() {
   const settings = await getSettings();
-  const CHAOS_CARDS = chaosCards(settings.cosplayFee);
+  const date = describeDate(settings);
+  const [stats, sponsors] = await Promise.all([publicContent("homeStats"), publicContent("sponsors")]);
+
+  // A hidden page still had a door on the home page, which landed visitors on a
+  // 404. Every link out of here is filtered through the same check now.
+  const live = (key: PageKey) => !isPageHidden(settings, key);
+  const CHAOS_CARDS = chaosCards(settings.cosplayFee).filter((c) => live(c.href.slice(1) as PageKey));
 
   return (
     <main>
@@ -117,6 +126,7 @@ export default async function HomePage() {
           </p>
 
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center", marginTop: 34 }}>
+            {live("concert") && (
             <Link
               href="/concert"
               className="mz-pop font-display"
@@ -124,6 +134,8 @@ export default async function HomePage() {
             >
               GUESS WHO &rarr;
             </Link>
+            )}
+            {live("tickets") && (
             <Link
               href="/tickets"
               className="mz-pop font-display"
@@ -131,6 +143,8 @@ export default async function HomePage() {
             >
               GRAB A PASS
             </Link>
+            )}
+            {live("cosplay") && (
             <Link
               href="/cosplay"
               className="mz-pop font-display"
@@ -138,6 +152,7 @@ export default async function HomePage() {
             >
               ENTER THE COSPLAY ARENA
             </Link>
+            )}
           </div>
 
           <div
@@ -158,24 +173,33 @@ export default async function HomePage() {
           >
             <div style={{ padding: "24px 26px 26px", containerType: "inline-size" }}>
               <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>IT ALL HAPPENS IN</div>
-              <div className="font-display" style={{ fontSize: "clamp(30px, 15cqw, 56px)", lineHeight: 0.94, marginTop: 8 }}>{DATE_REVEAL.year}</div>
+              <div className="font-display" style={{ fontSize: "clamp(30px, 15cqw, 56px)", lineHeight: 0.94, marginTop: 8 }}>{date.headline}</div>
               <div className="font-display" style={{ fontSize: "clamp(18px, 2.8vw, 26px)", color: "var(--crimson)", lineHeight: 1.05, marginTop: 6 }}>
-                ON A DAY WE<br />REFUSE TO NAME
+                {date.subline}
               </div>
-              <div style={{ fontSize: 12.5, lineHeight: 1.5, color: "var(--purple)", marginTop: 10, maxWidth: "26ch" }}>
-                Yet. The council has picked it. The council is sitting on it.
-              </div>
+              {date.sealed && (
+                <div style={{ fontSize: 12.5, lineHeight: 1.5, color: "var(--purple)", marginTop: 10, maxWidth: "26ch" }}>
+                  The council has picked it. The council is sitting on it.
+                </div>
+              )}
             </div>
             <div style={{ background: "var(--purple)", color: "var(--lilac)", padding: "24px 26px 26px", display: "flex", flexDirection: "column", gap: 12, justifyContent: "center", borderLeft: "3px solid var(--ink)" }}>
-              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal)" }}>{DATE_REVEAL.kicker}</div>
-              <SealedDateTiles />
-              <div style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.16em", color: "var(--teal)" }}>
-                <span style={{ animation: "mzflick 3.4s linear infinite" }}>&#9679;</span>
-                DAY AND MONTH SEALED
-              </div>
-              <div style={{ fontSize: 14.5, lineHeight: 1.5, color: "var(--lilac-text)" }}>
-                {DATE_REVEAL.line}
-              </div>
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal)" }}>THE EXACT DATE</div>
+              <SealedDateTiles date={date} />
+              {date.sealed && (
+                <div style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.16em", color: "var(--teal)" }}>
+                  <span style={{ animation: "mzflick 3.4s linear infinite" }}>&#9679;</span>
+                  {date.mode === "month" ? "THE DAY IS STILL SEALED" : "DAY AND MONTH SEALED"}
+                </div>
+              )}
+              {settings.countdownEnabled && settings.countdownTarget ? (
+                <Countdown target={settings.countdownTarget} label={settings.countdownLabel} />
+              ) : (
+                <div style={{ fontSize: 14.5, lineHeight: 1.5, color: "var(--lilac-text)" }}>
+                  Sealed until the guests are out. The day drops with the final reveal &mdash; and passes open the
+                  same hour.
+                </div>
+              )}
             </div>
           </div>
           <div style={{ fontSize: 12, letterSpacing: "0.14em", color: "var(--muted-lilac)", marginTop: 14 }}>
@@ -215,32 +239,39 @@ export default async function HomePage() {
               to anyone in town who hears the soundcheck and follows it. One pass. Everything inside.
             </p>
             <div style={{ display: "flex", gap: 12, flexWrap: "wrap", marginTop: 26 }}>
-              <Link href="/tickets" style={{ fontWeight: 700, fontSize: 12.5, letterSpacing: "0.14em", color: "var(--ink)", borderBottom: "3px solid var(--teal)", paddingBottom: 2 }}>
-                PASSES &rarr;
-              </Link>
-              <Link href="/faq" style={{ fontWeight: 700, fontSize: 12.5, letterSpacing: "0.14em", color: "var(--ink)", borderBottom: "3px solid var(--teal)", paddingBottom: 2 }}>
-                HOW TO GET THERE &rarr;
-              </Link>
+              {live("tickets") && (
+                <Link href="/tickets" style={{ fontWeight: 700, fontSize: 12.5, letterSpacing: "0.14em", color: "var(--ink)", borderBottom: "3px solid var(--teal)", paddingBottom: 2 }}>
+                  PASSES &rarr;
+                </Link>
+              )}
+              {live("faq") && (
+                <Link href="/faq" style={{ fontWeight: 700, fontSize: 12.5, letterSpacing: "0.14em", color: "var(--ink)", borderBottom: "3px solid var(--teal)", paddingBottom: 2 }}>
+                  HOW TO GET THERE &rarr;
+                </Link>
+              )}
             </div>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 16 }}>
-            {STATS.map((s) => (
-              <div
-                key={s.value}
-                style={{
-                  background: s.bg,
-                  color: s.fg,
-                  border: "3px solid var(--ink)",
-                  borderRadius: 20,
-                  boxShadow: "6px 6px 0 var(--ink)",
-                  padding: "20px 16px",
-                  transform: `rotate(${s.rotate})`,
-                }}
-              >
-                <div className="font-display" style={{ fontSize: 34, color: s.accent, lineHeight: 1 }}>{s.value}</div>
-                <div style={{ fontSize: 14, lineHeight: 1.4, marginTop: 6 }}>{s.note}</div>
-              </div>
-            ))}
+            {stats.map((stat, i) => {
+              const skin = STAT_SKINS[i % STAT_SKINS.length];
+              return (
+                <div
+                  key={stat.id}
+                  style={{
+                    background: skin.bg,
+                    color: skin.fg,
+                    border: "3px solid var(--ink)",
+                    borderRadius: 20,
+                    boxShadow: "6px 6px 0 var(--ink)",
+                    padding: "20px 16px",
+                    transform: `rotate(${skin.rotate})`,
+                  }}
+                >
+                  <div className="font-display" style={{ fontSize: 34, color: skin.accent, lineHeight: 1 }}>{String(stat.value ?? "")}</div>
+                  <div style={{ fontSize: 14, lineHeight: 1.4, marginTop: 6 }}>{String(stat.note ?? "")}</div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -303,6 +334,7 @@ export default async function HomePage() {
             A playback singer, a name from your screen, and one act the seniors keep laughing about. Clues drop
             weekly.
           </p>
+          {live("lineup") && (
           <Link
             href="/lineup"
             className="mz-pop font-display"
@@ -310,6 +342,7 @@ export default async function HomePage() {
           >
             GO CRACK THE CLUES
           </Link>
+          )}
         </div>
       </section>
 
@@ -319,26 +352,38 @@ export default async function HomePage() {
             BACKED BY PEOPLE WHO SAID YES
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 14 }}>
-            {["TITLE SPONSOR LOGO", "STAGE PARTNER LOGO", "FOOD PARTNER LOGO", "MEDIA PARTNER LOGO"].map((label) => (
+            {sponsors.map((sponsor) => {
+              const logo = sponsor.logo as { url?: string } | null;
+              const name = String(sponsor.name ?? "");
+              const signed = !!(logo?.url || name);
+              return (
               <div
-                key={label}
+                key={sponsor.id}
                 style={{
                   height: 78,
-                  border: "2px dashed #7D63A8",
+                  border: signed ? "3px solid var(--ink)" : "2px dashed #7D63A8",
+                  background: signed ? "var(--paper)" : undefined,
                   borderRadius: 18,
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   fontSize: 10.5,
                   letterSpacing: "0.14em",
-                  color: "#9B82C0",
+                  color: signed ? "var(--ink)" : "#9B82C0",
                   textAlign: "center",
                   padding: 8,
+                  overflow: "hidden",
                 }}
               >
-                {label}
+                {logo?.url ? (
+                  <Image src={logo.url} alt={name || "Sponsor logo"} width={140} height={58} style={{ objectFit: "contain", maxHeight: 58, width: "auto" }} />
+                ) : (
+                  name || String(sponsor.placeholder ?? "")
+                )}
               </div>
-            ))}
+              );
+            })}
+            {live("sponsors") && (
             <Link
               href="/sponsors"
               className="mz-pop font-display"
@@ -346,6 +391,7 @@ export default async function HomePage() {
             >
               BE ON THIS WALL
             </Link>
+            )}
           </div>
         </div>
       </section>

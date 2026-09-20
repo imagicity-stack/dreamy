@@ -19,11 +19,17 @@ export function getAdminApp(): App | null {
 
   if (!projectId || !clientEmail || !privateKey) return null;
 
-  app =
-    getApps()[0] ??
-    initializeApp({
-      credential: cert({ projectId, clientEmail, privateKey }),
-    });
+  try {
+    app =
+      getApps()[0] ??
+      initializeApp({
+        credential: cert({ projectId, clientEmail, privateKey }),
+      });
+  } catch {
+    // A malformed service account shouldn't take a page down — callers treat
+    // null as "Firebase isn't configured" and say so on screen.
+    return null;
+  }
 
   return app;
 }

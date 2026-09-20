@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 
 
-export default function FaqClient({ faqs }: { faqs: { q: string; a: string }[] }) {
+export default function FaqClient({ faqs, contactEmail }: { faqs: { q: string; a: string }[]; contactEmail: string }) {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
@@ -81,7 +81,7 @@ export default function FaqClient({ faqs }: { faqs: { q: string; a: string }[] }
               <p style={{ fontSize: 15, lineHeight: 1.55, margin: "0 0 14px", color: "var(--lilac-text)" }}>
                 Ask anything and a very real student will answer, usually between classes.
               </p>
-              <a href="mailto:contact@madooza.in" className="font-display" style={{ fontSize: 14, color: "var(--teal)" }}>contact@madooza.in</a>
+              <a href={`mailto:${contactEmail}`} className="font-display" style={{ fontSize: 14, color: "var(--teal)" }}>{contactEmail}</a>
             </div>
           </div>
         </div>

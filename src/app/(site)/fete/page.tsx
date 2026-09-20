@@ -1,5 +1,9 @@
 import Link from "next/link";
-import { stalls } from "@/data/fest";
+import { notFound } from "next/navigation";
+import { publicContent } from "@/lib/content";
+import { getSettings, isPageHidden } from "@/lib/settings";
+
+export const dynamic = "force-dynamic";
 
 const COIN_FACTS = [
   { title: "₹10 = 1 COIN", note: "Two coin counters by the main arch. Cards and UPI accepted there." },
@@ -8,7 +12,18 @@ const COIN_FACTS = [
   { title: "NO CASH", note: "If a stall asks for money, it isn't one of ours. Tell a volunteer." },
 ];
 
-export default function FetePage() {
+export default async function FetePage() {
+  const settings = await getSettings();
+  if (isPageHidden(settings, "fete")) notFound();
+
+  const stalls = (await publicContent("stalls")).map((r) => ({
+    id: r.id,
+    zone: String(r.zone ?? ""),
+    coins: Number(r.coins ?? 0),
+    run: String(r.run ?? ""),
+    desc: String(r.desc ?? ""),
+  }));
+
   return (
     <main>
       <section style={{ background: "var(--lilac)", color: "var(--ink)", borderBottom: "3px solid var(--ink)", padding: "54px 20px 46px" }}>

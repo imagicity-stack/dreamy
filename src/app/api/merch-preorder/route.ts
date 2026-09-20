@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/firebaseAdmin";
-import { getSettings, merchWithPrices } from "@/lib/settings";
+import { publicContent } from "@/lib/content";
 import { FieldValue } from "firebase-admin/firestore";
 
 export const dynamic = "force-dynamic";
@@ -13,8 +13,8 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
-  // Prices come from the server's settings; the cart only names items.
-  const catalogue = merchWithPrices(await getSettings());
+  // Prices come from the merch records on the server; the cart only names items.
+  const catalogue = await publicContent("merch");
 
   const lines = Object.entries(cart)
     .map(([id, qty]) => ({ item: catalogue.find((m) => m.id === id), qty: Number(qty) }))
@@ -24,12 +24,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Empty cart" }, { status: 400 });
   }
 
-  const total = lines.reduce((sum, l) => sum + l.item.price * l.qty, 0);
+  const total = lines.reduce((sum, l) => sum + Number(l.item.price ?? 0) * l.qty, 0);
 
   const db = getDb();
   if (db) {
     await db.collection("merchOrders").add({
-      lines: lines.map((l) => ({ id: l.item.id, name: l.item.name, price: l.item.price, qty: l.qty })),
+      lines: lines.map((l) => ({
+        id: l.item.id,
+        name: String(l.item.name ?? ""),
+        price: Number(l.item.price ?? 0),
+        qty: l.qty,
+      })),
       total,
       createdAt: FieldValue.serverTimestamp(),
     });

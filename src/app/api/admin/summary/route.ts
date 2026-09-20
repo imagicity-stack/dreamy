@@ -6,8 +6,8 @@ import { getSettings } from "@/lib/settings";
 export const dynamic = "force-dynamic";
 
 /** Headline numbers for the panel's overview: counts, seats and money taken. */
-export async function GET(req: Request) {
-  const check = await requireAdmin(req);
+export async function GET() {
+  const check = await requireAdmin();
   if ("response" in check) return check.response;
 
   const settings = await getSettings();

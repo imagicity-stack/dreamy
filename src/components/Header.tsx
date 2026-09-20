@@ -1,32 +1,21 @@
 import Image from "next/image";
 import Link from "next/link";
-import { DATE_REVEAL, formatInr } from "@/data/fest";
-import type { FestSettings } from "@/lib/settings";
+import { formatInr } from "@/data/fest";
+import { publicContent } from "@/lib/content";
+import { describeDate, visiblePages, type FestSettings } from "@/lib/settings";
+import MobileMenu from "./MobileMenu";
 
-function tickerItems(settings: FestSettings): string[] {
+async function tickerItems(settings: FestSettings): Promise<string[]> {
+  const lines = await publicContent("ticker");
   return [
-    DATE_REVEAL.ticker,
-    "THE ELDEN HEIGHTS SCHOOL, HAZARIBAGH",
-    "MUSIC · MOMENTS · MEMORIES",
-    "ONE DAY. ZERO CHILL.",
+    describeDate(settings).ticker,
+    ...lines.map((l) => String(l.text ?? "")).filter(Boolean),
     `FETE PASS ${formatInr(settings.fetePrice)} · CONCERT PASS SEALED`,
   ];
 }
 
-const NAV_LINKS = [
-  { href: "/lineup", label: "LINEUP" },
-  { href: "/concert", label: "CONCERT" },
-  { href: "/cosplay", label: "COSPLAY" },
-  { href: "/fete", label: "FETE" },
-  { href: "/merch", label: "MERCH" },
-  { href: "/gallery", label: "GALLERY" },
-  { href: "/sponsors", label: "SPONSORS" },
-  { href: "/faq", label: "FAQ + VENUE" },
-];
-
-function Ticker({ settings }: { settings: FestSettings }) {
-  const base = tickerItems(settings);
-  const items = [...base, ...base];
+function Ticker({ items }: { items: string[] }) {
+  const doubled = [...items, ...items];
   return (
     <div
       style={{
@@ -49,7 +38,7 @@ function Ticker({ settings }: { settings: FestSettings }) {
           paddingRight: 44,
         }}
       >
-        {items.map((item, i) => (
+        {doubled.map((item, i) => (
           <span key={i} style={{ display: "inline-flex", alignItems: "center", gap: 44 }}>
             {item}
             <span style={{ color: "var(--hot-pink)" }}>&#9679;</span>
@@ -60,7 +49,34 @@ function Ticker({ settings }: { settings: FestSettings }) {
   );
 }
 
-export default function Header({ settings }: { settings: FestSettings }) {
+function Announcement({ text }: { text: string }) {
+  return (
+    <div
+      style={{
+        background: "var(--crimson)",
+        color: "var(--paper)",
+        borderBottom: "3px solid var(--ink)",
+        padding: "9px 20px",
+        textAlign: "center",
+        fontSize: 13,
+        fontWeight: 700,
+        letterSpacing: "0.08em",
+        lineHeight: 1.45,
+      }}
+    >
+      {text}
+    </div>
+  );
+}
+
+export default async function Header({ settings }: { settings: FestSettings }) {
+  const items = await tickerItems(settings);
+  // Hidden pages drop out of the nav as well as off the site.
+  const links = visiblePages(settings)
+    .filter((p) => p.key !== "tickets")
+    .map((p) => ({ href: p.href, label: p.label }));
+  const ticketsVisible = visiblePages(settings).some((p) => p.key === "tickets");
+
   return (
     <header
       style={{
@@ -71,7 +87,8 @@ export default function Header({ settings }: { settings: FestSettings }) {
         borderBottom: "3px solid var(--ink)",
       }}
     >
-      <Ticker settings={settings} />
+      {settings.announcement.trim() && <Announcement text={settings.announcement.trim()} />}
+      <Ticker items={items} />
       <nav
         style={{
           maxWidth: 1180,
@@ -80,7 +97,6 @@ export default function Header({ settings }: { settings: FestSettings }) {
           display: "flex",
           alignItems: "center",
           gap: 18,
-          flexWrap: "wrap",
         }}
       >
         <Link
@@ -105,9 +121,10 @@ export default function Header({ settings }: { settings: FestSettings }) {
           />
           MADOOZA
         </Link>
+
         <div
+          className="mz-nav-desktop"
           style={{
-            display: "flex",
             gap: 4,
             flexWrap: "wrap",
             fontSize: 11.5,
@@ -116,28 +133,32 @@ export default function Header({ settings }: { settings: FestSettings }) {
             marginLeft: "auto",
           }}
         >
-          {NAV_LINKS.map((l) => (
+          {links.map((l) => (
             <Link key={l.href} href={l.href} className="mz-nav-link">
               {l.label}
             </Link>
           ))}
-          <Link
-            href="/tickets"
-            className="mz-pop"
-            style={{
-              color: "var(--ink)",
-              background: "var(--teal)",
-              border: "2px solid var(--ink)",
-              borderRadius: 999,
-              padding: "7px 12px",
-              boxShadow: "3px 3px 0 var(--ink)",
-              ["--mz-shadow" as string]: "3px",
-              ["--mz-lift" as string]: "1px",
-            }}
-          >
-            GET A PASS
-          </Link>
+          {ticketsVisible && (
+            <Link
+              href="/tickets"
+              className="mz-pop"
+              style={{
+                color: settings.soldOut ? "var(--lilac)" : "var(--ink)",
+                background: settings.soldOut ? "var(--crimson)" : "var(--teal)",
+                border: "2px solid var(--ink)",
+                borderRadius: 999,
+                padding: "7px 12px",
+                boxShadow: "3px 3px 0 var(--ink)",
+                ["--mz-shadow" as string]: "3px",
+                ["--mz-lift" as string]: "1px",
+              }}
+            >
+              {settings.soldOut ? "SOLD OUT" : "GET A PASS"}
+            </Link>
+          )}
         </div>
+
+        <MobileMenu links={links} showTickets={ticketsVisible} soldOut={settings.soldOut} />
       </nav>
     </header>
   );

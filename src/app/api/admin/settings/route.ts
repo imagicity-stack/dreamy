@@ -1,22 +1,18 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/adminAuth";
 import { getSettings, saveSettings } from "@/lib/settings";
-import { merchItems } from "@/data/fest";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: Request) {
-  const check = await requireAdmin(req);
+export async function GET() {
+  const check = await requireAdmin();
   if ("response" in check) return check.response;
 
-  return NextResponse.json({
-    settings: await getSettings(),
-    merch: merchItems.map((m) => ({ id: m.id, name: m.name, note: m.note })),
-  });
+  return NextResponse.json({ settings: await getSettings() });
 }
 
 export async function PUT(req: Request) {
-  const check = await requireAdmin(req);
+  const check = await requireAdmin();
   if ("response" in check) return check.response;
 
   const body = await req.json().catch(() => null);

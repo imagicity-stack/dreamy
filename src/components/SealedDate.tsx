@@ -1,4 +1,4 @@
-import { DATE_REVEAL } from "@/data/fest";
+import type { DateDisplay } from "@/lib/settings";
 
 /**
  * The date treatment used wherever the fest's day would otherwise be printed.
@@ -7,14 +7,17 @@ import { DATE_REVEAL } from "@/data/fest";
  */
 
 type TileProps = {
+  date: DateDisplay;
   /** Tile height. "lg" is the home hero, "sm" suits inline rows. */
   size?: "sm" | "lg";
 };
 
-export function SealedDateTiles({ size = "lg" }: TileProps) {
+export function SealedDateTiles({ date, size = "lg" }: TileProps) {
   const pad = size === "lg" ? "8px 14px" : "5px 10px";
   const fontSize = size === "lg" ? 22 : 16;
 
+  // A revealed number gets the solid treatment; a held-back one keeps the
+  // pulsing outline, so the tiles fill in as the council gives things away.
   const sealed = {
     background: "var(--ink)",
     color: "var(--teal)",
@@ -37,24 +40,31 @@ export function SealedDateTiles({ size = "lg" }: TileProps) {
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
-      <div className="font-display" style={{ ...sealed, animation: "mzpulse 1.6s ease-in-out infinite" }}>
-        {DATE_REVEAL.unknownDay}
+      <div
+        className="font-display"
+        style={date.dayTile === "??" ? { ...sealed, animation: "mzpulse 1.6s ease-in-out infinite" } : known}
+      >
+        {date.dayTile}
       </div>
       <div className="font-display" style={dot}>&middot;</div>
       <div
         className="font-display"
-        style={{ ...sealed, animation: "mzpulse 1.6s ease-in-out infinite", animationDelay: "0.35s" }}
+        style={
+          date.monthTile === "??"
+            ? { ...sealed, animation: "mzpulse 1.6s ease-in-out infinite", animationDelay: "0.35s" }
+            : known
+        }
       >
-        {DATE_REVEAL.unknownMonth}
+        {date.monthTile}
       </div>
       <div className="font-display" style={dot}>&middot;</div>
-      <div className="font-display" style={known}>{DATE_REVEAL.yearShort}</div>
+      <div className="font-display" style={known}>{date.yearTile}</div>
     </div>
   );
 }
 
 /** A small rotated sticker for page corners and pass cards. */
-export function SealedDateStamp({ rotate = -3 }: { rotate?: number }) {
+export function SealedDateStamp({ date, rotate = -3 }: { date: DateDisplay; rotate?: number }) {
   return (
     <div
       className="font-display"
@@ -71,7 +81,7 @@ export function SealedDateStamp({ rotate = -3 }: { rotate?: number }) {
         transform: `rotate(${rotate}deg)`,
       }}
     >
-      {DATE_REVEAL.stamp}
+      {date.sealed ? "DATE SEALED" : date.short}
     </div>
   );
 }

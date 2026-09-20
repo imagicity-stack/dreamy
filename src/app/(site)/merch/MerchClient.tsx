@@ -1,9 +1,18 @@
 "use client";
 
 import { useState } from "react";
-import { formatInr, type MerchItem } from "@/data/fest";
+import Image from "next/image";
+import { formatInr } from "@/data/fest";
 
-export default function MerchClient({ merchItems }: { merchItems: MerchItem[] }) {
+export type MerchRecord = {
+  id: string;
+  name: string;
+  price: number;
+  note: string;
+  image: { path: string; url: string } | null;
+};
+
+export default function MerchClient({ merchItems }: { merchItems: MerchRecord[] }) {
   const [cart, setCart] = useState<Record<string, number>>({});
   const [done, setDone] = useState(false);
   const [placing, setPlacing] = useState(false);
@@ -98,7 +107,17 @@ export default function MerchClient({ merchItems }: { merchItems: MerchItem[] })
                     textAlign: "center", padding: 12,
                   }}
                 >
-                  {item.name.toUpperCase()} PHOTO
+                  {item.image ? (
+                    <Image
+                      src={item.image.url}
+                      alt={item.name}
+                      width={420}
+                      height={190}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  ) : (
+                    <>{item.name.toUpperCase()} PHOTO</>
+                  )}
                 </div>
                 <div style={{ padding: "16px 16px 18px", display: "flex", flexDirection: "column", flex: 1 }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 8 }}>

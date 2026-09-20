@@ -1,14 +1,32 @@
-const SHOTS = [
-  { id: "gal-hero", caption: "THE FIELD, TWO WEEKS OUT", height: 340, wide: true, placeholder: "Wide shot of the grounds" },
-  { id: "gal-banner", caption: "ART CLUB, DAY FOUR", height: 340, placeholder: "Banner-painting shot" },
-  { id: "gal-rehearsal", caption: "CHOIR REHEARSAL", height: 220, placeholder: "Rehearsal photo" },
-  { id: "gal-cosplay", caption: "ARMOUR, MOSTLY CARDBOARD", height: 220, placeholder: "Costume work-in-progress" },
-  { id: "gal-stall", caption: "MOMO ALLEY UNDER CONSTRUCTION", height: 220, placeholder: "Stall build photo" },
-  { id: "gal-council", caption: "THE PEOPLE TO BLAME", height: 220, placeholder: "Council group photo" },
-  { id: "gal-stage", caption: "RIGGING ARRIVES", height: 220, placeholder: "Stage rigging photo" },
-];
+import Image from "next/image";
+import { notFound } from "next/navigation";
+import { publicContent } from "@/lib/content";
+import { getSettings, isPageHidden } from "@/lib/settings";
 
-export default function GalleryPage() {
+export const dynamic = "force-dynamic";
+
+type Shot = {
+  id: string;
+  caption: string;
+  placeholder: string;
+  height: number;
+  wide: boolean;
+  image: { path: string; url: string } | null;
+};
+
+export default async function GalleryPage() {
+  const settings = await getSettings();
+  if (isPageHidden(settings, "gallery")) notFound();
+
+  const SHOTS: Shot[] = (await publicContent("gallery")).map((r) => ({
+    id: r.id,
+    caption: String(r.caption ?? ""),
+    placeholder: String(r.placeholder ?? ""),
+    height: Number(r.height ?? 220) || 220,
+    wide: r.wide === true,
+    image: (r.image as Shot["image"]) ?? null,
+  }));
+
   return (
     <main>
       <section style={{ background: "var(--bg)", padding: "54px 20px 40px", borderBottom: "3px solid var(--ink)" }}>
@@ -35,7 +53,17 @@ export default function GalleryPage() {
                     letterSpacing: "0.06em", textAlign: "center", padding: 16,
                   }}
                 >
-                  {shot.placeholder}
+                  {shot.image ? (
+                    <Image
+                      src={shot.image.url}
+                      alt={shot.caption}
+                      width={shot.wide ? 1100 : 560}
+                      height={shot.height}
+                      style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                    />
+                  ) : (
+                    shot.placeholder
+                  )}
                 </div>
                 <div style={{ fontSize: 10.5, letterSpacing: "0.14em", color: "var(--purple)", marginTop: 10 }}>{shot.caption}</div>
               </div>
@@ -50,7 +78,7 @@ export default function GalleryPage() {
               </p>
             </div>
             <a
-              href="mailto:contact@madooza.in"
+              href={`mailto:${settings.contactEmail}`}
               className="mz-pop font-display"
               style={{ fontSize: 14, color: "var(--ink)", background: "var(--teal)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "6px 6px 0 var(--ink)", padding: "15px 20px", textAlign: "center", justifySelf: "start", ["--mz-shadow" as string]: "6px" }}
             >

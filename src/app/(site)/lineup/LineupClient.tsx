@@ -3,10 +3,32 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { lineup, supportActs } from "@/data/fest";
-import type { FestSettings } from "@/lib/settings";
+import type { FestSettings } from "@/lib/festSettings";
 
-export default function LineupClient({ settings }: { settings: FestSettings }) {
+export type ArtistCard = {
+  id: string;
+  slot: string;
+  kicker: string;
+  clue: string;
+  hint: string;
+  reveal: string;
+  revealed: boolean;
+  name: string;
+  bio: string;
+  image: { path: string; url: string } | null;
+};
+
+export type SupportAct = { id: string; name: string; when: string; note: string };
+
+export default function LineupClient({
+  settings,
+  lineup,
+  supportActs,
+}: {
+  settings: FestSettings;
+  lineup: ArtistCard[];
+  supportActs: SupportAct[];
+}) {
   const [peeked, setPeeked] = useState<Record<string, boolean>>({});
 
   return (
@@ -47,6 +69,7 @@ export default function LineupClient({ settings }: { settings: FestSettings }) {
         <div style={{ maxWidth: 1180, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(290px, 1fr))", gap: 22 }}>
           {lineup.map((card) => {
             const open = settings.lineupUnlocked || !!peeked[card.id];
+            const out = card.revealed && card.name.trim().length > 0;
             return (
               <div
                 key={card.id}
@@ -68,7 +91,39 @@ export default function LineupClient({ settings }: { settings: FestSettings }) {
                 </div>
                 <h2 className="font-display" style={{ fontSize: 27, margin: "12px 0 18px", lineHeight: 1.08 }}>{card.slot}</h2>
 
-                {!open && (
+                {out && (
+                  <div
+                    style={{
+                      flex: 1,
+                      background: "var(--purple)",
+                      border: "2px solid var(--ink)",
+                      borderRadius: 14,
+                      padding: card.image ? 0 : "20px 18px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 14,
+                      overflow: "hidden",
+                      animation: "mzclue .45s cubic-bezier(.2,.7,.3,1) both",
+                    }}
+                  >
+                    {card.image && (
+                      <Image
+                        src={card.image.url}
+                        alt={card.name}
+                        width={560}
+                        height={260}
+                        style={{ width: "100%", height: 190, objectFit: "cover", borderBottom: "2px solid var(--ink)" }}
+                      />
+                    )}
+                    <div style={{ padding: card.image ? "4px 18px 18px" : 0, display: "flex", flexDirection: "column", gap: 10 }}>
+                      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal)" }}>CONFIRMED</div>
+                      <div className="font-display" style={{ fontSize: 24, lineHeight: 1.1, color: "var(--paper)" }}>{card.name}</div>
+                      {card.bio && <p style={{ fontSize: 14.5, lineHeight: 1.55, color: "#F0E4FA", margin: 0 }}>{card.bio}</p>}
+                    </div>
+                  </div>
+                )}
+
+                {!out && !open && (
                   <div
                     style={{
                       flex: 1,
@@ -105,7 +160,7 @@ export default function LineupClient({ settings }: { settings: FestSettings }) {
                   </div>
                 )}
 
-                {open && (
+                {!out && open && (
                   <div
                     style={{
                       flex: 1,
@@ -128,6 +183,7 @@ export default function LineupClient({ settings }: { settings: FestSettings }) {
                   </div>
                 )}
 
+                {!out && (
                 <button
                   onClick={() => setPeeked((p) => ({ ...p, [card.id]: !p[card.id] }))}
                   className="font-display mz-pop"
@@ -149,8 +205,9 @@ export default function LineupClient({ settings }: { settings: FestSettings }) {
                 >
                   TAP TO PEEK
                 </button>
+                )}
                 <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.16em", color: "var(--purple)", marginTop: 12, textAlign: "center" }}>
-                  {card.reveal}
+                  {out ? "ANNOUNCED" : card.reveal}
                 </div>
               </div>
             );
@@ -165,7 +222,7 @@ export default function LineupClient({ settings }: { settings: FestSettings }) {
           <div style={{ display: "grid", gap: 0, borderTop: "2px solid var(--ink)" }}>
             {supportActs.map((act) => (
               <div
-                key={act.name}
+                key={act.id}
                 style={{ display: "grid", gridTemplateColumns: "90px minmax(0,1fr)", gap: 18, alignItems: "baseline", padding: "18px 4px", borderBottom: "2px solid var(--ink)" }}
               >
                 <div className="font-display" style={{ fontSize: 15, color: "var(--purple)" }}>{act.when}</div>

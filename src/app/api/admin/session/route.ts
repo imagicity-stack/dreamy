@@ -3,9 +3,9 @@ import { requireAdmin } from "@/lib/adminAuth";
 
 export const dynamic = "force-dynamic";
 
-/** Confirms the signed-in account is an admin, so the panel can open. */
-export async function GET(req: Request) {
-  const check = await requireAdmin(req);
+/** Confirms the session cookie still belongs to an admin. */
+export async function GET() {
+  const check = await requireAdmin();
   if ("response" in check) return check.response;
   return NextResponse.json({ email: check.user.email, uid: check.user.uid });
 }
