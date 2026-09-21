@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { verifyWebhookSignature } from "@/lib/razorpay";
 import {
   claimWebhookEvent,
@@ -8,6 +8,12 @@ import {
   markOrderRefunded,
   releaseWebhookEvent,
 } from "@/lib/orders";
+import {
+  notifyOrderPaid,
+  notifyOversold,
+  notifyPaymentFailed,
+  notifyRefund,
+} from "@/lib/notify";
 
 export const dynamic = "force-dynamic";
 // The signature is computed over the exact bytes Razorpay sent, so this route
@@ -82,8 +88,14 @@ export async function POST(req: NextRequest) {
         if (isFailure(result)) {
           // A refusal here is a real state — sold out, amount mismatch — and is
           // already recorded on the order. Redelivering it would not help.
+          if (result.code === "oversold") {
+            after(() => notifyOversold({ orderId, paymentId, product: "pass" }));
+          }
           return NextResponse.json({ ok: true, event, handled: false, reason: result.error });
         }
+        // Only the call that issued the codes sends the receipt, so a browser
+        // that already reported in doesn't cause a second copy.
+        if (result.firstTime) after(() => notifyOrderPaid(result));
         return NextResponse.json({ ok: true, event, handled: true, issued: result.firstTime });
       }
 
@@ -93,8 +105,12 @@ export async function POST(req: NextRequest) {
         if (!orderId || !paymentId) break;
         const result = await fulfilOrder({ orderId, paymentId, source: "webhook" });
         if (isFailure(result)) {
+          if (result.code === "oversold") {
+            after(() => notifyOversold({ orderId, paymentId, product: "pass" }));
+          }
           return NextResponse.json({ ok: true, event, handled: false, reason: result.error });
         }
+        if (result.firstTime) after(() => notifyOrderPaid(result));
         return NextResponse.json({ ok: true, event, handled: true, issued: result.firstTime });
       }
 
@@ -104,6 +120,7 @@ export async function POST(req: NextRequest) {
         const reason =
           String(payment?.error_description ?? "") || String(payment?.error_reason ?? "") || "Payment failed";
         await markOrderFailed(orderId, reason, String(payment?.id ?? ""));
+        after(() => notifyPaymentFailed({ orderId, paymentId: String(payment?.id ?? ""), reason }));
         return NextResponse.json({ ok: true, event, handled: true });
       }
 
@@ -111,11 +128,22 @@ export async function POST(req: NextRequest) {
       case "refund.processed": {
         const orderId = String(refund?.order_id ?? payment?.order_id ?? "");
         if (!orderId) break;
-        await markOrderRefunded({
+        const refunded = await markOrderRefunded({
           orderId,
           refundId: String(refund?.id ?? ""),
           amountPaise: Number(refund?.amount ?? 0),
         });
+        if (refunded) {
+          after(() =>
+            notifyRefund({
+              orderId,
+              refundId: String(refund?.id ?? ""),
+              amountPaise: Number(refund?.amount ?? 0),
+              buyerEmail: refunded.email,
+              buyerName: refunded.name,
+            }),
+          );
+        }
         return NextResponse.json({ ok: true, event, handled: true });
       }
     }

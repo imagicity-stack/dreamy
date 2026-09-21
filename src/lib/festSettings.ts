@@ -18,8 +18,10 @@ export type FestSettings = {
   interestBase: number;
   /** Convenience fee charged on top of every online payment, as a percentage. */
   convenienceFeePercent: number;
-  /** GST charged on the convenience fee, as a percentage of that fee. */
+  /** GST charged on the ticket price, as a percentage. */
   gstPercent: number;
+  /** Whether the convenience fee carries GST of its own. Normally it does. */
+  gstOnConvenienceFee: boolean;
   /** Fete Passes that may be sold in total. 0 means no limit. */
   fetePassCapacity: number;
   /** Cosplay entries that may be sold in total. 0 means no limit. */
@@ -78,6 +80,7 @@ export const DEFAULT_SETTINGS: FestSettings = {
   interestBase: FEST.interestBase,
   convenienceFeePercent: FEST.convenienceFeePercent,
   gstPercent: FEST.gstPercent,
+  gstOnConvenienceFee: true,
   fetePassCapacity: 0,
   cosplayCapacity: 0,
   lineupUnlocked: FEST.lineupUnlocked,
@@ -96,7 +99,7 @@ export const DEFAULT_SETTINGS: FestSettings = {
   siteTitle: "MADOOZA — The Voice of Hazaribagh",
   siteDescription:
     "MADOOZA — The Elden Heights School's fest. Cosplay, fete, carnival stalls and a sealed concert reveal, in Hazaribagh.",
-  contactEmail: "contact@madooza.in",
+  contactEmail: "hello@madooza.com",
   contactPhone: "+91 91222 80578",
 };
 
@@ -137,6 +140,7 @@ export function normalizeSettings(raw: unknown): FestSettings {
     // asNumber() — that rounds, and a 2.5% fee would quietly become 3%.
     convenienceFeePercent: asRate(data.convenienceFeePercent, DEFAULT_SETTINGS.convenienceFeePercent),
     gstPercent: asRate(data.gstPercent, DEFAULT_SETTINGS.gstPercent),
+    gstOnConvenienceFee: asBool(data.gstOnConvenienceFee, DEFAULT_SETTINGS.gstOnConvenienceFee),
     fetePassCapacity: asNumber(data.fetePassCapacity, DEFAULT_SETTINGS.fetePassCapacity, 100_000),
     cosplayCapacity: asNumber(data.cosplayCapacity, DEFAULT_SETTINGS.cosplayCapacity, 100_000),
     lineupUnlocked: asBool(data.lineupUnlocked, DEFAULT_SETTINGS.lineupUnlocked),
@@ -163,6 +167,15 @@ export function normalizeSettings(raw: unknown): FestSettings {
   };
 }
 
+
+/** The three numbers every price is computed from, read straight off settings. */
+export function feeRates(settings: FestSettings) {
+  return {
+    convenienceFeePercent: settings.convenienceFeePercent,
+    gstPercent: settings.gstPercent,
+    gstOnConvenienceFee: settings.gstOnConvenienceFee,
+  };
+}
 
 export function isPageHidden(settings: FestSettings, key: PageKey): boolean {
   return settings.hiddenPages.includes(key);

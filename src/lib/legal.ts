@@ -1,5 +1,5 @@
 import type { FestSettings } from "./festSettings";
-import { describeDate } from "./festSettings";
+import { describeDate, feeRates } from "./festSettings";
 import { formatInr } from "@/data/fest";
 import { formatPaise, formatPercent, priceWithFees, rupeesToPaise } from "./pricing";
 
@@ -69,7 +69,7 @@ export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
   const cosplay = formatInr(settings.cosplayFee);
   // Quoted with the fee on, because the price a policy names should be the one
   // that leaves the buyer's account.
-  const rates = { convenienceFeePercent: settings.convenienceFeePercent, gstPercent: settings.gstPercent };
+  const rates = feeRates(settings);
   const feteTotal = formatPaise(priceWithFees(rupeesToPaise(settings.fetePrice), rates).totalPaise);
   const cosplayTotal = formatPaise(priceWithFees(rupeesToPaise(settings.cosplayFee), rates).totalPaise);
   const date = describeDate(settings);
@@ -403,10 +403,12 @@ export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
             {
               kind: "p",
               text:
-                `Every online payment carries a convenience fee of ${formatPercent(settings.convenienceFeePercent)}% of the ` +
-                `price, and GST of ${formatPercent(settings.gstPercent)}% on that fee. Both are itemised on screen before ` +
-                `you pay and on the receipt afterwards — a ${fete} Fete Pass is charged at ${feteTotal}, ` +
-                `and a ${cosplay} cosplay entry at ${cosplayTotal}. There is nothing else added at the end.`,
+                `Every online payment carries GST of ${formatPercent(settings.gstPercent)}% on the price, and a ` +
+                `convenience fee of ${formatPercent(settings.convenienceFeePercent)}% of the price` +
+                (settings.gstOnConvenienceFee ? `, which carries GST of its own at the same rate` : ``) +
+                `. Each is itemised on screen before you pay and on the receipt afterwards — a ${fete} Fete ` +
+                `Pass is charged at ${feteTotal}, and a ${cosplay} cosplay entry at ${cosplayTotal}. There is ` +
+                `nothing else added at the end.`,
             },
             {
               kind: "p",
@@ -667,9 +669,9 @@ export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
             {
               kind: "p",
               text:
-                `A refund is of the whole amount you were charged, the ${formatPercent(settings.convenienceFeePercent)}% convenience fee ` +
-                `and the GST on it included. We do not keep the fee on a refunded order and we deduct ` +
-                `nothing for handling it.`,
+                `A refund is of the whole amount you were charged — the GST and the ` +
+                `${formatPercent(settings.convenienceFeePercent)}% convenience fee included. We do not keep the fee on a refunded ` +
+                `order and we deduct nothing for handling it.`,
             },
           ],
         },
