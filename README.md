@@ -44,6 +44,9 @@ settings for deployment:
   to check an admin's password against Firebase Auth; the Admin SDK can mint tokens but cannot verify a
   password, so this one call goes through the Identity Toolkit REST API.
 - `ADMIN_EMAILS` — comma-separated emails allowed into `/admin`.
+- `NEXT_PUBLIC_SITE_URL` — the site's own address, e.g. `https://madooza.com`. QR codes encode
+  `<this>/t/<token>`, so it has to be reachable from a visitor's phone. Falls back to Vercel's production
+  URL. Compiled into the bundle, so changing it needs a redeploy.
 - `SMTP_USER` / `SMTP_PASS` / `MAIL_FROM` / `MAIL_TO` — the Google Workspace mailbox that sends the
   fest's mail, and the inbox that gets a copy of everything. `SMTP_HOST` and `SMTP_PORT` default to
   `smtp.gmail.com` and `465`. See **Mail** below.
@@ -167,6 +170,45 @@ means adding an entry to `CONTENT` in `src/lib/content.ts` — the editor and th
 Prices are always taken from the server. The order route computes the amount from `settings/fest`, and
 fulfilment re-fetches the payment from Razorpay and checks its amount against the stored order, so a
 tampered request body can't change what gets charged or recorded.
+
+## Tickets and the gate
+
+A pass code like `MDZ-F-0042` is fine for a human to read out, but it is sequential: anybody holding one
+can guess the next. So the code is not what the QR carries. Each ticket also gets a random 128-bit token,
+and **only the token's hash is stored** — a copy of the database is not a stack of working tickets. The QR
+encodes `<site>/t/<token>`, a URL, so a scan from a plain camera app lands on the ticket rather than
+showing a string of gibberish.
+
+**One ticket per person, not per payment.** An order of three passes issues three tickets with three QRs,
+all in the one receipt email, because three different people walk through the gate.
+
+**The day, end to end.**
+
+1. Payment clears → fulfilment issues the codes → `issueTickets()` writes one `tickets` row per pass and
+   the receipt goes out with a QR per pass, each a card with the holder's name and `ADMIT ONE · 1 OF 3`.
+2. The QR is an **inline attachment**, not a link to an image — every mail client blocks remote images by
+   default, and a pass nobody can see is not a pass. Each card also links to `/t/<token>`, which is the
+   real ticket: one screen, QR large, the code underneath, and a line telling the holder to screenshot it.
+3. Volunteers open **`/gate`** on their own phones, sign in once with their name and the gate PIN, and the
+   camera starts. No app to install and no hardware to buy.
+4. A scan calls `/api/gate/check-in`. The answer fills the screen in one colour and one phrase — green
+   **LET THEM IN** with the holder's name, amber **ALREADY IN** with the time it was first scanned, red
+   **NOT OURS** — because a volunteer in a queue reads a colour, not a sentence. There is a blip and a
+   buzz, since a gate is loud and nobody is watching the screen.
+5. Admission is a Firestore transaction on the ticket, so two gates scanning the same code at the same
+   moment produce one entry and one "already admitted".
+6. A dead phone is not a dead end: **Phone dead? Find by name** searches by name, phone or pass code and
+   admits from the list, recorded as a manual admit.
+7. Every scan records the ticket, the time, the volunteer and the answer. That log **is** the visitor
+   count — counted at the gate rather than inferred from sales — and it shows in the panel as ADMITTED,
+   with how many are still to arrive.
+
+**Before the gates open:** set the PIN in `/admin` → Settings → Scanner PIN. It is stored hashed and never
+shown again; changing it signs out every phone at once, which is what you want if a phone goes missing.
+The overview warns if tickets exist and no PIN has been set.
+
+**A refund voids its tickets** through the webhook, so a refunded pass stops working at the gate rather
+than only in the ledger.
 
 ## Mail
 

@@ -89,12 +89,25 @@ function getTransport(config: MailConfig): Transporter {
   return transporter;
 }
 
+export type MailAttachment = {
+  filename: string;
+  content: Buffer;
+  contentType: string;
+  /**
+   * Set to reference the file from the HTML as <img src="cid:…">. Inline
+   * attachments display where a remote image would be blocked, which is why
+   * the QR travels with the mail rather than being fetched from the site.
+   */
+  cid?: string;
+};
+
 export type MailMessage = {
   to: string;
   subject: string;
   html: string;
   /** Plain-text alternative. Some clients show it, and spam filters read it. */
   text: string;
+  attachments?: MailAttachment[];
 };
 
 export type MailResult = { sent: boolean; skipped?: string; error?: string };
@@ -113,6 +126,13 @@ export async function sendMail(message: MailMessage): Promise<MailResult> {
       subject: message.subject,
       html: message.html,
       text: message.text,
+      attachments: message.attachments?.map((a) => ({
+        filename: a.filename,
+        content: a.content,
+        contentType: a.contentType,
+        cid: a.cid,
+        contentDisposition: a.cid ? ("inline" as const) : ("attachment" as const),
+      })),
     });
     return { sent: true };
   } catch (e) {

@@ -29,6 +29,24 @@ export default function SettingsTab({ pages }: { pages: { key: string; label: st
   const [mailState, setMailState] = useState<"idle" | "sending" | "sent" | "failed">("idle");
   const [mailNote, setMailNote] = useState("");
 
+  const [pin, setPin] = useState("");
+  const [pinState, setPinState] = useState<"idle" | "saving" | "saved" | "failed">("idle");
+  const [pinNote, setPinNote] = useState("");
+
+  async function saveGatePin() {
+    setPinState("saving");
+    setPinNote("");
+    try {
+      await api("/api/admin/gate-pin", { method: "PUT", body: JSON.stringify({ pin }) });
+      setPinState("saved");
+      setPin("");
+      setPinNote("Set. Every phone signed in with the old PIN has been signed out.");
+    } catch (e) {
+      setPinState("failed");
+      setPinNote(message(e, "Could not set the PIN"));
+    }
+  }
+
   async function testMail() {
     setMailState("sending");
     setMailNote("");
@@ -154,6 +172,49 @@ export default function SettingsTab({ pages }: { pages: { key: string; label: st
           <strong>₹{rupees(chargedFor(settings.cosplayFee))}</strong>. Every checkout, receipt and email shows
           the buyer this split line by line before they pay.
         </p>
+      </Section>
+
+      <Section kicker="THE GATE" title="SCANNER PIN">
+        <p style={{ fontSize: 13.5, color: "#5B4480", margin: "0 0 14px", lineHeight: 1.6 }}>
+          Volunteers open <strong>/gate</strong> on their own phones and sign in with this PIN and their name.
+          Set it on the morning of the fest and read it out; changing it signs every phone out at once, which
+          is what you want if a phone goes missing. It is stored hashed and never shown again.
+        </p>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <input
+            className="mz-input"
+            style={{ flex: "1 1 200px", width: "auto" }}
+            value={pin}
+            onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 8))}
+            inputMode="numeric"
+            placeholder="4 to 8 digits"
+          />
+          <button
+            type="button"
+            onClick={saveGatePin}
+            disabled={pinState === "saving" || pin.length < 4}
+            className="font-display mz-pop"
+            style={{
+              fontSize: 13,
+              color: "var(--lilac)",
+              background: "var(--purple)",
+              border: "3px solid var(--ink)",
+              borderRadius: 16,
+              boxShadow: "4px 4px 0 var(--ink)",
+              padding: "13px 18px",
+              cursor: pin.length < 4 ? "not-allowed" : "pointer",
+              opacity: pin.length < 4 ? 0.6 : 1,
+              ["--mz-shadow" as string]: "4px",
+            }}
+          >
+            {pinState === "saving" ? "SETTING…" : "SET GATE PIN"}
+          </button>
+        </div>
+        {pinNote && (
+          <p style={{ fontSize: 13, margin: "12px 0 0", color: pinState === "failed" ? "var(--crimson)" : "#3D7A45", lineHeight: 1.6 }}>
+            {pinNote}
+          </p>
+        )}
       </Section>
 
       <Section kicker="MAIL" title="IS THE MAILBOX WORKING?">

@@ -1,6 +1,14 @@
 import { formatPaise } from "./pricing";
-import { renderEmail, type DetailRow } from "./mailTemplates";
-import { officeAddress, sendAll, sendMail, type MailMessage, type MailResult } from "./mail";
+import { renderEmail, type DetailRow, type TicketBlock } from "./mailTemplates";
+import {
+  officeAddress,
+  sendAll,
+  sendMail,
+  type MailAttachment,
+  type MailMessage,
+  type MailResult,
+} from "./mail";
+import { issueTickets, qrPng, type IssuedTicket } from "./tickets";
 import { getSettings } from "./settings";
 import type { Receipt } from "./orders";
 
@@ -71,12 +79,64 @@ function officeRows(receipt: Receipt): DetailRow[] {
   return rows;
 }
 
+/**
+ * Turns a paid order into scannable tickets and their QR images.
+ *
+ * Only passes get them: a cosplay entry is a slot at a desk and a merch order
+ * is a bag at a tent, neither of which is a turnstile. Returns empty for
+ * everything else, and the mail falls back to its plain code block.
+ */
+async function ticketsFor(receipt: Receipt): Promise<{ blocks: TicketBlock[]; files: MailAttachment[] }> {
+  if (receipt.product !== "fetePass") return { blocks: [], files: [] };
+
+  let issued: IssuedTicket[] = [];
+  try {
+    issued = await issueTickets(receipt);
+  } catch (e) {
+    // A pass without a QR is still a pass — the code and the gate list work.
+    console.error("could not issue tickets for", receipt.orderId, e);
+    return { blocks: [], files: [] };
+  }
+
+  const blocks: TicketBlock[] = [];
+  const files: MailAttachment[] = [];
+
+  for (const ticket of issued) {
+    const cid = `qr-${ticket.code.toLowerCase()}@madooza`;
+    try {
+      files.push({
+        filename: `${ticket.code}.png`,
+        content: await qrPng(ticket.url),
+        contentType: "image/png",
+        cid,
+      });
+    } catch {
+      continue; // No image, no card: better a missing stub than a broken one.
+    }
+    blocks.push({
+      cid,
+      code: ticket.code,
+      holderName: ticket.holderName,
+      tierLabel: ticket.tierLabel,
+      index: ticket.index,
+      of: ticket.of,
+      url: ticket.url,
+    });
+  }
+
+  return { blocks, files };
+}
+
 /** A paid pass, entry or merch order: the buyer's receipt and the office's copy. */
 export async function notifyOrderPaid(receipt: Receipt): Promise<MailResult[]> {
   const settings = await getSettings();
   const w = words(receipt.product);
   const office = officeAddress();
   const messages: MailMessage[] = [];
+
+  // Issued before either mail is built, so the office's copy can say whether
+  // the buyer's passes are scannable.
+  const { blocks, files } = await ticketsFor(receipt);
 
   if (office) {
     const doc = renderEmail(
@@ -88,8 +148,8 @@ export async function notifyOrderPaid(receipt: Receipt): Promise<MailResult[]> {
         rows: officeRows(receipt),
         money: { price: receipt.amount, baseLabel: receipt.product === "merch" ? "ITEMS" : "TICKETS" },
         outro: receipt.customer.email
-          ? `A receipt has gone to ${receipt.customer.email} as well.`
-          : `No email address was given, so the buyer has only the confirmation on screen and their phone number is the way to reach them.`,
+          ? `A receipt has gone to ${receipt.customer.email} as well${blocks.length ? `, with ${blocks.length === 1 ? "a scannable ticket" : `${blocks.length} scannable tickets`}` : ""}.`
+          : `No email address was given, so the buyer has only the confirmation on screen${blocks.length ? ` — their ${blocks.length === 1 ? "ticket is" : "tickets are"} still scannable at the gate by name or code` : ""}, and their phone number is the way to reach them.`,
       },
       settings,
     );
@@ -112,9 +172,12 @@ export async function notifyOrderPaid(receipt: Receipt): Promise<MailResult[]> {
           ? `Paid and reserved. Bring the code below to the merch tent on the day and it will be waiting for you.`
           : receipt.product === "cosplayEntry"
             ? `Your entry is in. Keep the code below — it is how the arena desk finds you on the day.`
-            : `That's ${receipt.units === 1 ? "your pass" : `all ${receipt.units} passes`} sorted. Show the code below at the gate, or just give your name.`,
-        code: { label: w.codeLabel, value: receipt.primaryCode },
-        codes: receipt.codes,
+            : blocks.length
+              ? `That's ${receipt.units === 1 ? "your pass" : `all ${receipt.units} passes`} sorted. Show the code${receipt.units === 1 ? "" : "s"} below at the gate and we'll scan ${receipt.units === 1 ? "it" : "them"} — screenshot ${receipt.units === 1 ? "it" : "them"} now, so a flat battery or no signal can't stop you getting in.`
+              : `That's ${receipt.units === 1 ? "your pass" : `all ${receipt.units} passes`} sorted. Show the code below at the gate, or just give your name.`,
+        code: blocks.length ? undefined : { label: w.codeLabel, value: receipt.primaryCode },
+        codes: blocks.length ? undefined : receipt.codes,
+        tickets: blocks,
         rows: buyerRows(receipt),
         money: { price: receipt.amount, baseLabel: isMerch ? "ITEMS" : "TICKETS" },
         outro: `Keep this mail — the payment reference on it is what the fest office needs if anything has to be sorted out.`,
@@ -126,6 +189,7 @@ export async function notifyOrderPaid(receipt: Receipt): Promise<MailResult[]> {
       subject: `${receipt.product === "fetePass" ? "Your MADOOZA pass" : `Your MADOOZA ${w.officeNoun.toLowerCase()}`} — ${receipt.primaryCode}`,
       html: doc.html,
       text: doc.text,
+      attachments: files,
     });
   }
 

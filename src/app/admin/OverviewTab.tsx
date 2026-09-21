@@ -32,6 +32,7 @@ type Summary = {
   };
   records: { passes: number; cosplayEntries: number; merchOrders: number };
   orders: { total: number; byStatus: Record<string, number> };
+  gate: { issued: number; admitted: number; voided: number; pinSet: boolean };
   webhookConfigured: boolean;
   mailMissing: string[];
 };
@@ -80,6 +81,12 @@ export default function OverviewTab() {
       note: `${summary.merchOrders} paid orders · ${formatInr(summary.merchValue)}`,
     },
     { label: "CONCERT CAPACITY", value: summary.concertCapacity.toLocaleString("en-IN"), note: "seats on the field" },
+    {
+      // The only number here counted at the gate rather than at checkout.
+      label: "ADMITTED",
+      value: summary.gate.admitted.toLocaleString("en-IN"),
+      note: `${Math.max(0, summary.gate.issued - summary.gate.admitted - summary.gate.voided).toLocaleString("en-IN")} still to arrive`,
+    },
   ];
 
   // What was charged, split the way it has to be accounted for: the fest's own
@@ -97,6 +104,10 @@ export default function OverviewTab() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {summary.gate.issued > 0 && !summary.gate.pinSet && (
+        <Notice text="No gate PIN is set, so nobody can sign into the scanner. Set one in Settings before the gates open." />
+      )}
+
       {summary.mailMissing.length > 0 && (
         <Notice
           text={`No mail is being sent: ${summary.mailMissing.join(", ")} ${summary.mailMissing.length === 1 ? "is" : "are"} not set. Passes still sell and are still recorded — nobody is told about them by email.`}
