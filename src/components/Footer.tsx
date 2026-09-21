@@ -1,7 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getCopy } from "@/lib/copy";
+import { HOST_NAME, LEGAL_PAGES, ORGANIZER_NAME, ORGANIZER_ROLE } from "@/lib/legal";
 import { describeDate, getSettings, isPageHidden, type PageKey } from "@/lib/settings";
+
+/** Label for a legal link: the council's wording if they have set one, else the default. */
+function legalLabel(words: Record<string, string>, key: string, fallback: string): string {
+  const slot = `legalLink${key.charAt(0).toUpperCase()}${key.slice(1)}`;
+  const value = words[slot];
+  return value && value.trim() ? value : fallback;
+}
 
 export default async function Footer() {
   const settings = await getSettings();
@@ -100,17 +108,27 @@ export default async function Footer() {
           margin: "34px auto 0",
           paddingTop: 18,
           borderTop: "1px solid #351059",
-          display: "flex",
-          justifyContent: "space-between",
-          gap: 14,
-          flexWrap: "wrap",
           fontSize: 11,
           letterSpacing: "0.12em",
           color: "var(--muted-lilac)",
         }}
       >
-        <span>{words.copyrightLine}</span>
-        <span>{date.dayTile} &middot; {date.monthTile} &middot; {settings.festYear}</span>
+        {/* The legal pages are never hidden from the panel: a site taking money
+            has to keep them reachable from every page. */}
+        <div style={{ display: "flex", gap: 16, flexWrap: "wrap", marginBottom: 14 }}>
+          {LEGAL_PAGES.map((page) => (
+            <Link key={page.key} href={page.href} className="mz-footer-link" style={{ letterSpacing: "0.12em" }}>
+              {legalLabel(words, page.key, page.label).toUpperCase()}
+            </Link>
+          ))}
+        </div>
+        <div style={{ lineHeight: 1.7, marginBottom: 12, letterSpacing: "0.1em" }}>
+          Hosted by {HOST_NAME} &middot; {ORGANIZER_ROLE}: {ORGANIZER_NAME}
+        </div>
+        <div style={{ display: "flex", justifyContent: "space-between", gap: 14, flexWrap: "wrap" }}>
+          <span>{words.copyrightLine}</span>
+          <span>{date.dayTile} &middot; {date.monthTile} &middot; {settings.festYear}</span>
+        </div>
       </div>
     </footer>
   );

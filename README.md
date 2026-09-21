@@ -126,6 +126,28 @@ setting decides how much to give away — sealed, month only, or the full date �
 line, the hero headline, the body-copy sentence. Revealing the month is a change in the panel, not a
 deploy, and nothing has to be hunted down page by page.
 
+## Legal pages
+
+`/privacy`, `/terms` and `/refunds` — the privacy policy, the terms and conditions, and the refund
+policy. They are linked from the bottom bar of every page and from both checkouts (the pass checkout and
+the cosplay entry form), because a site that takes money has to keep them one tap from the pay button.
+
+Unlike the rest of the site's writing, these are **not** editable in the admin panel. They live in
+`src/lib/legal.ts` and change by a reviewed commit: the copy editor is for the fest's voice, and this is
+the school's word to someone who has paid. Live values still come from settings — the pass price, the
+cosplay fee, the concert capacity, the contact email and phone, and the fest date are read in as the page
+renders, so a price change in the panel never leaves a stale figure in a policy. `src/components/LegalDoc.tsx`
+renders all three from the same shell, and `LEGAL_UPDATED` in `legal.ts` is the "last updated" date —
+change it when you change the wording.
+
+They are also not in `PAGES`, so the panel's show/hide switches cannot take them off the site. The only
+thing the panel can reword is the three link labels in the footer (Words → Footer).
+
+The fest is hosted by The Elden Heights School and organised and operated by FLYKRAFT SYNERGIES PRIVATE
+LIMITED (Event Organizer); both are named on every legal page and in the footer, and the constants for
+them are at the top of `legal.ts`. Every refund is settled in person at the school's fest office — the
+site has no refund form, and the refund policy says so.
+
 ## Development
 
 ```bash
