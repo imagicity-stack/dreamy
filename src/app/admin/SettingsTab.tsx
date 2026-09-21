@@ -204,6 +204,22 @@ export default function SettingsTab({ pages }: { pages: { key: string; label: st
             onChange={(v) => edit({ soldOut: v })}
           />
           <Toggle
+            on={settings.merchOpen}
+            label="Merch pre-orders open"
+            hint="Turn this off to leave the shop up but stop taking orders. Hiding the page in Pages removes it entirely."
+            onChange={(v) => edit({ merchOpen: v })}
+          />
+          {!settings.merchOpen && (
+            <div>
+              <label style={ui.label}>WHAT THE CLOSED SHOP SAYS</label>
+              <input
+                className="mz-input"
+                value={settings.merchClosedNote}
+                onChange={(e) => edit({ merchClosedNote: e.target.value })}
+              />
+            </div>
+          )}
+          <Toggle
             on={settings.lineupUnlocked}
             label="Lineup unlocked"
             hint="Opens every clue card without anyone having to tap it."

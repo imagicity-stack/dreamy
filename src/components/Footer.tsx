@@ -1,9 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
+import { getCopy } from "@/lib/copy";
 import { describeDate, getSettings, isPageHidden, type PageKey } from "@/lib/settings";
 
 export default async function Footer() {
   const settings = await getSettings();
+  const words = await getCopy("footer");
   const date = describeDate(settings);
 
   // The footer used to carry its own copy of the site map. Hiding a page in the
@@ -32,11 +34,10 @@ export default async function Footer() {
       >
         <div>
           <div className="font-display" style={{ fontSize: 22, color: "var(--teal)", marginBottom: 10 }}>
-            MADOOZA
+            {words.brandWordmark}
           </div>
           <p style={{ fontSize: 14, lineHeight: 1.55, color: "var(--muted-lilac)", margin: 0, maxWidth: "30ch" }}>
-            The Voice of Hazaribagh. Built, painted, wired and shouted about by the students of The Elden Heights
-            School.
+            {words.brandBlurb}
           </p>
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 20 }}>
             <Image
@@ -47,43 +48,43 @@ export default async function Footer() {
               style={{ objectFit: "contain", display: "block" }}
             />
             <div style={{ fontSize: 11, fontWeight: 800, letterSpacing: "0.16em", color: "var(--lilac)", lineHeight: 1.6 }}>
-              THE ELDEN HEIGHTS SCHOOL
+              {words.schoolName}
               <br />
-              <span style={{ color: "var(--muted-lilac)", letterSpacing: "0.1em" }}>TOWARDS ETERNAL GLORY</span>
+              <span style={{ color: "var(--muted-lilac)", letterSpacing: "0.1em" }}>{words.schoolMotto}</span>
             </div>
           </div>
         </div>
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "var(--lilac)", marginBottom: 12 }}>
-            THE FEST
+            {words.festColumnTitle}
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 14 }}>
-            {live("lineup") && <Link href="/lineup" className="mz-footer-link">Lineup &amp; reveal</Link>}
-            {live("concert") && <Link href="/concert" className="mz-footer-link">The concert &middot; guess who</Link>}
-            {live("cosplay") && <Link href="/cosplay" className="mz-footer-link">Cosplay contest</Link>}
-            {live("fete") && <Link href="/fete" className="mz-footer-link">Fete &amp; stalls</Link>}
-            {live("gallery") && <Link href="/gallery" className="mz-footer-link">Gallery</Link>}
+            {live("lineup") && <Link href="/lineup" className="mz-footer-link">{words.festLinkLineup}</Link>}
+            {live("concert") && <Link href="/concert" className="mz-footer-link">{words.festLinkConcert}</Link>}
+            {live("cosplay") && <Link href="/cosplay" className="mz-footer-link">{words.festLinkCosplay}</Link>}
+            {live("fete") && <Link href="/fete" className="mz-footer-link">{words.festLinkFete}</Link>}
+            {live("gallery") && <Link href="/gallery" className="mz-footer-link">{words.festLinkGallery}</Link>}
           </div>
         </div>
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "var(--lilac)", marginBottom: 12 }}>
-            GET IN
+            {words.getInColumnTitle}
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 8, fontSize: 14 }}>
-            {live("tickets") && <Link href="/tickets" className="mz-footer-link">Passes &amp; tickets</Link>}
-            {live("merch") && <Link href="/merch" className="mz-footer-link">Merch shop</Link>}
-            {live("sponsors") && <Link href="/sponsors" className="mz-footer-link">Sponsors &amp; press kit</Link>}
-            {live("faq") && <Link href="/faq" className="mz-footer-link">FAQ + venue</Link>}
+            {live("tickets") && <Link href="/tickets" className="mz-footer-link">{words.getInLinkTickets}</Link>}
+            {live("merch") && <Link href="/merch" className="mz-footer-link">{words.getInLinkMerch}</Link>}
+            {live("sponsors") && <Link href="/sponsors" className="mz-footer-link">{words.getInLinkSponsors}</Link>}
+            {live("faq") && <Link href="/faq" className="mz-footer-link">{words.getInLinkFaq}</Link>}
           </div>
         </div>
         <div>
           <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", color: "var(--lilac)", marginBottom: 12 }}>
-            FEST OFFICE
+            {words.officeColumnTitle}
           </div>
           <div style={{ fontSize: 14, lineHeight: 1.6, color: "var(--muted-lilac)" }}>
-            The Elden Heights School
+            {words.officeAddressSchool}
             <br />
-            Hazaribagh, Jharkhand
+            {words.officeAddressCity}
             <br />
             <a href={`mailto:${settings.contactEmail}`} style={{ color: "var(--teal)" }}>
               {settings.contactEmail}
@@ -108,7 +109,7 @@ export default async function Footer() {
           color: "var(--muted-lilac)",
         }}
       >
-        <span>&copy; {settings.festYear} MADOOZA &middot; STUDENT COUNCIL, ELDEN HEIGHTS</span>
+        <span>{words.copyrightLine}</span>
         <span>{date.dayTile} &middot; {date.monthTile} &middot; {settings.festYear}</span>
       </div>
     </footer>

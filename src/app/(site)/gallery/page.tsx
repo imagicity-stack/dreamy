@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { publicContent } from "@/lib/content";
+import { getCopy } from "@/lib/copy";
 import { getSettings, isPageHidden } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
@@ -16,6 +17,7 @@ type Shot = {
 
 export default async function GalleryPage() {
   const settings = await getSettings();
+  const words = await getCopy("gallery");
   if (isPageHidden(settings, "gallery")) notFound();
 
   const SHOTS: Shot[] = (await publicContent("gallery")).map((r) => ({
@@ -31,11 +33,10 @@ export default async function GalleryPage() {
     <main>
       <section style={{ background: "var(--bg)", padding: "54px 20px 40px", borderBottom: "3px solid var(--ink)" }}>
         <div style={{ maxWidth: 1180, margin: "0 auto" }}>
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.24em", color: "var(--teal)" }}>06 / EVIDENCE</div>
-          <h1 className="font-display" style={{ fontSize: "clamp(30px, 6vw, 60px)", lineHeight: 1.02, margin: "14px 0 16px", color: "var(--lilac)" }}>GALLERY</h1>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.24em", color: "var(--teal)" }}>{words.heroEyebrow}</div>
+          <h1 className="font-display" style={{ fontSize: "clamp(30px, 6vw, 60px)", lineHeight: 1.02, margin: "14px 0 16px", color: "var(--lilac)" }}>{words.heroTitle}</h1>
           <p style={{ fontSize: 17, lineHeight: 1.6, color: "var(--lilac-text)", maxWidth: "58ch", margin: 0 }}>
-            Nothing from the fest itself yet &mdash; that&apos;s the whole point of a first edition. Until fest day
-            this page is the build-up: paint, plywood, rehearsals, and one very tired council.
+            {words.heroIntro}
           </p>
         </div>
       </section>
@@ -71,10 +72,9 @@ export default async function GalleryPage() {
           </div>
           <div style={{ marginTop: 38, background: "var(--purple)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "8px 8px 0 var(--ink)", padding: "26px 24px", color: "var(--lilac)", display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: 20, alignItems: "center" }}>
             <div>
-              <h3 className="font-display" style={{ fontSize: 20, margin: "0 0 8px", color: "var(--teal)" }}>SHOT SOMETHING GOOD?</h3>
+              <h3 className="font-display" style={{ fontSize: 20, margin: "0 0 8px", color: "var(--teal)" }}>{words.submitCardTitle}</h3>
               <p style={{ fontSize: 15, lineHeight: 1.55, margin: 0, color: "#F0E4FA" }}>
-                Send it in after the fest and it goes up here with your name on it. Photos, phone video, blurry
-                mosh-pit chaos &mdash; all welcome.
+                {words.submitCardBody}
               </p>
             </div>
             <a
@@ -82,7 +82,7 @@ export default async function GalleryPage() {
               className="mz-pop font-display"
               style={{ fontSize: 14, color: "var(--ink)", background: "var(--teal)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "6px 6px 0 var(--ink)", padding: "15px 20px", textAlign: "center", justifySelf: "start", ["--mz-shadow" as string]: "6px" }}
             >
-              SEND YOUR SHOTS
+              {words.submitCtaLabel}
             </a>
           </div>
         </div>

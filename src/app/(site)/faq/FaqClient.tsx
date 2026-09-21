@@ -3,18 +3,29 @@
 import { useState } from "react";
 import Image from "next/image";
 
+export type VenueTime = { id: string; label: string; time: string };
 
-export default function FaqClient({ faqs, contactEmail }: { faqs: { q: string; a: string }[]; contactEmail: string }) {
+export default function FaqClient({
+  faqs,
+  venueTimes,
+  words,
+  contactEmail,
+}: {
+  faqs: { q: string; a: string }[];
+  venueTimes: VenueTime[];
+  words: Record<string, string>;
+  contactEmail: string;
+}) {
   const [open, setOpen] = useState<number | null>(null);
 
   return (
     <main>
       <section style={{ background: "var(--bg)", padding: "54px 20px 40px", borderBottom: "3px solid var(--ink)" }}>
         <div style={{ maxWidth: 1180, margin: "0 auto" }}>
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.24em", color: "var(--teal)" }}>08 / THE SMALL PRINT</div>
-          <h1 className="font-display" style={{ fontSize: "clamp(30px, 6vw, 60px)", lineHeight: 1.02, margin: "14px 0 16px", color: "var(--lilac)" }}>FAQ + VENUE</h1>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.24em", color: "var(--teal)" }}>{words.heroEyebrow}</div>
+          <h1 className="font-display" style={{ fontSize: "clamp(30px, 6vw, 60px)", lineHeight: 1.02, margin: "14px 0 16px", color: "var(--lilac)" }}>{words.heroTitle}</h1>
           <p style={{ fontSize: 17, lineHeight: 1.6, color: "var(--lilac-text)", maxWidth: "58ch", margin: 0 }}>
-            The questions the council keeps getting asked in the corridor, answered once, properly.
+            {words.heroIntro}
           </p>
         </div>
       </section>
@@ -41,45 +52,36 @@ export default function FaqClient({ faqs, contactEmail }: { faqs: { q: string; a
 
           <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
             <div style={{ background: "var(--purple)", color: "var(--lilac)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "9px 9px 0 var(--ink)", padding: "26px 24px" }}>
-              <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal)" }}>THE VENUE</div>
+              <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal)" }}>{words.venueEyebrow}</div>
               <Image src="/assets/elden-heights-crest.png" alt="" width={64} height={64} style={{ objectFit: "contain", display: "block", margin: "14px 0 8px" }} />
-              <h2 className="font-display" style={{ fontSize: 22, margin: "4px 0 14px", lineHeight: 1.15 }}>THE ELDEN HEIGHTS SCHOOL</h2>
+              <h2 className="font-display" style={{ fontSize: 22, margin: "4px 0 14px", lineHeight: 1.15 }}>{words.venueName}</h2>
               <div style={{ fontSize: 15.5, lineHeight: 1.6, color: "#F0E4FA" }}>
-                Main grounds, senior block and the assembly canopy<br />Hazaribagh, Jharkhand 825301
+                {words.venueAddressLine}<br />{words.venueAddressCity}
               </div>
               <div style={{ borderTop: "1px dashed var(--muted-lilac)", margin: "18px 0", paddingTop: 18, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(120px, 1fr))", gap: 16 }}>
-                <div>
-                  <div style={{ fontSize: 10, letterSpacing: "0.16em", color: "var(--teal)" }}>GATES</div>
-                  <div className="font-display" style={{ fontSize: 17, marginTop: 4 }}>9:00 AM</div>
-                </div>
-                <div>
-                  <div style={{ fontSize: 10, letterSpacing: "0.16em", color: "var(--teal)" }}>ARENA</div>
-                  <div className="font-display" style={{ fontSize: 17, marginTop: 4 }}>2:30 PM</div>
-                </div>
-                <div>
-                  <div style={{ fontSize: 10, letterSpacing: "0.16em", color: "var(--teal)" }}>LAST ACT</div>
-                  <div className="font-display" style={{ fontSize: 17, marginTop: 4 }}>6:00 PM</div>
-                </div>
+                {venueTimes.map((slot) => (
+                  <div key={slot.id}>
+                    <div style={{ fontSize: 10, letterSpacing: "0.16em", color: "var(--teal)" }}>{slot.label}</div>
+                    <div className="font-display" style={{ fontSize: 17, marginTop: 4 }}>{slot.time}</div>
+                  </div>
+                ))}
               </div>
               <div style={{ fontSize: 14.5, lineHeight: 1.6, color: "var(--lilac-text)" }}>
-                <strong style={{ color: "var(--lilac)" }}>Getting there:</strong> ten minutes from the Hazaribagh bus
-                stand, autos run to the main gate all day. Parking is on the far field, entry through the service
-                gate off the back road.
+                <strong style={{ color: "var(--lilac)" }}>{words.venueGettingThereLabel}</strong> {words.venueGettingThereBody}
               </div>
             </div>
             <div style={{ background: "var(--teal)", color: "var(--ink)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "9px 9px 0 var(--ink)", padding: "24px 22px" }}>
-              <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>ON THE DAY</div>
-              <h3 className="font-display" style={{ fontSize: 19, margin: "10px 0 12px" }}>HELP DESK &amp; LOST THINGS</h3>
+              <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>{words.helpDeskEyebrow}</div>
+              <h3 className="font-display" style={{ fontSize: 19, margin: "10px 0 12px" }}>{words.helpDeskTitle}</h3>
               <p style={{ fontSize: 15, lineHeight: 1.55, margin: "0 0 14px" }}>
-                Volunteers in gold armbands, help desk beside the coin counter, first aid at the sports room. Lost
-                phones end up at the help desk within the hour, they always do.
+                {words.helpDeskBody}
               </p>
-              <a href="tel:+919122280578" className="font-display" style={{ fontSize: 14, color: "var(--ink)", borderBottom: "3px solid var(--ink)" }}>CALL THE FEST OFFICE</a>
+              <a href="tel:+919122280578" className="font-display" style={{ fontSize: 14, color: "var(--ink)", borderBottom: "3px solid var(--ink)" }}>{words.helpDeskCtaLabel}</a>
             </div>
             <div style={{ background: "var(--bg)", color: "var(--lilac)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "9px 9px 0 var(--ink)", padding: "24px 22px" }}>
-              <h3 className="font-display" style={{ fontSize: 19, margin: "0 0 12px", color: "var(--teal)" }}>STILL STUCK?</h3>
+              <h3 className="font-display" style={{ fontSize: 19, margin: "0 0 12px", color: "var(--teal)" }}>{words.stillStuckTitle}</h3>
               <p style={{ fontSize: 15, lineHeight: 1.55, margin: "0 0 14px", color: "var(--lilac-text)" }}>
-                Ask anything and a very real student will answer, usually between classes.
+                {words.stillStuckBody}
               </p>
               <a href={`mailto:${contactEmail}`} className="font-display" style={{ fontSize: 14, color: "var(--teal)" }}>{contactEmail}</a>
             </div>

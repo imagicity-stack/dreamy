@@ -1,4 +1,4 @@
-import { FEST } from "@/data/fest";
+import { FEST, formatInr } from "@/data/fest";
 
 /**
  * The shape of everything the admin panel can change that isn't a list of
@@ -17,7 +17,11 @@ export type FestSettings = {
   concertCapacity: number;
   interestBase: number;
   lineupUnlocked: boolean;
+  /** Fete passes sold out — checkout closes, the page says so. */
   soldOut: boolean;
+  /** Merch pre-orders open. Hiding the page removes it; this keeps it up and shuts the shop. */
+  merchOpen: boolean;
+  merchClosedNote: string;
   /** How much of the fest date to give away. */
   dateMode: DateMode;
   festDay: number;
@@ -66,6 +70,8 @@ export const DEFAULT_SETTINGS: FestSettings = {
   interestBase: FEST.interestBase,
   lineupUnlocked: FEST.lineupUnlocked,
   soldOut: FEST.soldOut,
+  merchOpen: true,
+  merchClosedNote: "Pre-orders are closed. Whatever is left goes on sale at the merch tent on the day.",
   dateMode: "sealed",
   festDay: 0,
   festMonth: 0,
@@ -110,6 +116,8 @@ export function normalizeSettings(raw: unknown): FestSettings {
     interestBase: asNumber(data.interestBase, DEFAULT_SETTINGS.interestBase),
     lineupUnlocked: asBool(data.lineupUnlocked, DEFAULT_SETTINGS.lineupUnlocked),
     soldOut: asBool(data.soldOut, DEFAULT_SETTINGS.soldOut),
+    merchOpen: asBool(data.merchOpen, DEFAULT_SETTINGS.merchOpen),
+    merchClosedNote: asText(data.merchClosedNote, DEFAULT_SETTINGS.merchClosedNote),
     dateMode: mode === "month" || mode === "full" ? mode : "sealed",
     festDay: asNumber(data.festDay, DEFAULT_SETTINGS.festDay, 31),
     festMonth: asNumber(data.festMonth, DEFAULT_SETTINGS.festMonth, 12),
@@ -216,4 +224,18 @@ export function describeDate(settings: FestSettings): DateDisplay {
     sentence: `sometime in ${year}`,
     sealed: true,
   };
+}
+
+/**
+ * Text saved in the panel can quote a live value rather than repeating one that
+ * will go stale: {fete}, {cosplay}, {seats} and {date} are replaced as it is
+ * read, so a price rise or a date reveal never leaves stale copy behind.
+ */
+export function applyTokens(text: string, settings: FestSettings): string {
+  return text
+    .replace(/\{fete\}/g, formatInr(settings.fetePrice))
+    .replace(/\{cosplay\}/g, formatInr(settings.cosplayFee))
+    .replace(/\{seats\}/g, settings.concertCapacity.toLocaleString("en-IN"))
+    .replace(/\{date\}/g, describeDate(settings).short)
+    .replace(/\{year\}/g, String(settings.festYear));
 }

@@ -22,10 +22,12 @@ export type SupportAct = { id: string; name: string; when: string; note: string 
 
 export default function LineupClient({
   settings,
+  words,
   lineup,
   supportActs,
 }: {
   settings: FestSettings;
+  words: Record<string, string>;
   lineup: ArtistCard[];
   supportActs: SupportAct[];
 }) {
@@ -54,13 +56,12 @@ export default function LineupClient({
           }}
         />
         <div style={{ position: "relative", maxWidth: 1180, margin: "0 auto" }}>
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.24em", color: "var(--teal)" }}>01 / THE VAULT</div>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.24em", color: "var(--teal)" }}>{words.heroEyebrow}</div>
           <h1 className="font-display" style={{ fontSize: "clamp(30px, 6vw, 60px)", lineHeight: 1.02, margin: "14px 0 16px", color: "var(--lilac)" }}>
-            LINEUP &amp; REVEAL
+            {words.heroTitle}
           </h1>
           <p style={{ fontSize: 17, lineHeight: 1.6, color: "#F0E4FA", maxWidth: "60ch", margin: 0 }}>
-            Three headline slots are sealed. Each card holds a clue written by the council &mdash; tap one to peek,
-            then argue about it with your friends. Names go public on the dates below, no earlier.
+            {words.heroIntro}
           </p>
         </div>
       </section>
@@ -116,7 +117,7 @@ export default function LineupClient({
                       />
                     )}
                     <div style={{ padding: card.image ? "4px 18px 18px" : 0, display: "flex", flexDirection: "column", gap: 10 }}>
-                      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal)" }}>CONFIRMED</div>
+                      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal)" }}>{words.artistCardConfirmedLabel}</div>
                       <div className="font-display" style={{ fontSize: 24, lineHeight: 1.1, color: "var(--paper)" }}>{card.name}</div>
                       {card.bio && <p style={{ fontSize: 14.5, lineHeight: 1.55, color: "#F0E4FA", margin: 0 }}>{card.bio}</p>}
                     </div>
@@ -156,7 +157,7 @@ export default function LineupClient({
                     >
                       <span style={{ animation: "mzflick 4.5s steps(1,end) infinite" }}>?</span>
                     </div>
-                    <div style={{ fontSize: 12, letterSpacing: "0.16em", color: "var(--muted-lilac)" }}>SEALED UNTIL FURTHER NOTICE</div>
+                    <div style={{ fontSize: 12, letterSpacing: "0.16em", color: "var(--muted-lilac)" }}>{words.artistCardSealedNote}</div>
                   </div>
                 )}
 
@@ -174,10 +175,10 @@ export default function LineupClient({
                       animation: "mzclue .45s cubic-bezier(.2,.7,.3,1) both",
                     }}
                   >
-                    <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal)" }}>CLUE</div>
+                    <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal)" }}>{words.artistCardClueLabel}</div>
                     <p style={{ fontSize: 15.5, lineHeight: 1.55, color: "var(--paper)", margin: 0 }}>{card.clue}</p>
                     <div style={{ borderTop: "1px dashed var(--muted-lilac)", paddingTop: 12, marginTop: "auto" }}>
-                      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal)", marginBottom: 6 }}>EXTRA CRUMBS</div>
+                      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--teal)", marginBottom: 6 }}>{words.artistCardHintLabel}</div>
                       <p style={{ fontSize: 13.5, lineHeight: 1.5, color: "#F0E4FA", margin: 0 }}>{card.hint}</p>
                     </div>
                   </div>
@@ -203,11 +204,11 @@ export default function LineupClient({
                     ["--mz-lift" as string]: "1px",
                   }}
                 >
-                  TAP TO PEEK
+                  {words.artistCardPeekButton}
                 </button>
                 )}
                 <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.16em", color: "var(--purple)", marginTop: 12, textAlign: "center" }}>
-                  {out ? "ANNOUNCED" : card.reveal}
+                  {out ? words.artistCardAnnouncedLabel : card.reveal}
                 </div>
               </div>
             );
@@ -217,8 +218,8 @@ export default function LineupClient({
 
       <section style={{ background: "var(--paper)", color: "var(--ink)", borderTop: "3px solid var(--ink)", borderBottom: "3px solid var(--ink)", padding: "56px 20px" }}>
         <div style={{ maxWidth: 1180, margin: "0 auto" }}>
-          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.24em", color: "var(--purple)" }}>ALREADY CONFIRMED</div>
-          <h2 className="font-display" style={{ fontSize: "clamp(24px, 3.6vw, 38px)", margin: "12px 0 26px" }}>THE REST OF THE STAGE</h2>
+          <div style={{ fontSize: 12, fontWeight: 700, letterSpacing: "0.24em", color: "var(--purple)" }}>{words.supportEyebrow}</div>
+          <h2 className="font-display" style={{ fontSize: "clamp(24px, 3.6vw, 38px)", margin: "12px 0 26px" }}>{words.supportTitle}</h2>
           <div style={{ display: "grid", gap: 0, borderTop: "2px solid var(--ink)" }}>
             {supportActs.map((act) => (
               <div
@@ -240,7 +241,7 @@ export default function LineupClient({
               className="mz-pop font-display"
               style={{ fontSize: 15, color: "var(--ink)", background: "var(--teal)", border: "3px solid var(--ink)", borderRadius: 999, boxShadow: "6px 6px 0 var(--ink)", padding: "16px 28px", ["--mz-shadow" as string]: "6px" }}
             >
-              GET A PASS BEFORE THE REVEAL
+              {words.ticketsCtaLabel}
             </Link>
             )}
           </div>
