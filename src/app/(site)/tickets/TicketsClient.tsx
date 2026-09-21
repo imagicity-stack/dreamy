@@ -5,6 +5,7 @@ import Link from "next/link";
 import { formatInr } from "@/data/fest";
 import { SealedDateStamp, SealedDateTiles } from "@/components/SealedDate";
 import { isPageHidden, type DateDisplay, type FestSettings } from "@/lib/festSettings";
+import { LEGAL_PAGES } from "@/lib/legal";
 import { openRazorpayCheckout } from "@/lib/razorpayClient";
 
 type PassResult = {
@@ -362,6 +363,14 @@ export default function TicketsClient({
                 )}
                 <div style={{ fontSize: 10.5, lineHeight: 1.6, letterSpacing: "0.06em", color: "#DCC9F2" }}>
                   {words.checkoutPaymentNote}
+                </div>
+                {/* Paying is agreeing, so the terms and the refund rules are one tap away from the button. */}
+                <div style={{ display: "flex", gap: 14, flexWrap: "wrap", fontSize: 10.5, letterSpacing: "0.1em" }}>
+                  {LEGAL_PAGES.map((page) => (
+                    <Link key={page.key} href={page.href} style={{ color: "var(--teal)", textDecoration: "underline" }}>
+                      {page.label.toUpperCase()}
+                    </Link>
+                  ))}
                 </div>
               </div>
             </div>

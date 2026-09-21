@@ -6,6 +6,7 @@ import { useState } from "react";
 import { openRazorpayCheckout } from "@/lib/razorpayClient";
 import { formatInr } from "@/data/fest";
 import { isPageHidden, type FestSettings } from "@/lib/festSettings";
+import { LEGAL_PAGES } from "@/lib/legal";
 
 export type Category = {
   id: string;
@@ -281,6 +282,14 @@ export default function CosplayClient({
                   {status === "error" && <div style={{ fontSize: 13, color: "var(--crimson)" }}>{error}</div>}
                   <div style={{ fontSize: 10.5, lineHeight: 1.6, letterSpacing: "0.06em", color: "#7D63A8" }}>
                     {words.entryFinePrint}
+                  </div>
+                  {/* The entry fee is non-refundable, so say where that is written down. */}
+                  <div style={{ display: "flex", gap: 14, flexWrap: "wrap", fontSize: 10.5, letterSpacing: "0.1em" }}>
+                    {LEGAL_PAGES.map((page) => (
+                      <Link key={page.key} href={page.href} style={{ color: "var(--purple)", textDecoration: "underline" }}>
+                        {page.label.toUpperCase()}
+                      </Link>
+                    ))}
                   </div>
                 </div>
               </div>
