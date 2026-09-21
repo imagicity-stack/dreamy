@@ -15,8 +15,9 @@ type Summary = {
   cosplayEntries: number;
   cosplayRevenue: number;
   cosplayCapacity: number;
-  interestEntries: number;
-  interestCounter: number;
+  interestSignups: number;
+  interestStart: number;
+  interestShown: number;
   merchOrders: number;
   merchItems: number;
   merchValue: number;
@@ -70,8 +71,8 @@ export default function OverviewTab() {
     },
     {
       label: "CONCERT INTEREST",
-      value: summary.interestCounter.toLocaleString("en-IN"),
-      note: `${summary.interestEntries} signed up here`,
+      value: summary.interestShown.toLocaleString("en-IN"),
+      note: `${summary.interestSignups.toLocaleString("en-IN")} real signups + ${summary.interestStart.toLocaleString("en-IN")} start`,
     },
     {
       label: "MERCH SOLD",

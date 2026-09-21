@@ -120,7 +120,7 @@ export default function SettingsTab({ pages }: { pages: { key: string; label: st
           {number("fetePrice", "FETE PASS (₹)", "The pass price, before the convenience fee below.")}
           {number("cosplayFee", "COSPLAY ENTRY (₹)", "Solo or squad, same fee.")}
           {number("concertCapacity", "CONCERT SEATS", "Shown wherever the cap is quoted.")}
-          {number("interestBase", "INTEREST LIST START", "Queue numbers count up from here.")}
+          {number("interestBase", "INTEREST LIST START", "The concert page shows this plus the real signups. Change it any time — the number moves with it.")}
           {number("fetePassCapacity", "FETE PASSES ON SALE", "Hard cap — checkout closes when it is reached. 0 means no limit.")}
           {number("cosplayCapacity", "COSPLAY ENTRIES ON SALE", "Hard cap on arena entries. 0 means no limit.")}
         </Grid>

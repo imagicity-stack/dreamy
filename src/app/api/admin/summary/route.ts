@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/adminAuth";
 import { getDb } from "@/lib/firebaseAdmin";
 import { getCounters, liveUnits } from "@/lib/orders";
+import { readInterest } from "@/lib/interest";
 import { webhookConfigured } from "@/lib/razorpay";
 import { missingMailConfig } from "@/lib/mail";
 import { getSettings } from "@/lib/settings";
@@ -31,13 +32,12 @@ export async function GET() {
   // have been sold, and none of these numbers needs the documents themselves.
   const ORDER_STATUSES = ["created", "paid", "failed", "oversold", "refunded"] as const;
 
-  const [counters, passes, cosplay, interest, merch, interestCounter, ...orderCounts] = await Promise.all([
+  const [counters, passes, cosplay, merch, interest, ...orderCounts] = await Promise.all([
     getCounters(),
     db.collection("passes").count().get(),
     db.collection("cosplayEntries").count().get(),
-    db.collection("concertInterest").count().get(),
     db.collection("merchOrders").count().get(),
-    db.collection("counters").doc("concertInterest").get(),
+    readInterest(settings),
     ...ORDER_STATUSES.map((status) => db.collection("orders").where("status", "==", status).count().get()),
   ]);
 
@@ -69,10 +69,12 @@ export async function GET() {
     merchOrders: mer.orders,
     merchItems: liveUnits(mer),
     merchValue: mer.totalPaise / 100,
-    interestEntries: interest.data().count,
-    interestCounter: interestCounter.exists
-      ? Number(interestCounter.data()?.count ?? settings.interestBase)
-      : settings.interestBase,
+    // Said as three numbers on purpose: what the site shows is the start the
+    // council chose plus the people who actually signed up, and anyone reading
+    // the panel should be able to see which is which.
+    interestSignups: interest.signups,
+    interestStart: interest.start,
+    interestShown: interest.shown,
     concertCapacity: settings.concertCapacity,
     money: {
       basePaise: sum("basePaise"),

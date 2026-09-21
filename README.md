@@ -202,9 +202,12 @@ receipt cannot disagree with the screen the buyer saw.
 
 - `passes` — Fete Pass purchases (buyer info, qty, total, Razorpay order/payment ids, pass code).
 - `cosplayEntries` — cosplay contest registrations (solo/squad, category, entry fee payment ids).
-- `concertInterest` — "Guess Who" interest-list signups, plus `counters/concertInterest` for the running
-  count used both as the public "X have already put their name down" figure and each signup's queue
-  number.
+- `concertInterest` — "Guess Who" interest-list signups. `counters/concertInterest` holds `signups`: the
+  number of real people who used the form, and nothing else. The figure the concert page quotes is that
+  plus **Interest list start** from the panel, added at read time (`src/lib/interest.ts`), so the start is
+  a live setting rather than something baked into the tally on the first signup. Move it and the public
+  number moves with it; the record of who actually signed up is untouched. A counter left in the old
+  shape repairs itself on the first read by counting the entries.
 - `merchOrders` — paid merch orders (line items, total, collection code, buyer).
 - `orders` — one document per checkout, keyed by the Razorpay order id: the priced lines, the buyer, the
   status (`created`, `paid`, `failed`, `oversold`, `refunded`), the payment and the codes issued.

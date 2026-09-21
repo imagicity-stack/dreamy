@@ -111,10 +111,12 @@ export const RECORD_VIEWS: RecordView[] = [
   {
     key: "concertInterest",
     title: "Concert interest list",
-    blurb: "Who wants the reveal first, in queue order.",
+    blurb:
+      "Who wants the reveal first, in queue order. Every row here is one real person; the number the site quotes is these plus the start set in Settings.",
     columns: [
       { label: "WHEN", get: when },
       { label: "QUEUE", get: (r) => text(r, "queueNumber") },
+      { label: "SIGNUP #", get: (r) => text(r, "signupNumber") },
       { label: "NAME", get: (r) => text(r, "name") },
       { label: "CONTACT", get: (r) => text(r, "contact") },
       { label: "WANTS", get: (r) => text(r, "pick") },
