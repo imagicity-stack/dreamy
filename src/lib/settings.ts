@@ -1,6 +1,7 @@
 import { cache } from "react";
 import { getDb } from "./firebaseAdmin";
 import { DEFAULT_SETTINGS, normalizeSettings, type FestSettings } from "./festSettings";
+import { cachedSettingsRead, dropSettingsCache } from "./cache";
 
 /**
  * Reading and writing the live settings document. The shape, the defaults and
@@ -20,13 +21,18 @@ export const getSettings = cache(async (): Promise<FestSettings> => {
   const db = getDb();
   if (!db) return DEFAULT_SETTINGS;
 
-  try {
-    const snap = await db.collection(SETTINGS_DOC.collection).doc(SETTINGS_DOC.doc).get();
-    if (!snap.exists) return DEFAULT_SETTINGS;
-    return normalizeSettings(snap.data());
-  } catch {
-    return DEFAULT_SETTINGS;
-  }
+  // cache() above shares this within one render; cachedSettingsRead shares the
+  // Firestore round trip across requests until a save drops the tag.
+  const read = cachedSettingsRead(async () => {
+    try {
+      const snap = await db.collection(SETTINGS_DOC.collection).doc(SETTINGS_DOC.doc).get();
+      return snap.exists ? normalizeSettings(snap.data()) : DEFAULT_SETTINGS;
+    } catch {
+      return DEFAULT_SETTINGS;
+    }
+  });
+
+  return read();
 });
 
 /** Writes a validated, complete settings document and returns what was stored. */
@@ -41,5 +47,8 @@ export async function saveSettings(patch: unknown): Promise<FestSettings | null>
   const merged = normalizeSettings({ ...current, ...((patch ?? {}) as Record<string, unknown>) });
 
   await db.collection(SETTINGS_DOC.collection).doc(SETTINGS_DOC.doc).set(merged, { merge: true });
+  // The site reads settings from the data cache, so a save has to drop it or
+  // the new price would take a full TTL to appear.
+  dropSettingsCache();
   return merged;
 }

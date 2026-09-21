@@ -237,6 +237,31 @@ setting decides how much to give away — sealed, month only, or the full date �
 line, the hero headline, the body-copy sentence. Revealing the month is a change in the panel, not a
 deploy, and nothing has to be hunted down page by page.
 
+## Speed
+
+Every public page is rendered per request, so that a price or a headline changed in the panel is live for
+the next visitor without a deploy. Read literally that meant six or seven Firestore round trips per page
+view — the settings, the page's words, the footer's words, the header ticker and two or three content
+lists — and on a bad day, with the function and the database in different parts of the world, that is a
+couple of seconds of a visitor looking at a page that hasn't changed yet.
+
+Two things fix it, and they work together:
+
+- **Reads go through Next's data cache, tagged** (`src/lib/cache.ts`). Between edits a page render costs
+  no Firestore round trips at all. Every write in the panel drops the tags it touched — and the dropping
+  happens inside `saveSettings()`, `saveCopy()`, `createRecord()`, `updateRecord()` and `deleteRecord()`
+  rather than in the routes that call them, so a new editing endpoint cannot forget to do it. Editing in
+  the panel is still live immediately. The `revalidate` windows are a safety net, not the mechanism.
+- **`src/app/(site)/loading.tsx`** fills the page area the moment a link is clicked, so a navigation that
+  still has to wait on the server shows movement rather than the old page. Measured with a 1.5s delay in
+  front of the navigation: something appears in 130ms instead of nothing for two seconds.
+
+**If it is still slow, look at where things are.** The function and Firestore should be in the same part
+of the world. Firestore's location is fixed when the database is created and cannot be moved afterwards;
+Vercel's function region is a setting (Project → Settings → Functions). A database in `asia-south1` with
+functions in Washington pays roughly a quarter of a second per round trip, and the first render after any
+edit makes several. Put `vercel.json`'s region — or the dashboard setting — next door to the database.
+
 ## Legal pages
 
 `/privacy`, `/terms` and `/refunds` — the privacy policy, the terms and conditions, and the refund
