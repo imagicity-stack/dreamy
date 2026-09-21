@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/adminAuth";
 import { getDb } from "@/lib/firebaseAdmin";
 import { getCounters, liveUnits } from "@/lib/orders";
 import { webhookConfigured } from "@/lib/razorpay";
+import { missingMailConfig } from "@/lib/mail";
 import { getSettings } from "@/lib/settings";
 
 export const dynamic = "force-dynamic";
@@ -40,12 +41,12 @@ export async function GET() {
     ...ORDER_STATUSES.map((status) => db.collection("orders").where("status", "==", status).count().get()),
   ]);
 
-  const empty = { units: 0, orders: 0, refundedUnits: 0, lastSeq: 0, basePaise: 0, feePaise: 0, gstPaise: 0, totalPaise: 0, refundedPaise: 0 };
+  const empty = { units: 0, orders: 0, refundedUnits: 0, lastSeq: 0, basePaise: 0, feePaise: 0, gstPaise: 0, feeGstPaise: 0, totalPaise: 0, refundedPaise: 0 };
   const fete = counters.fetePass ?? empty;
   const cos = counters.cosplayEntry ?? empty;
   const mer = counters.merch ?? empty;
 
-  const sum = (key: "basePaise" | "feePaise" | "gstPaise" | "totalPaise" | "refundedPaise") =>
+  const sum = (key: "basePaise" | "feePaise" | "gstPaise" | "feeGstPaise" | "totalPaise" | "refundedPaise") =>
     fete[key] + cos[key] + mer[key];
 
   // Orders that never became passes, so the council can see what is stuck.
@@ -77,6 +78,7 @@ export async function GET() {
       basePaise: sum("basePaise"),
       feePaise: sum("feePaise"),
       gstPaise: sum("gstPaise"),
+      feeGstPaise: sum("feeGstPaise"),
       totalPaise: sum("totalPaise"),
       refundedPaise: sum("refundedPaise"),
     },
@@ -87,5 +89,6 @@ export async function GET() {
     },
     orders: { total: totalOrders, byStatus },
     webhookConfigured: webhookConfigured(),
+    mailMissing: missingMailConfig(),
   });
 }

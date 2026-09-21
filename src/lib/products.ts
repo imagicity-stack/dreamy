@@ -1,5 +1,5 @@
 import { publicContent } from "./content";
-import { isPageHidden, type FestSettings } from "./festSettings";
+import { feeRates, isPageHidden, type FestSettings } from "./festSettings";
 import { priceWithFees, rupeesToPaise, type PriceBreakdown } from "./pricing";
 
 /**
@@ -67,9 +67,7 @@ export type Product = {
 };
 
 /** The fee rates every product is priced with. */
-function rates(settings: FestSettings) {
-  return { convenienceFeePercent: settings.convenienceFeePercent, gstPercent: settings.gstPercent };
-}
+const rates = feeRates;
 
 function asQty(value: unknown, max: number): number | null {
   const n = Number(value);

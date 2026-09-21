@@ -11,23 +11,39 @@
  *    figure that reaches Razorpay is always computed on the server from the
  *    settings, never read back off a request body.
  *
- * The fee itself: a convenience fee of `convenienceFeePercent` on the ticket
- * price, and GST of `gstPercent` on that fee — not on the ticket. That is the
- * usual Indian ticketing treatment, and it is what the council chose. If that
- * ever changes, it changes here and the whole site follows.
+ * What is charged, in the order the buyer sees it:
+ *
+ *   the ticket price
+ *   + GST on the ticket
+ *   + a convenience fee, taken as a percentage of the ticket price
+ *   + GST on that fee
+ *
+ * GST sits on the ticket itself, which is the thing being sold; the fee is a
+ * separate service and carries its own GST, which is the ordinary treatment and
+ * why it is billed as its own line. A council that does not want GST on the fee
+ * turns off `gstOnConvenienceFee` in the panel and the fee line goes out clean.
+ *
+ * If any of that changes it changes here, once, and the whole site — checkout,
+ * receipts, the emails, the policies — follows.
  */
 
 export type FeeRates = {
-  /** Convenience fee, as a percentage of the base amount. */
+  /** Convenience fee, as a percentage of the ticket price. */
   convenienceFeePercent: number;
-  /** GST, as a percentage of the convenience fee. */
+  /** GST, as a percentage. Applies to the ticket, and to the fee unless told otherwise. */
   gstPercent: number;
+  /** Whether the convenience fee carries GST of its own. Normally it does. */
+  gstOnConvenienceFee: boolean;
 };
 
 export type PriceBreakdown = {
+  /** The tickets or items themselves. */
   basePaise: number;
-  convenienceFeePaise: number;
+  /** GST on that. */
   gstPaise: number;
+  convenienceFeePaise: number;
+  /** GST on the convenience fee, or 0 when the fee is exempt. */
+  feeGstPaise: number;
   totalPaise: number;
   /** The rates this breakdown was computed at, so a record can be re-read years later. */
   convenienceFeePercent: number;
@@ -44,25 +60,30 @@ export function paiseToRupees(paise: number): number {
 }
 
 /**
- * The base amount plus the convenience fee plus GST on that fee.
+ * The ticket, its GST, the convenience fee, and the fee's GST.
  *
- * Each step is rounded to a whole paisa before the next one uses it, so the
- * three lines on screen always add up to the total that is charged — a
- * breakdown that doesn't add up is worse than no breakdown.
+ * Every line is rounded to a whole paisa on its own, from the ticket price,
+ * rather than each one compounding on the last. The four lines on screen then
+ * add up to the total that is charged — a breakdown that doesn't add up is
+ * worse than no breakdown at all.
  */
 export function priceWithFees(basePaise: number, rates: FeeRates): PriceBreakdown {
   const base = Math.max(0, Math.round(basePaise));
   const feePercent = clampPercent(rates.convenienceFeePercent);
   const gstPercent = clampPercent(rates.gstPercent);
 
+  const gstPaise = Math.round((base * gstPercent) / 100);
   const convenienceFeePaise = Math.round((base * feePercent) / 100);
-  const gstPaise = Math.round((convenienceFeePaise * gstPercent) / 100);
+  const feeGstPaise = rates.gstOnConvenienceFee
+    ? Math.round((convenienceFeePaise * gstPercent) / 100)
+    : 0;
 
   return {
     basePaise: base,
-    convenienceFeePaise,
     gstPaise,
-    totalPaise: base + convenienceFeePaise + gstPaise,
+    convenienceFeePaise,
+    feeGstPaise,
+    totalPaise: base + gstPaise + convenienceFeePaise + feeGstPaise,
     convenienceFeePercent: feePercent,
     gstPercent,
   };
@@ -96,16 +117,22 @@ export type BreakdownLine = { label: string; amountPaise: number; strong?: boole
 /** The breakdown as the rows a checkout panel prints, in order. */
 export function breakdownLines(price: PriceBreakdown, baseLabel = "SUBTOTAL"): BreakdownLine[] {
   const lines: BreakdownLine[] = [{ label: baseLabel, amountPaise: price.basePaise }];
+  if (price.gstPaise > 0) {
+    lines.push({
+      label: `GST (${formatPercent(price.gstPercent)}%)`,
+      amountPaise: price.gstPaise,
+    });
+  }
   if (price.convenienceFeePaise > 0) {
     lines.push({
       label: `CONVENIENCE FEE (${formatPercent(price.convenienceFeePercent)}%)`,
       amountPaise: price.convenienceFeePaise,
     });
   }
-  if (price.gstPaise > 0) {
+  if (price.feeGstPaise > 0) {
     lines.push({
-      label: `GST (${formatPercent(price.gstPercent)}% ON FEE)`,
-      amountPaise: price.gstPaise,
+      label: `GST ON FEE (${formatPercent(price.gstPercent)}%)`,
+      amountPaise: price.feeGstPaise,
     });
   }
   lines.push({ label: "TOTAL", amountPaise: price.totalPaise, strong: true });

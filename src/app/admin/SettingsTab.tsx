@@ -25,6 +25,22 @@ export default function SettingsTab({ pages }: { pages: { key: string; label: st
   const [settings, setSettings] = useState<FestSettings | null>(null);
   const [status, setStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
   const [error, setError] = useState("");
+  const [mailTo, setMailTo] = useState("");
+  const [mailState, setMailState] = useState<"idle" | "sending" | "sent" | "failed">("idle");
+  const [mailNote, setMailNote] = useState("");
+
+  async function testMail() {
+    setMailState("sending");
+    setMailNote("");
+    try {
+      await api("/api/admin/mail-test", { method: "POST", body: JSON.stringify({ to: mailTo }) });
+      setMailState("sent");
+      setMailNote(`Sent. If it isn't in the inbox in a minute, check the spam folder before changing anything.`);
+    } catch (e) {
+      setMailState("failed");
+      setMailNote(message(e, "Could not send the test"));
+    }
+  }
 
   useEffect(() => {
     api("/api/admin/settings")
@@ -85,12 +101,17 @@ export default function SettingsTab({ pages }: { pages: { key: string; label: st
     </div>
   );
 
-  // What a ₹-priced thing actually costs once the fee and its GST are on it.
-  const feeOn = (amount: number) => {
-    const fee = Math.round(amount * 100 * settings.convenienceFeePercent) / 100;
-    const gst = Math.round(fee * settings.gstPercent) / 100;
-    return (amount * 100 + fee + gst) / 100;
+  // What a ₹-priced thing actually costs once GST and the fee are on it. Same
+  // four lines as priceWithFees(), in paise, so the preview cannot drift from
+  // what checkout charges.
+  const chargedFor = (amount: number) => {
+    const base = Math.round(amount * 100);
+    const gst = Math.round((base * settings.gstPercent) / 100);
+    const fee = Math.round((base * settings.convenienceFeePercent) / 100);
+    const feeGst = settings.gstOnConvenienceFee ? Math.round((fee * settings.gstPercent) / 100) : 0;
+    return (base + gst + fee + feeGst) / 100;
   };
+  const rupees = (n: number) => n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
   return (
     <div style={{ display: "grid", gap: 16 }}>
@@ -108,20 +129,72 @@ export default function SettingsTab({ pages }: { pages: { key: string; label: st
         </p>
       </Section>
 
-      <Section kicker="CHECKOUT" title="CONVENIENCE FEE & GST">
+      <Section kicker="CHECKOUT" title="GST & CONVENIENCE FEE">
         <Grid>
-          {rate("convenienceFeePercent", "CONVENIENCE FEE (%)", "Added to every online payment, on top of the price.")}
-          {rate("gstPercent", "GST ON THE FEE (%)", "Charged on the convenience fee itself, not on the ticket.")}
+          {rate("gstPercent", "GST (%)", "Charged on the ticket price, and on the fee below unless that is switched off.")}
+          {rate("convenienceFeePercent", "CONVENIENCE FEE (%)", "A percentage of the ticket price, added on top.")}
         </Grid>
+        <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 16, cursor: "pointer" }}>
+          <input
+            type="checkbox"
+            checked={settings.gstOnConvenienceFee}
+            onChange={(e) => edit({ gstOnConvenienceFee: e.target.checked })}
+            style={{ width: 18, height: 18, cursor: "pointer" }}
+          />
+          <span style={{ fontSize: 13.5 }}>
+            Charge GST on the convenience fee as well <span style={{ color: "#5B4480" }}>(the usual treatment — the fee is a service of its own)</span>
+          </span>
+        </label>
         <p style={{ fontSize: 13, color: "#5B4480", margin: "16px 0 0", lineHeight: 1.6 }}>
-          {/* Said in rupees, because a percentage of a percentage is not
-              something anyone should have to picture on a Tuesday. */}
+          {/* Said in rupees, because a stack of percentages is not something
+              anyone should have to picture on a Tuesday. */}
           A ₹{settings.fetePrice.toLocaleString("en-IN")} Fete Pass is charged at{" "}
-          <strong>₹{feeOn(settings.fetePrice).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>, and a ₹
+          <strong>₹{rupees(chargedFor(settings.fetePrice))}</strong>, and a ₹
           {settings.cosplayFee.toLocaleString("en-IN")} cosplay entry at{" "}
-          <strong>₹{feeOn(settings.cosplayFee).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>. Every
-          checkout shows the buyer this split before they pay.
+          <strong>₹{rupees(chargedFor(settings.cosplayFee))}</strong>. Every checkout, receipt and email shows
+          the buyer this split line by line before they pay.
         </p>
+      </Section>
+
+      <Section kicker="MAIL" title="IS THE MAILBOX WORKING?">
+        <p style={{ fontSize: 13.5, color: "#5B4480", margin: "0 0 14px", lineHeight: 1.6 }}>
+          Every pass, cosplay entry, merch order and interest-list signup sends a mail to the fest inbox, and
+          a receipt to the buyer when they gave an address. The addresses themselves are set in the hosting
+          environment, not here. Send yourself one to check the mailbox is really wired up.
+        </p>
+        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+          <input
+            className="mz-input"
+            style={{ flex: "1 1 240px", width: "auto" }}
+            value={mailTo}
+            onChange={(e) => setMailTo(e.target.value)}
+            placeholder="Send to… (blank = the fest inbox)"
+          />
+          <button
+            type="button"
+            onClick={testMail}
+            disabled={mailState === "sending"}
+            className="font-display mz-pop"
+            style={{
+              fontSize: 13,
+              color: "var(--ink)",
+              background: "var(--teal)",
+              border: "3px solid var(--ink)",
+              borderRadius: 16,
+              boxShadow: "4px 4px 0 var(--ink)",
+              padding: "13px 18px",
+              cursor: "pointer",
+              ["--mz-shadow" as string]: "4px",
+            }}
+          >
+            {mailState === "sending" ? "SENDING…" : "SEND A TEST"}
+          </button>
+        </div>
+        {mailNote && (
+          <p style={{ fontSize: 13, margin: "12px 0 0", color: mailState === "failed" ? "var(--crimson)" : "#3D7A45", lineHeight: 1.6 }}>
+            {mailNote}
+          </p>
+        )}
       </Section>
 
       <Section kicker="THE DATE" title="HOW MUCH TO GIVE AWAY">

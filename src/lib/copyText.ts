@@ -275,7 +275,7 @@ export const COPY_GROUPS: CopyGroup[] = [
       { key: "checkoutPayProcessing", label: "Pay button — processing label", type: "text", value: "OPENING PAYMENT…" },
       { key: "checkoutPayCta", label: "Pay button", type: "text", value: "PAY {total} · GET MY PASS", hint: "{total} is the running order total (quantity × pass price), filled in by the page" },
       { key: "checkoutSoldOut", label: "Sold-out replacement for the pay button", type: "text", value: "SOLD OUT — JOIN THE WAITLIST" },
-      { key: "checkoutPaymentNote", label: "Checkout footnote", type: "longtext", value: "PASSES ARE PROCESSED BY RAZORPAY. THE CONVENIENCE FEE AND ITS GST ARE ITEMISED ABOVE. YOUR PASS CODE IS ISSUED THE MOMENT PAYMENT CLEARS." },
+      { key: "checkoutPaymentNote", label: "Checkout footnote", type: "longtext", value: "PASSES ARE PROCESSED BY RAZORPAY. GST AND THE CONVENIENCE FEE ARE ITEMISED ABOVE. YOUR PASS CODE IS ISSUED THE MOMENT PAYMENT CLEARS." },
     ],
   },
   {

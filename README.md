@@ -44,6 +44,9 @@ settings for deployment:
   to check an admin's password against Firebase Auth; the Admin SDK can mint tokens but cannot verify a
   password, so this one call goes through the Identity Toolkit REST API.
 - `ADMIN_EMAILS` — comma-separated emails allowed into `/admin`.
+- `SMTP_USER` / `SMTP_PASS` / `MAIL_FROM` / `MAIL_TO` — the Google Workspace mailbox that sends the
+  fest's mail, and the inbox that gets a copy of everything. `SMTP_HOST` and `SMTP_PORT` default to
+  `smtp.gmail.com` and `465`. See **Mail** below.
 
 All of the server-only ones are read at request time, so changing them takes effect on the next request
 rather than needing a rebuild. `NEXT_PUBLIC_RAZORPAY_KEY_ID` is compiled into the bundle, so that one
@@ -60,11 +63,21 @@ Everything the fest sells goes through one flow. Adding a paid thing is an entry
 (`src/lib/products.ts`), not another pair of API routes.
 
 **What it costs.** `src/lib/pricing.ts` is the only place money is worked out, and it works in paise as
-integers — `499 × 1.02` in floating point is `508.98000000000002`, and Razorpay takes paise anyway. On
-top of the price sits a convenience fee (2% by default) and GST on that fee (18%), both editable in the
-panel under Settings → Convenience fee & GST. GST is charged on the fee, not on the ticket: a ₹499 Fete
-Pass is charged at ₹510.78. Each step is rounded to a whole paisa before the next uses it, so the
-breakdown on screen always adds up to the amount charged.
+integers — `499 × 1.18` in floating point is not a rupee figure, and Razorpay takes paise anyway. Four
+lines, in this order:
+
+| | |
+|---|---|
+| the ticket price | ₹499.00 |
+| GST on it (18%) | ₹89.82 |
+| convenience fee (2% of the ticket) | ₹9.98 |
+| GST on the fee (18%) | ₹1.80 |
+| **charged** | **₹600.60** |
+
+Both rates are editable in the panel under Settings → GST & convenience fee, and a switch there exempts
+the convenience fee from GST if the council ever needs it to be. Every line is rounded to a whole paisa
+from the ticket price rather than compounding, so the breakdown on screen always adds up to the amount
+charged.
 
 **Where it is worked out.** On the server, always. The checkout panels call `POST /api/checkout/quote`
 and print what comes back; they never multiply a price by a quantity themselves. The amount sent to
@@ -154,6 +167,36 @@ means adding an entry to `CONTENT` in `src/lib/content.ts` — the editor and th
 Prices are always taken from the server. The order route computes the amount from `settings/fest`, and
 fulfilment re-fetches the payment from Razorpay and checks its amount against the stored order, so a
 tampered request body can't change what gets charged or recorded.
+
+## Mail
+
+Everything that happens sends mail, from one Workspace mailbox to the fest inbox — and to the buyer as
+well, whenever there is an address to send to.
+
+| What happened | The office gets | The buyer gets |
+|---|---|---|
+| Pass, cosplay entry or merch paid | The sale, the buyer, the codes, the money split | A receipt with their code(s) and what they paid |
+| Interest-list signup | Name, contact, who they're hoping for, queue number | Their queue number, if they signed up with an email |
+| Payment failed | A note, with the reason Razorpay gave | — |
+| Refund processed | The amount and whose it was | Confirmation, and where to ask about it |
+| Paid but sold out | **REFUND NEEDED**, in red, with the payment reference | — (they were told on screen) |
+
+The addresses live in the environment (`MAIL_FROM`, `MAIL_TO`), never in the source, so changing the
+inbox is a Vercel setting rather than a deploy.
+
+**Setting it up.** In Google Workspace, turn on 2-Step Verification for the sending mailbox, then create
+an App Password for it (Google Account → Security → App passwords) and put that in `SMTP_PASS` —
+Workspace will not accept the account's own password over SMTP. Port 465 is implicit TLS; 587 also works
+and negotiates STARTTLS. Then open `/admin` → Settings → **Is the mailbox working?** and send yourself a
+test, which goes through the real transport rather than pretending.
+
+**How it behaves.** Mail is sent from inside `after()`, so it goes out once the response has already
+reached the browser — a slow mail server never leaves somebody who has paid watching a spinner. Nothing
+it does can fail a payment: every error is caught and logged, and the record in Firestore is written
+first, always. Only the call that actually issued the codes sends the receipt, so the browser and the
+webhook both reporting the same payment still produces exactly one email. Templates live in
+`src/lib/mailTemplates.ts` and are built from the same `breakdownLines()` the checkout panel prints, so a
+receipt cannot disagree with the screen the buyer saw.
 
 ## Firestore collections
 

@@ -53,11 +53,18 @@ export type Receipt = {
   lines: QuoteLine[];
   amount: OrderAmount;
   customerName: string;
+  /** The buyer, so a receipt can be addressed without re-reading the order. */
+  customer: Customer;
   /** True when this call did the fulfilling, false when it was already done. */
   firstTime: boolean;
 };
 
-export type OrderFailure = { error: string; status: number };
+export type OrderFailure = {
+  error: string;
+  status: number;
+  /** Names the cases a caller acts on rather than merely reports. */
+  code?: "oversold" | "not-ours" | "already-refunded";
+};
 
 export function isFailure<T>(value: T | OrderFailure): value is OrderFailure {
   return typeof value === "object" && value !== null && "error" in value && "status" in value;
@@ -76,6 +83,7 @@ export type ProductCounter = {
   basePaise: number;
   feePaise: number;
   gstPaise: number;
+  feeGstPaise: number;
   totalPaise: number;
   refundedPaise: number;
 };
@@ -91,6 +99,7 @@ function readCounter(data: unknown): ProductCounter {
     basePaise: num(raw.basePaise),
     feePaise: num(raw.feePaise),
     gstPaise: num(raw.gstPaise),
+    feeGstPaise: num(raw.feeGstPaise),
     totalPaise: num(raw.totalPaise),
     refundedPaise: num(raw.refundedPaise),
   };
@@ -257,6 +266,7 @@ function receiptFrom(order: StoredOrder, paymentId: string, firstTime: boolean):
     lines: order.lines ?? [],
     amount: order.amount,
     customerName: order.customer?.name ?? "",
+    customer: order.customer ?? { name: "", phone: "", email: "", school: "", extra: {} },
     firstTime,
   };
 }
@@ -279,7 +289,7 @@ export async function fulfilOrder(args: {
 
   const orderRef = db.collection(ORDERS).doc(args.orderId);
   const existing = await orderRef.get();
-  if (!existing.exists) return { error: "That order is not one of ours.", status: 404 };
+  if (!existing.exists) return { error: "That order is not one of ours.", status: 404, code: "not-ours" };
 
   const order = existing.data() as StoredOrder;
 
@@ -288,7 +298,7 @@ export async function fulfilOrder(args: {
     return receiptFrom(order, order.payment?.paymentId ?? args.paymentId, false);
   }
   if (order.status === "refunded") {
-    return { error: "That payment has been refunded.", status: 409 };
+    return { error: "That payment has been refunded.", status: 409, code: "already-refunded" };
   }
 
   // The truth about a payment is Razorpay's, not the browser's.
@@ -338,6 +348,7 @@ export async function fulfilOrder(args: {
       return {
         error: "We sold out while you were paying. The office will refund this in full.",
         status: 409,
+        code: "oversold",
       } as OrderFailure;
     }
 
@@ -358,6 +369,7 @@ export async function fulfilOrder(args: {
         basePaise: counter.basePaise + current.amount.basePaise,
         feePaise: counter.feePaise + current.amount.convenienceFeePaise,
         gstPaise: counter.gstPaise + current.amount.gstPaise,
+        feeGstPaise: counter.feeGstPaise + current.amount.feeGstPaise,
         totalPaise: counter.totalPaise + current.amount.totalPaise,
         refundedUnits: counter.refundedUnits,
         refundedPaise: counter.refundedPaise,
@@ -391,6 +403,14 @@ export async function fulfilOrder(args: {
 
     return receiptFrom({ ...current, fulfilment: { codes, recordId: recordRef.id } }, args.paymentId, true);
   });
+
+  // Our own form treats the email as optional, but Razorpay's checkout collects
+  // one. If the buyer gave it there and not here, that is still their address
+  // and the receipt should reach it.
+  if (!isFailure(result) && !result.customer.email) {
+    const fromPayment = String(payment.email ?? "").trim();
+    if (fromPayment) result.customer = { ...result.customer, email: fromPayment };
+  }
 
   return result;
 }
@@ -487,16 +507,17 @@ export async function markOrderRefunded(args: {
   orderId: string;
   refundId: string;
   amountPaise: number;
-}) {
+}): Promise<{ name: string; email: string } | null> {
   const db = getDb();
-  if (!db) return;
+  if (!db) return null;
   const orderRef = db.collection(ORDERS).doc(args.orderId);
 
-  await db.runTransaction(async (tx) => {
+  return db.runTransaction(async (tx): Promise<{ name: string; email: string } | null> => {
     const snap = await tx.get(orderRef);
-    if (!snap.exists) return;
+    if (!snap.exists) return null;
     const order = snap.data() as StoredOrder & { refund?: unknown };
-    if (order.status === "refunded") return;
+    // Already refunded: no counter moves again, and nobody is told twice.
+    if (order.status === "refunded") return null;
 
     const wasFulfilled = order.status === "paid";
     if (wasFulfilled) {
@@ -533,6 +554,8 @@ export async function markOrderRefunded(args: {
       },
       { merge: true },
     );
+
+    return { name: order.customer?.name ?? "", email: order.customer?.email ?? "" };
   });
 }
 

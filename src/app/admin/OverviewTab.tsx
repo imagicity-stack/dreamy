@@ -25,12 +25,14 @@ type Summary = {
     basePaise: number;
     feePaise: number;
     gstPaise: number;
+    feeGstPaise: number;
     totalPaise: number;
     refundedPaise: number;
   };
   records: { passes: number; cosplayEntries: number; merchOrders: number };
   orders: { total: number; byStatus: Record<string, number> };
   webhookConfigured: boolean;
+  mailMissing: string[];
 };
 
 /** "142 of 500" when there is a cap, "no limit" when there isn't. */
@@ -83,8 +85,9 @@ export default function OverviewTab() {
   // money, the convenience fee, and the GST collected on that fee.
   const moneyRows = [
     { label: "TICKETS AND ITEMS", value: money.basePaise },
+    { label: "GST ON TICKETS", value: money.gstPaise },
     { label: "CONVENIENCE FEES", value: money.feePaise },
-    { label: "GST ON FEES", value: money.gstPaise },
+    { label: "GST ON FEES", value: money.feeGstPaise },
     { label: "TAKEN THROUGH RAZORPAY", value: money.totalPaise, strong: true },
     ...(money.refundedPaise > 0 ? [{ label: "REFUNDED", value: -money.refundedPaise }] : []),
   ];
@@ -93,6 +96,12 @@ export default function OverviewTab() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+      {summary.mailMissing.length > 0 && (
+        <Notice
+          text={`No mail is being sent: ${summary.mailMissing.join(", ")} ${summary.mailMissing.length === 1 ? "is" : "are"} not set. Passes still sell and are still recorded — nobody is told about them by email.`}
+        />
+      )}
+
       {!summary.webhookConfigured && (
         <Notice text="RAZORPAY_WEBHOOK_SECRET is not set, so Razorpay cannot confirm payments to us. A buyer who loses their connection mid-payment will not get their pass until someone issues it by hand." />
       )}

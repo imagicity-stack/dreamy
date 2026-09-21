@@ -1,6 +1,7 @@
-import { NextRequest, NextResponse } from "next/server";
+import { after, NextRequest, NextResponse } from "next/server";
 import { getDb } from "@/lib/firebaseAdmin";
 import { getSettings } from "@/lib/settings";
+import { notifyConcertInterest } from "@/lib/notify";
 import { FieldValue } from "firebase-admin/firestore";
 
 export const dynamic = "force-dynamic";
@@ -41,6 +42,19 @@ export async function POST(req: NextRequest) {
       createdAt: FieldValue.serverTimestamp(),
     });
   }
+
+  // The council reads every one of these, so every one of them gets mailed
+  // over — after the response, so the page answers at once.
+  after(() =>
+    notifyConcertInterest({
+      queueNumber,
+      name,
+      contact,
+      pick,
+      guess: guess || "Kept to yourself",
+      seats,
+    }),
+  );
 
   return NextResponse.json({
     queueNumber: queueNumber.toLocaleString("en-IN"),
