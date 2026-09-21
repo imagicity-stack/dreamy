@@ -99,7 +99,7 @@ export const DEFAULT_SETTINGS: FestSettings = {
   siteTitle: "MADOOZA — The Voice of Hazaribagh",
   siteDescription:
     "MADOOZA — The Elden Heights School's fest. Cosplay, fete, carnival stalls and a sealed concert reveal, in Hazaribagh.",
-  contactEmail: "contact@madooza.in",
+  contactEmail: "hello@madooza.com",
   contactPhone: "+91 91222 80578",
 };
 
