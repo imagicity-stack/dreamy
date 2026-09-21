@@ -125,7 +125,7 @@ export default async function Header({ settings }: { settings: FestSettings }) {
         <div
           className="mz-nav-desktop"
           style={{
-            gap: 4,
+            gap: 6,
             flexWrap: "wrap",
             fontSize: 11.5,
             fontWeight: 700,
@@ -147,7 +147,12 @@ export default async function Header({ settings }: { settings: FestSettings }) {
                 background: settings.soldOut ? "var(--crimson)" : "var(--teal)",
                 border: "2px solid var(--ink)",
                 borderRadius: 999,
-                padding: "7px 12px",
+                // Matches the nav links' height so the whole row is one
+                // consistent, easily-hit strip rather than a 32px sliver.
+                display: "inline-flex",
+                alignItems: "center",
+                minHeight: 40,
+                padding: "8px 14px",
                 boxShadow: "3px 3px 0 var(--ink)",
                 ["--mz-shadow" as string]: "3px",
                 ["--mz-lift" as string]: "1px",
