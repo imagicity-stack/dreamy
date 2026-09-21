@@ -1,12 +1,12 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import { getSettings, isPageHidden } from "@/lib/settings";
-import { publicContent } from "@/lib/content";
+import { publicContent, type ContentRecord } from "@/lib/content";
 import { getCopy } from "@/lib/copy";
 
 export const dynamic = "force-dynamic";
 
-/** The six card backgrounds, cycled so a new tier still looks like the set. */
+/** The card backgrounds, cycled so a new tier still looks like the set. */
 const TIER_SKINS = [
   { bg: "var(--lilac)", fg: "var(--ink)" },
   { bg: "var(--paper)", fg: "var(--ink)" },
@@ -22,19 +22,65 @@ function text(record: Record<string, unknown>, key: string): string {
   return typeof value === "string" ? value : "";
 }
 
+/**
+ * Both ladders draw the same card, so the markup lives here once. Featured tiers
+ * span the full row, so they are drawn first whatever their position in the panel.
+ */
+function TierGrid({ records }: { records: ContentRecord[] }) {
+  const tiers = [...records].sort((a, b) => Number(!!b.featured) - Number(!!a.featured));
+  return (
+  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
+    {tiers.map((t, i) => {
+      const featured = !!t.featured;
+      const skin = featured ? FEATURED_SKIN : TIER_SKINS[i % TIER_SKINS.length];
+      const perks = text(t, "perks").split("\n").map((line) => line.trim()).filter(Boolean);
+      const badge = text(t, "badge");
+            return (
+        <div
+          key={t.id}
+          style={{
+            background: skin.bg, color: skin.fg, border: skin.border ?? "3px solid var(--ink)", borderRadius: 20,
+            boxShadow: "8px 8px 0 var(--ink)", padding: "26px 22px", display: "flex", flexDirection: "column",
+            gridColumn: featured ? "1 / -1" : undefined, minWidth: featured ? 0 : undefined,
+          }}
+        >
+          <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "baseline" }}>
+            <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>{text(t, "name")}</div>
+            {badge && (
+              <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.16em", background: "var(--ink)", color: "var(--teal)", borderRadius: 999, padding: "5px 11px" }}>{badge}</div>
+            )}
+          </div>
+          <div className="font-display" style={{ fontSize: featured ? "clamp(34px, 5vw, 46px)" : 30, margin: "12px 0 4px", lineHeight: 1, color: skin.priceColor }}>{text(t, "price")}</div>
+          <div style={{ fontSize: featured ? 12 : 11, fontWeight: 700, letterSpacing: "0.14em", color: featured ? "#1C0540" : "#6B3AA0", marginBottom: 16 }}>{text(t, "sub")}</div>
+          <div
+            style={
+              featured
+                ? { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "9px 22px", fontSize: 14.5, lineHeight: 1.45 }
+                : { display: "flex", flexDirection: "column", gap: 9, fontSize: 14.5, lineHeight: 1.45 }
+            }
+          >
+            {perks.map((perk) => (
+              <div key={perk}>{perk}</div>
+            ))}
+          </div>
+        </div>
+      );
+    })}
+  </div>
+  );
+}
+
 export default async function SponsorsPage() {
   const settings = await getSettings();
   const words = await getCopy("sponsors");
   if (isPageHidden(settings, "sponsors")) notFound();
 
-  const [tierRecords, sponsors] = await Promise.all([
+  const [tierRecords, cosplayTiers, sponsors] = await Promise.all([
     publicContent("sponsorTiers"),
+    publicContent("cosplayTiers"),
     publicContent("sponsors"),
   ]);
 
-  // Featured tiers span the full row, so they are drawn first whatever their
-  // position in the panel.
-  const tiers = [...tierRecords].sort((a, b) => Number(!!b.featured) - Number(!!a.featured));
   const signed = sponsors.filter((s) => text(s, "name") || (s.logo as { url?: string } | null)?.url);
 
   return (
@@ -61,44 +107,20 @@ export default async function SponsorsPage() {
             <h2 className="font-display" style={{ fontSize: "clamp(24px, 3.6vw, 36px)", margin: 0, color: "var(--lilac)" }}>{words.tiersTitle}</h2>
             <span style={{ fontSize: 12, letterSpacing: "0.16em", color: "var(--muted-lilac)" }}>{words.tiersNote}</span>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 20 }}>
-            {tiers.map((t, i) => {
-              const featured = !!t.featured;
-              const skin = featured ? FEATURED_SKIN : TIER_SKINS[i % TIER_SKINS.length];
-              const perks = text(t, "perks").split("\n").map((line) => line.trim()).filter(Boolean);
-              const badge = text(t, "badge");
-              return (
-                <div
-                  key={t.id}
-                  style={{
-                    background: skin.bg, color: skin.fg, border: skin.border ?? "3px solid var(--ink)", borderRadius: 20,
-                    boxShadow: "8px 8px 0 var(--ink)", padding: "26px 22px", display: "flex", flexDirection: "column",
-                    gridColumn: featured ? "1 / -1" : undefined, minWidth: featured ? 0 : undefined,
-                  }}
-                >
-                  <div style={{ display: "flex", justifyContent: "space-between", gap: 12, flexWrap: "wrap", alignItems: "baseline" }}>
-                    <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>{text(t, "name")}</div>
-                    {badge && (
-                      <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.16em", background: "var(--ink)", color: "var(--teal)", borderRadius: 999, padding: "5px 11px" }}>{badge}</div>
-                    )}
-                  </div>
-                  <div className="font-display" style={{ fontSize: featured ? "clamp(34px, 5vw, 46px)" : 30, margin: "12px 0 4px", lineHeight: 1, color: skin.priceColor }}>{text(t, "price")}</div>
-                  <div style={{ fontSize: featured ? 12 : 11, fontWeight: 700, letterSpacing: "0.14em", color: featured ? "#1C0540" : "#6B3AA0", marginBottom: 16 }}>{text(t, "sub")}</div>
-                  <div
-                    style={
-                      featured
-                        ? { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "9px 22px", fontSize: 14.5, lineHeight: 1.45 }
-                        : { display: "flex", flexDirection: "column", gap: 9, fontSize: 14.5, lineHeight: 1.45 }
-                    }
-                  >
-                    {perks.map((perk) => (
-                      <div key={perk}>{perk}</div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
+          <TierGrid records={tierRecords} />
+
+          {cosplayTiers.length > 0 && (
+            <div style={{ marginTop: 46, border: "3px solid var(--ink)", borderRadius: 24, padding: "30px 24px 32px", background: "var(--purple)", boxShadow: "9px 9px 0 var(--ink)" }}>
+              <div style={{ display: "flex", alignItems: "baseline", gap: 16, flexWrap: "wrap", marginBottom: 12 }}>
+                <h2 className="font-display" style={{ fontSize: "clamp(24px, 3.6vw, 36px)", margin: 0, color: "var(--teal)" }}>{words.cosplayTiersTitle}</h2>
+                <span style={{ fontSize: 12, letterSpacing: "0.16em", color: "var(--muted-lilac)" }}>{words.cosplayTiersNote}</span>
+              </div>
+              <p style={{ fontSize: 15.5, lineHeight: 1.6, color: "#F0E4FA", maxWidth: "62ch", margin: "0 0 24px" }}>
+                {words.cosplayTiersIntro}
+              </p>
+              <TierGrid records={cosplayTiers} />
+            </div>
+          )}
 
           {signed.length > 0 && (
             <div style={{ marginTop: 46 }}>

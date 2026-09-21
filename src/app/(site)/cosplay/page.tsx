@@ -12,9 +12,10 @@ export default async function CosplayPage() {
 
   const words = await getCopy("cosplay");
 
-  const [categoryRecords, prizeRecords] = await Promise.all([
+  const [categoryRecords, prizeRecords, carnivalTiers] = await Promise.all([
     publicContent("cosplayCategories"),
     publicContent("cosplayPrizes"),
+    publicContent("cosplayTiers"),
   ]);
 
   const categories: Category[] = categoryRecords.map((c) => ({
@@ -34,5 +35,13 @@ export default async function CosplayPage() {
     note: String(p.note ?? ""),
   }));
 
-  return <CosplayClient settings={settings} words={words} categories={categories} prizes={prizes} />;
+  return (
+    <CosplayClient
+      settings={settings}
+      words={words}
+      categories={categories}
+      prizes={prizes}
+      carnivalTiersLive={carnivalTiers.length > 0}
+    />
+  );
 }

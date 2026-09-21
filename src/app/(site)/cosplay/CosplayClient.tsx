@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useState } from "react";
 import { openRazorpayCheckout } from "@/lib/razorpayClient";
 import { formatInr } from "@/data/fest";
-import type { FestSettings } from "@/lib/festSettings";
+import { isPageHidden, type FestSettings } from "@/lib/festSettings";
 
 export type Category = {
   id: string;
@@ -50,11 +51,13 @@ export default function CosplayClient({
   words,
   categories,
   prizes,
+  carnivalTiersLive,
 }: {
   settings: FestSettings;
   words: Record<string, string>;
   categories: Category[];
   prizes: Prize[];
+  carnivalTiersLive: boolean;
 }) {
   const [entry, setEntry] = useState<Entry>({
     name: "", school: "", phone: "", character: "", category: categories[0]?.value ?? "", mode: "solo", team: "", members: "",
@@ -188,6 +191,16 @@ export default function CosplayClient({
                   );
                 })}
               </div>
+              {carnivalTiersLive && !isPageHidden(settings, "sponsors") && (
+                <div style={{ marginTop: 22, borderTop: "2px dashed var(--purple)", paddingTop: 18 }}>
+                  <p style={{ fontSize: 14.5, lineHeight: 1.55, color: "var(--muted-lilac)", margin: "0 0 12px", maxWidth: "46ch" }}>
+                    {words.partnersNote}
+                  </p>
+                  <Link href="/sponsors" className="font-display" style={{ fontSize: 13, letterSpacing: "0.04em", color: "var(--teal)" }}>
+                    {words.partnersCtaLabel}
+                  </Link>
+                </div>
+              )}
             </div>
 
             {!done ? (

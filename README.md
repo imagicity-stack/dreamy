@@ -79,7 +79,7 @@ no Firebase SDK in the browser bundle and no token in JavaScript for a script to
   writes `settings/fest` in Firestore and the site picks it up on the next request — no deploy needed.
 - **Content** — every editable list: guest artists (with photos and a per-artist reveal), support acts,
   gallery shots, merch, fete stalls, FAQ answers, the header ticker, the home stat cards, sponsor logos,
-  sponsor tiers, and the cosplay categories and prizes. Rows can be added, reordered, hidden or deleted,
+  sponsor tiers, cosplay carnival tiers, and the cosplay categories and prizes. Rows can be added, reordered, hidden or deleted,
   and image fields upload straight to the Firebase storage bucket.
 - **Sign-ups** — read views of `passes`, `cosplayEntries`, `concertInterest` and `merchOrders`, each with
   a CSV download.
