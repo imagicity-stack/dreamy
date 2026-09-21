@@ -1,19 +1,20 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { formatInr } from "@/data/fest";
 import { SealedDateStamp, SealedDateTiles } from "@/components/SealedDate";
+import PriceLines from "@/components/PriceLines";
 import { isPageHidden, type DateDisplay, type FestSettings } from "@/lib/festSettings";
 import { LEGAL_PAGES } from "@/lib/legal";
-import { openRazorpayCheckout } from "@/lib/razorpayClient";
-
-type PassResult = {
-  passCode: string;
-  tierLabel: string;
-  qty: number;
-  totalLabel: string;
-};
+import { formatPaise } from "@/lib/pricing";
+import {
+  CheckoutDismissed,
+  fetchQuote,
+  startCheckout,
+  type Quote,
+  type Receipt,
+} from "@/lib/checkoutClient";
 
 type PassLine = { id: string; text: string; included?: boolean };
 
@@ -48,65 +49,53 @@ export default function TicketsClient({
   concertPassIncludes: PassLine[];
 }) {
   const [qty, setQty] = useState(1);
-  const [buyer, setBuyer] = useState({ name: "", school: "", phone: "" });
-  const [pass, setPass] = useState<PassResult | null>(null);
+  const [buyer, setBuyer] = useState({ name: "", school: "", phone: "", email: "" });
+  const [pass, setPass] = useState<Receipt | null>(null);
+  const [quote, setQuote] = useState<Quote | null>(null);
   const [status, setStatus] = useState<"idle" | "processing" | "error">("idle");
   const [error, setError] = useState("");
 
-  const total = qty * settings.fetePrice;
-  const canBuy = buyer.name.trim().length > 1 && buyer.phone.trim().length >= 10 && !settings.soldOut;
+  // What the passes cost is the server's answer, asked again whenever the
+  // quantity changes. The browser never multiplies a price by a quantity — the
+  // fee and the GST on it would have to be reimplemented here to do that, and
+  // two implementations of a price is one too many.
+  useEffect(() => {
+    if (settings.soldOut) return;
+    let live = true;
+    fetchQuote("fetePass", { qty })
+      .then((q) => live && setQuote(q))
+      .catch(() => live && setQuote(null));
+    return () => {
+      live = false;
+    };
+  }, [qty, settings.soldOut]);
+
+  const canBuy =
+    buyer.name.trim().length > 1 &&
+    buyer.phone.trim().length >= 10 &&
+    !settings.soldOut &&
+    // A quote for a different quantity is a stale price; wait for the live one.
+    quote?.units === qty;
 
   async function buyPass() {
     if (!canBuy) return;
     setStatus("processing");
     setError("");
     try {
-      const orderRes = await fetch("/api/passes/order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ qty }),
+      const receipt = await startCheckout({
+        product: "fetePass",
+        input: { qty },
+        customer: buyer,
+        title: "MADOOZA",
       });
-      if (!orderRes.ok) {
-        const { error: msg } = await orderRes.json().catch(() => ({ error: "Could not start checkout" }));
-        throw new Error(msg || "Could not start checkout");
-      }
-      const order = await orderRes.json();
-
-      await openRazorpayCheckout({
-        key: order.keyId,
-        amount: order.amount,
-        currency: order.currency,
-        name: "MADOOZA",
-        description: `Fete Pass × ${qty}`,
-        order_id: order.orderId,
-        prefill: { name: buyer.name, contact: buyer.phone },
-        theme: { color: "#35C6D4" },
-        handler: async (response) => {
-          try {
-            const verifyRes = await fetch("/api/passes/verify", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                orderId: response.razorpay_order_id,
-                paymentId: response.razorpay_payment_id,
-                signature: response.razorpay_signature,
-                qty,
-                buyer,
-              }),
-            });
-            if (!verifyRes.ok) throw new Error("Payment could not be verified");
-            const result = await verifyRes.json();
-            setPass(result);
-            setStatus("idle");
-            window.scrollTo(0, 0);
-          } catch (e) {
-            setStatus("error");
-            setError(e instanceof Error ? e.message : "Something went wrong verifying payment");
-          }
-        },
-        modal: { ondismiss: () => setStatus("idle") },
-      });
+      setPass(receipt);
+      setStatus("idle");
+      window.scrollTo(0, 0);
     } catch (e) {
+      if (e instanceof CheckoutDismissed) {
+        setStatus("idle");
+        return;
+      }
       setStatus("error");
       setError(e instanceof Error ? e.message : "Could not start checkout");
     }
@@ -146,19 +135,44 @@ export default function TicketsClient({
               <div style={{ padding: 26, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 22 }}>
                 <div>
                   <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>{words.successPassCodeLabel}</div>
-                  <div className="font-display" style={{ fontSize: 24, marginTop: 6 }}>{pass.passCode}</div>
+                  <div className="font-display" style={{ fontSize: 24, marginTop: 6 }}>{pass.primaryCode}</div>
                 </div>
                 <div>
                   <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>{words.successNameLabel}</div>
                   <div style={{ fontWeight: 700, fontSize: 19, marginTop: 8 }}>{buyer.name}</div>
                 </div>
                 <div>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>{pass.tierLabel}</div>
-                  <div style={{ fontWeight: 700, fontSize: 19, marginTop: 8 }}>&times; {pass.qty}</div>
+                  <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>{pass.label.toUpperCase()}</div>
+                  <div style={{ fontWeight: 700, fontSize: 19, marginTop: 8 }}>&times; {pass.units}</div>
                 </div>
                 <div>
                   <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>{words.successPaidLabel}</div>
-                  <div style={{ fontWeight: 700, fontSize: 19, marginTop: 8 }}>{pass.totalLabel}</div>
+                  <div style={{ fontWeight: 700, fontSize: 19, marginTop: 8 }}>{formatPaise(pass.amount.totalPaise)}</div>
+                </div>
+              </div>
+              {pass.codes.length > 1 && (
+                <div style={{ borderTop: "2px dashed var(--ink)", padding: "18px 26px" }}>
+                  {/* One code per person through the gate, not one per payment. */}
+                  <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)", marginBottom: 10 }}>
+                    ALL {pass.codes.length} PASS CODES
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                    {pass.codes.map((code) => (
+                      <span
+                        key={code}
+                        className="font-display"
+                        style={{ fontSize: 14, background: "var(--lilac)", border: "2px solid var(--ink)", borderRadius: 12, padding: "7px 11px" }}
+                      >
+                        {code}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+              <div style={{ borderTop: "2px dashed var(--ink)", padding: "18px 26px" }}>
+                <PriceLines price={pass.amount} baseLabel={`PASSES × ${pass.units}`} tone="light" />
+                <div style={{ fontSize: 10.5, letterSpacing: "0.12em", color: "#6B5292", marginTop: 12 }}>
+                  PAYMENT {pass.paymentId}
                 </div>
               </div>
               <div style={{ borderTop: "2px dashed var(--ink)", padding: "20px 26px", fontSize: 14.5, lineHeight: 1.55, color: "#453063" }}>
@@ -179,7 +193,7 @@ export default function TicketsClient({
                 onClick={() => {
                   setPass(null);
                   setQty(1);
-                  setBuyer({ name: "", school: "", phone: "" });
+                  setBuyer({ name: "", school: "", phone: "", email: "" });
                 }}
                 style={{ fontWeight: 700, fontSize: 12, letterSpacing: "0.14em", background: "transparent", border: "2px solid var(--ink)", borderRadius: 14, padding: "14px 18px", cursor: "pointer", color: "var(--ink)" }}
               >
@@ -296,12 +310,23 @@ export default function TicketsClient({
                     >
                       +
                     </button>
-                    <div style={{ marginLeft: "auto", textAlign: "right" }}>
-                      <div style={{ fontSize: 10.5, letterSpacing: "0.16em", color: "#F0E4FA" }}>TOTAL</div>
-                      <div className="font-display" style={{ fontSize: 24, color: "var(--lilac)", lineHeight: 1.1 }}>{formatInr(total)}</div>
+                    {/* The total used to sit here; it lives in the breakdown below now,
+                        where it can be seen next to what makes it up. The unit
+                        price is the server's own line, printed, not divided out. */}
+                    <div style={{ marginLeft: "auto", textAlign: "right", fontSize: 10.5, letterSpacing: "0.16em", color: "#C4AAE4" }}>
+                      {quote ? `${formatPaise(quote.lines[0].unitPaise)} EACH` : ""}
                     </div>
                   </div>
                 </div>
+                {quote && (
+                  // The row label counts the quote's own units, not the stepper's:
+                  // between a click and the server's answer the two disagree, and a
+                  // panel that says "× 3" beside a two-pass price is worse than one
+                  // that lags by a moment.
+                  <div style={{ background: "rgba(0,0,0,0.18)", border: "2px solid #4A2A73", borderRadius: 18, padding: "15px 16px", opacity: quote.units === qty ? 1 : 0.55, transition: "opacity 0.15s ease" }}>
+                    <PriceLines price={quote.price} baseLabel={`PASSES × ${quote.units}`} />
+                  </div>
+                )}
                 <div>
                   <label style={{ display: "block", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--lilac)", marginBottom: 7 }}>FULL NAME</label>
                   <input
@@ -329,6 +354,15 @@ export default function TicketsClient({
                     placeholder="10 digits, we send the pass code here"
                   />
                 </div>
+                <div>
+                  <label style={{ display: "block", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--lilac)", marginBottom: 7 }}>EMAIL</label>
+                  <input
+                    className="mz-input"
+                    value={buyer.email}
+                    onChange={(e) => setBuyer((b) => ({ ...b, email: e.target.value }))}
+                    placeholder="Optional &mdash; where the receipt goes"
+                  />
+                </div>
 
                 {!settings.soldOut ? (
                   <button
@@ -351,7 +385,10 @@ export default function TicketsClient({
                   >
                     {status === "processing"
                       ? words.checkoutPayProcessing
-                      : words.checkoutPayCta.replace("{total}", formatInr(total))}
+                      : words.checkoutPayCta.replace(
+                          "{total}",
+                          quote && quote.units === qty ? formatPaise(quote.price.totalPaise) : "…",
+                        )}
                   </button>
                 ) : (
                   <div className="font-display" style={{ fontSize: 15, color: "var(--lilac)", background: "var(--bg)", border: "3px solid var(--ink)", borderRadius: 20, padding: "17px 20px", textAlign: "center" }}>

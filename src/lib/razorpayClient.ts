@@ -11,7 +11,7 @@ type RazorpayCheckoutOptions = {
   name: string;
   description: string;
   order_id: string;
-  prefill?: { name?: string; contact?: string };
+  prefill?: { name?: string; contact?: string; email?: string };
   theme?: { color?: string };
   handler: (response: RazorpaySuccessResponse) => void;
   modal?: { ondismiss?: () => void };

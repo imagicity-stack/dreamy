@@ -11,7 +11,15 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December",
 ];
 
-type NumericKey = "fetePrice" | "cosplayFee" | "concertCapacity" | "interestBase";
+type NumericKey =
+  | "fetePrice"
+  | "cosplayFee"
+  | "concertCapacity"
+  | "interestBase"
+  | "fetePassCapacity"
+  | "cosplayCapacity";
+
+type RateKey = "convenienceFeePercent" | "gstPercent";
 
 export default function SettingsTab({ pages }: { pages: { key: string; label: string }[] }) {
   const [settings, setSettings] = useState<FestSettings | null>(null);
@@ -60,17 +68,59 @@ export default function SettingsTab({ pages }: { pages: { key: string; label: st
     </div>
   );
 
+  // Rates carry decimals, so they get their own input rather than the integer one.
+  const rate = (key: RateKey, label: string, hint: string) => (
+    <div key={key}>
+      <label style={ui.label}>{label}</label>
+      <input
+        className="mz-input"
+        type="number"
+        min={0}
+        max={100}
+        step={0.01}
+        value={settings[key]}
+        onChange={(e) => edit({ [key]: Number(e.target.value) } as Partial<FestSettings>)}
+      />
+      <div style={{ fontSize: 12, color: "#5B4480", marginTop: 6 }}>{hint}</div>
+    </div>
+  );
+
+  // What a ₹-priced thing actually costs once the fee and its GST are on it.
+  const feeOn = (amount: number) => {
+    const fee = Math.round(amount * 100 * settings.convenienceFeePercent) / 100;
+    const gst = Math.round(fee * settings.gstPercent) / 100;
+    return (amount * 100 + fee + gst) / 100;
+  };
+
   return (
     <div style={{ display: "grid", gap: 16 }}>
       <Section kicker="THE NUMBERS" title="PRICES & CAPACITY">
         <Grid>
-          {number("fetePrice", "FETE PASS (₹)", "Charged per pass at checkout.")}
+          {number("fetePrice", "FETE PASS (₹)", "The pass price, before the convenience fee below.")}
           {number("cosplayFee", "COSPLAY ENTRY (₹)", "Solo or squad, same fee.")}
           {number("concertCapacity", "CONCERT SEATS", "Shown wherever the cap is quoted.")}
           {number("interestBase", "INTEREST LIST START", "Queue numbers count up from here.")}
+          {number("fetePassCapacity", "FETE PASSES ON SALE", "Hard cap — checkout closes when it is reached. 0 means no limit.")}
+          {number("cosplayCapacity", "COSPLAY ENTRIES ON SALE", "Hard cap on arena entries. 0 means no limit.")}
         </Grid>
         <p style={{ fontSize: 13, color: "#5B4480", margin: "16px 0 0" }}>
           Merch prices moved to the Content tab, alongside their photos.
+        </p>
+      </Section>
+
+      <Section kicker="CHECKOUT" title="CONVENIENCE FEE & GST">
+        <Grid>
+          {rate("convenienceFeePercent", "CONVENIENCE FEE (%)", "Added to every online payment, on top of the price.")}
+          {rate("gstPercent", "GST ON THE FEE (%)", "Charged on the convenience fee itself, not on the ticket.")}
+        </Grid>
+        <p style={{ fontSize: 13, color: "#5B4480", margin: "16px 0 0", lineHeight: 1.6 }}>
+          {/* Said in rupees, because a percentage of a percentage is not
+              something anyone should have to picture on a Tuesday. */}
+          A ₹{settings.fetePrice.toLocaleString("en-IN")} Fete Pass is charged at{" "}
+          <strong>₹{feeOn(settings.fetePrice).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>, and a ₹
+          {settings.cosplayFee.toLocaleString("en-IN")} cosplay entry at{" "}
+          <strong>₹{feeOn(settings.cosplayFee).toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</strong>. Every
+          checkout shows the buyer this split before they pay.
         </p>
       </Section>
 

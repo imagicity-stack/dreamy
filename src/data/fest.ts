@@ -7,6 +7,9 @@ export const FEST = {
   cosplayFee: 400,
   concertCapacity: 2000,
   interestBase: 1246,
+  /** Charged on top of every online payment, with GST on the fee itself. */
+  convenienceFeePercent: 2,
+  gstPercent: 18,
   lineupUnlocked: false,
   soldOut: false,
 };

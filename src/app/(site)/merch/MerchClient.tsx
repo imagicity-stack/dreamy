@@ -1,8 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { formatInr } from "@/data/fest";
+import PriceLines from "@/components/PriceLines";
+import { formatPaise } from "@/lib/pricing";
+import {
+  CheckoutDismissed,
+  fetchQuote,
+  startCheckout,
+  type Quote,
+  type Receipt,
+} from "@/lib/checkoutClient";
 
 export type MerchRecord = {
   id: string;
@@ -24,7 +33,9 @@ export default function MerchClient({
   closedNote: string;
 }) {
   const [cart, setCart] = useState<Record<string, number>>({});
-  const [done, setDone] = useState(false);
+  const [buyer, setBuyer] = useState({ name: "", phone: "", email: "" });
+  const [receipt, setReceipt] = useState<Receipt | null>(null);
+  const [quote, setQuote] = useState<Quote | null>(null);
   const [placing, setPlacing] = useState(false);
   const [error, setError] = useState("");
 
@@ -32,11 +43,32 @@ export default function MerchClient({
     .filter((m) => (cart[m.id] || 0) > 0)
     .map((m) => ({ ...m, qty: cart[m.id], lineLabel: formatInr(m.price * cart[m.id]) }));
   const cartCount = cartLines.reduce((a, l) => a + l.qty, 0);
-  const cartTotal = cartLines.reduce((a, l) => a + l.price * l.qty, 0);
+
+  // The bag's own arithmetic is for the item rows; what is charged — the bag,
+  // the convenience fee and the GST on it — is priced by the server on every
+  // change to the bag.
+  useEffect(() => {
+    if (cartCount === 0) {
+      setQuote(null);
+      return;
+    }
+    let live = true;
+    fetchQuote("merch", { cart })
+      .then((q) => live && setQuote(q))
+      .catch(() => live && setQuote(null));
+    return () => {
+      live = false;
+    };
+  }, [cart, cartCount]);
+
+  // Same rule as the passes page: a quote for a different bag is a stale price.
+  const quoteMatchesBag = !!quote && quote.units === cartCount;
+  const canPay =
+    cartCount > 0 && quoteMatchesBag && buyer.name.trim().length > 1 && buyer.phone.trim().length >= 10;
 
   function add(id: string) {
     setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
-    setDone(false);
+    setReceipt(null);
   }
   function sub(id: string) {
     setCart((c) => {
@@ -45,24 +77,27 @@ export default function MerchClient({
       else delete next[id];
       return next;
     });
-    setDone(false);
+    setReceipt(null);
   }
 
   async function placeMerch() {
-    if (cartCount === 0) return;
+    if (!canPay) return;
     setPlacing(true);
     setError("");
     try {
-      const res = await fetch("/api/merch-preorder", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cart }),
+      const paid = await startCheckout({
+        product: "merch",
+        input: { cart },
+        customer: buyer,
+        title: "MADOOZA Merch",
       });
-      if (!res.ok) throw new Error(words.orderErrorMessage);
-      setDone(true);
+      setReceipt(paid);
+      setCart({});
       window.scrollTo(0, 0);
     } catch (e) {
-      setError(e instanceof Error ? e.message : words.orderErrorFallback);
+      if (!(e instanceof CheckoutDismissed)) {
+        setError(e instanceof Error ? e.message : words.orderErrorFallback);
+      }
     } finally {
       setPlacing(false);
     }
@@ -80,20 +115,28 @@ export default function MerchClient({
             </p>
           </div>
           <div style={{ background: "var(--purple)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "6px 6px 0 var(--ink)", padding: "14px 18px", fontSize: 11.5, fontWeight: 700, letterSpacing: "0.14em", color: "var(--lilac)" }}>
-            IN BAG: {cartCount} &middot; {formatInr(cartTotal)}
+            IN BAG: {cartCount} &middot; {quoteMatchesBag ? formatPaise(quote.price.totalPaise) : "…"}
           </div>
         </div>
       </section>
 
-      {done && (
+      {receipt && (
         <section style={{ background: "var(--teal)", color: "var(--ink)", borderBottom: "3px solid var(--ink)", padding: "40px 20px" }}>
           <div style={{ maxWidth: 1180, margin: "0 auto", display: "flex", alignItems: "center", gap: 20, flexWrap: "wrap" }}>
-            <div className="font-display" style={{ fontSize: "clamp(20px, 3.4vw, 30px)" }}>{words.confirmTitle.replace("{total}", formatInr(cartTotal))}</div>
+            <div>
+              <div className="font-display" style={{ fontSize: "clamp(20px, 3.4vw, 30px)" }}>
+                {words.confirmTitle.replace("{total}", formatPaise(receipt.amount.totalPaise))}
+              </div>
+              {/* The code is what the merch tent looks up, so it leads. */}
+              <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.2em", marginTop: 10 }}>
+                COLLECTION CODE &middot; <span className="font-display" style={{ fontSize: 18, letterSpacing: 0 }}>{receipt.primaryCode}</span>
+              </div>
+            </div>
             <div style={{ fontSize: 15, lineHeight: 1.5, maxWidth: "46ch" }}>
               {words.confirmBody}
             </div>
             <button
-              onClick={() => setCart({})}
+              onClick={() => setReceipt(null)}
               style={{ marginLeft: "auto", fontWeight: 700, fontSize: 12, letterSpacing: "0.14em", background: "var(--ink)", color: "var(--teal)", border: "3px solid var(--ink)", borderRadius: 20, padding: "13px 16px", cursor: "pointer" }}
             >
               {words.confirmResetButton}
@@ -171,16 +214,39 @@ export default function MerchClient({
                     </div>
                   ))}
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline", gap: 12, marginBottom: 18 }}>
-                  <span style={{ fontSize: 11, letterSpacing: "0.16em", color: "var(--muted-lilac)" }}>TOTAL</span>
-                  <span className="font-display" style={{ fontSize: 24, color: "var(--teal)" }}>{formatInr(cartTotal)}</span>
-                </div>
+                {quote && (
+                  <div style={{ marginBottom: 18, opacity: quoteMatchesBag ? 1 : 0.55, transition: "opacity 0.15s ease" }}>
+                    <PriceLines price={quote.price} baseLabel="BAG" />
+                  </div>
+                )}
+                {open && (
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 18 }}>
+                    <input
+                      className="mz-input"
+                      value={buyer.name}
+                      onChange={(e) => setBuyer((b) => ({ ...b, name: e.target.value }))}
+                      placeholder="Your name"
+                    />
+                    <input
+                      className="mz-input"
+                      value={buyer.phone}
+                      onChange={(e) => setBuyer((b) => ({ ...b, phone: e.target.value }))}
+                      placeholder="Phone — 10 digits"
+                    />
+                    <input
+                      className="mz-input"
+                      value={buyer.email}
+                      onChange={(e) => setBuyer((b) => ({ ...b, email: e.target.value }))}
+                      placeholder="Email (optional)"
+                    />
+                  </div>
+                )}
                 {open ? (
                   <button
                     onClick={placeMerch}
-                    disabled={placing}
+                    disabled={placing || !canPay}
                     className="font-display mz-pop"
-                    style={{ fontSize: 14, color: "var(--ink)", background: "var(--teal)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "5px 5px 0 var(--ink)", padding: "15px 16px", cursor: "pointer", width: "100%", ["--mz-shadow" as string]: "5px" }}
+                    style={{ fontSize: 14, color: "var(--ink)", background: "var(--teal)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "5px 5px 0 var(--ink)", padding: "15px 16px", cursor: canPay ? "pointer" : "not-allowed", width: "100%", opacity: canPay ? 1 : 0.6, ["--mz-shadow" as string]: "5px" }}
                   >
                     {placing ? words.placeOrderBusyLabel : words.placeOrderButton}
                   </button>

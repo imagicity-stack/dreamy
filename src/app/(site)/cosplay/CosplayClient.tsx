@@ -2,11 +2,12 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { openRazorpayCheckout } from "@/lib/razorpayClient";
-import { formatInr } from "@/data/fest";
+import { useEffect, useState } from "react";
+import PriceLines from "@/components/PriceLines";
 import { isPageHidden, type FestSettings } from "@/lib/festSettings";
 import { LEGAL_PAGES } from "@/lib/legal";
+import { formatPaise } from "@/lib/pricing";
+import { CheckoutDismissed, fetchQuote, startCheckout, type Quote } from "@/lib/checkoutClient";
 
 export type Category = {
   id: string;
@@ -43,7 +44,7 @@ function fillEntryTokens(text: string, values: { character: string; entryCategor
 }
 
 type Entry = {
-  name: string; school: string; phone: string; character: string; category: string;
+  name: string; school: string; phone: string; email: string; character: string; category: string;
   mode: "solo" | "team"; team: string; members: string;
 };
 
@@ -61,18 +62,37 @@ export default function CosplayClient({
   carnivalTiersLive: boolean;
 }) {
   const [entry, setEntry] = useState<Entry>({
-    name: "", school: "", phone: "", character: "", category: categories[0]?.value ?? "", mode: "solo", team: "", members: "",
+    name: "", school: "", phone: "", email: "", character: "", category: categories[0]?.value ?? "", mode: "solo", team: "", members: "",
   });
   const [done, setDone] = useState(false);
   const [status, setStatus] = useState<"idle" | "processing" | "error">("idle");
   const [error, setError] = useState("");
+  const [quote, setQuote] = useState<Quote | null>(null);
+  const [entryCode, setEntryCode] = useState("");
+
+  // The fee, the convenience charge and the GST on it are priced by the server;
+  // solo and squad cost the same today, but the quote is asked for either way
+  // so the panel never has to know that.
+  useEffect(() => {
+    let live = true;
+    fetchQuote("cosplayEntry", { mode: entry.mode })
+      .then((q) => live && setQuote(q))
+      .catch(() => live && setQuote(null));
+    return () => {
+      live = false;
+    };
+  }, [entry.mode]);
 
   // The fee note opens with a bold teal sentence and runs on in plain text.
   const feeBreak = words.doneFeeNote.indexOf(". ");
   const feeLead = feeBreak === -1 ? words.doneFeeNote : words.doneFeeNote.slice(0, feeBreak + 1);
   const feeRest = feeBreak === -1 ? "" : words.doneFeeNote.slice(feeBreak + 1);
 
-  const canSubmit = entry.name.trim().length > 1 && entry.character.trim().length > 1 && entry.phone.trim().length >= 10;
+  const canSubmit =
+    entry.name.trim().length > 1 &&
+    entry.character.trim().length > 1 &&
+    entry.phone.trim().length >= 10 &&
+    !!quote;
   const entryLabel = entry.mode === "team" ? "SQUAD ENTRY" : "SOLO ENTRY";
 
   function set<K extends keyof Entry>(key: K) {
@@ -85,46 +105,34 @@ export default function CosplayClient({
     setStatus("processing");
     setError("");
     try {
-      const orderRes = await fetch("/api/cosplay/order", { method: "POST" });
-      if (!orderRes.ok) {
-        const { error: msg } = await orderRes.json().catch(() => ({ error: "Could not start checkout" }));
-        throw new Error(msg || "Could not start checkout");
-      }
-      const order = await orderRes.json();
-
-      await openRazorpayCheckout({
-        key: order.keyId,
-        amount: order.amount,
-        currency: order.currency,
-        name: "MADOOZA Cosplay Contest",
-        description: `${entryLabel} — ${entry.character}`,
-        order_id: order.orderId,
-        prefill: { name: entry.name, contact: entry.phone },
-        theme: { color: "#35C6D4" },
-        handler: async (response) => {
-          try {
-            const verifyRes = await fetch("/api/cosplay/verify", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                orderId: response.razorpay_order_id,
-                paymentId: response.razorpay_payment_id,
-                signature: response.razorpay_signature,
-                entry,
-              }),
-            });
-            if (!verifyRes.ok) throw new Error("Payment could not be verified");
-            setDone(true);
-            setStatus("idle");
-            window.scrollTo(0, 0);
-          } catch (e) {
-            setStatus("error");
-            setError(e instanceof Error ? e.message : "Something went wrong verifying payment");
-          }
+      const receipt = await startCheckout({
+        product: "cosplayEntry",
+        input: { mode: entry.mode },
+        // The whole entry rides along with the order, so a browser that dies
+        // after paying still leaves the webhook everything it needs to register
+        // the walk.
+        customer: {
+          name: entry.name,
+          phone: entry.phone,
+          email: entry.email,
+          school: entry.school,
+          character: entry.character,
+          category: entry.category,
+          mode: entry.mode,
+          team: entry.team,
+          members: entry.members,
         },
-        modal: { ondismiss: () => setStatus("idle") },
+        title: "MADOOZA Cosplay Contest",
       });
+      setEntryCode(receipt.primaryCode);
+      setDone(true);
+      setStatus("idle");
+      window.scrollTo(0, 0);
     } catch (e) {
+      if (e instanceof CheckoutDismissed) {
+        setStatus("idle");
+        return;
+      }
       setStatus("error");
       setError(e instanceof Error ? e.message : "Could not start checkout");
     }
@@ -240,6 +248,10 @@ export default function CosplayClient({
                     <input className="mz-input" value={entry.phone} onChange={set("phone")} placeholder="10 digits — for slot timings on the day" />
                   </div>
                   <div>
+                    <label style={{ display: "block", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--purple)", marginBottom: 6 }}>EMAIL</label>
+                    <input className="mz-input" value={entry.email} onChange={set("email")} placeholder="Optional — where the receipt goes" />
+                  </div>
+                  <div>
                     <label style={{ display: "block", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--purple)", marginBottom: 6 }}>WHO ARE YOU COMING AS</label>
                     <input className="mz-input" value={entry.character} onChange={set("character")} placeholder="Character and source" />
                   </div>
@@ -267,9 +279,15 @@ export default function CosplayClient({
                       </div>
                     </div>
                   )}
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, flexWrap: "wrap", background: "var(--lilac)", border: "3px solid var(--ink)", borderRadius: 20, padding: "14px 17px" }}>
-                    <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--purple)" }}>{entryLabel} FEE</div>
-                    <div className="font-display" style={{ fontSize: 24 }}>{formatInr(settings.cosplayFee)}</div>
+                  <div style={{ background: "var(--lilac)", border: "3px solid var(--ink)", borderRadius: 20, padding: "15px 17px" }}>
+                    {quote ? (
+                      <PriceLines price={quote.price} baseLabel={`${entryLabel} FEE`} tone="light" />
+                    ) : (
+                      <div style={{ display: "flex", justifyContent: "space-between", gap: 12 }}>
+                        <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--purple)" }}>{entryLabel} FEE</span>
+                        <span className="font-display" style={{ fontSize: 20 }}>…</span>
+                      </div>
+                    )}
                   </div>
                   <button
                     onClick={submitCos}
@@ -277,7 +295,9 @@ export default function CosplayClient({
                     className="font-display mz-pop"
                     style={{ fontSize: 15, color: "var(--lilac)", background: "var(--purple)", border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "6px 6px 0 var(--ink)", padding: "16px 18px", cursor: canSubmit ? "pointer" : "not-allowed", width: "100%", opacity: canSubmit ? 1 : 0.6, ["--mz-shadow" as string]: "6px" }}
                   >
-                    {status === "processing" ? words.submitProcessingLabel : words.submitLabel}
+                    {status === "processing"
+                      ? words.submitProcessingLabel
+                      : words.submitLabel.replace("{total}", quote ? formatPaise(quote.price.totalPaise) : "…")}
                   </button>
                   {status === "error" && <div style={{ fontSize: 13, color: "var(--crimson)" }}>{error}</div>}
                   <div style={{ fontSize: 10.5, lineHeight: 1.6, letterSpacing: "0.06em", color: "#7D63A8" }}>
@@ -306,13 +326,19 @@ export default function CosplayClient({
                 <div style={{ background: "var(--purple)", color: "var(--lilac)", border: "3px solid var(--ink)", borderRadius: 20, padding: "15px 16px", fontSize: 14.5, lineHeight: 1.55, marginBottom: 12 }}>
                   <strong style={{ color: "var(--teal)" }}>{feeLead}</strong>{feeRest}
                 </div>
+                {entryCode && (
+                  <div style={{ background: "var(--paper)", border: "3px solid var(--ink)", borderRadius: 20, padding: "14px 16px", marginBottom: 12, display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
+                    <span style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: "var(--purple)" }}>ENTRY CODE</span>
+                    <span className="font-display" style={{ fontSize: 22 }}>{entryCode}</span>
+                  </div>
+                )}
                 <div style={{ background: "var(--paper)", border: "3px solid var(--ink)", borderRadius: 20, padding: 16, fontSize: 14.5, lineHeight: 1.55 }}>
                   {words.doneRepairNote}
                 </div>
                 <button
                   onClick={() => {
                     setDone(false);
-                    setEntry({ name: "", school: "", phone: "", character: "", category: categories[0]?.value ?? "", mode: "solo", team: "", members: "" });
+                    setEntry({ name: "", school: "", phone: "", email: "", character: "", category: categories[0]?.value ?? "", mode: "solo", team: "", members: "" });
                   }}
                   style={{ marginTop: 20, fontWeight: 700, fontSize: 12, letterSpacing: "0.14em", background: "transparent", border: "2px solid var(--ink)", borderRadius: 14, padding: "13px 16px", cursor: "pointer", color: "var(--ink)" }}
                 >
