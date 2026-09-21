@@ -51,11 +51,13 @@ export default function CosplayClient({
   words,
   categories,
   prizes,
+  carnivalTiersLive,
 }: {
   settings: FestSettings;
   words: Record<string, string>;
   categories: Category[];
   prizes: Prize[];
+  carnivalTiersLive: boolean;
 }) {
   const [entry, setEntry] = useState<Entry>({
     name: "", school: "", phone: "", character: "", category: categories[0]?.value ?? "", mode: "solo", team: "", members: "",
@@ -189,7 +191,7 @@ export default function CosplayClient({
                   );
                 })}
               </div>
-              {!isPageHidden(settings, "sponsors") && (
+              {carnivalTiersLive && !isPageHidden(settings, "sponsors") && (
                 <div style={{ marginTop: 22, borderTop: "2px dashed var(--purple)", paddingTop: 18 }}>
                   <p style={{ fontSize: 14.5, lineHeight: 1.55, color: "var(--muted-lilac)", margin: "0 0 12px", maxWidth: "46ch" }}>
                     {words.partnersNote}

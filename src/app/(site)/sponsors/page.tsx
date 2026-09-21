@@ -110,12 +110,12 @@ export default async function SponsorsPage() {
           <TierGrid records={tierRecords} />
 
           {cosplayTiers.length > 0 && (
-            <div style={{ marginTop: 46, border: "3px solid var(--purple)", borderRadius: 24, padding: "30px 24px 32px", background: "#150331" }}>
+            <div style={{ marginTop: 46, border: "3px solid var(--ink)", borderRadius: 24, padding: "30px 24px 32px", background: "var(--purple)", boxShadow: "9px 9px 0 var(--ink)" }}>
               <div style={{ display: "flex", alignItems: "baseline", gap: 16, flexWrap: "wrap", marginBottom: 12 }}>
                 <h2 className="font-display" style={{ fontSize: "clamp(24px, 3.6vw, 36px)", margin: 0, color: "var(--teal)" }}>{words.cosplayTiersTitle}</h2>
                 <span style={{ fontSize: 12, letterSpacing: "0.16em", color: "var(--muted-lilac)" }}>{words.cosplayTiersNote}</span>
               </div>
-              <p style={{ fontSize: 15.5, lineHeight: 1.6, color: "var(--lilac-text)", maxWidth: "62ch", margin: "0 0 24px" }}>
+              <p style={{ fontSize: 15.5, lineHeight: 1.6, color: "#F0E4FA", maxWidth: "62ch", margin: "0 0 24px" }}>
                 {words.cosplayTiersIntro}
               </p>
               <TierGrid records={cosplayTiers} />

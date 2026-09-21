@@ -61,7 +61,7 @@ const COSPLAY_TIER_SEED = [
       "A seat on the judging panel that actually votes",
       "A table beside the arena for the day, staffed by your own people",
       "The 2:30 stage walk opens in your name and you read out People\u2019s Choice",
-      "Six entries to give away, and first refusal on the carnival next year",
+      "Six entries waived by the council for you to give away, and first refusal next year",
     ].join("\n"),
   },
   {
@@ -72,10 +72,10 @@ const COSPLAY_TIER_SEED = [
     featured: false,
     perks: [
       "Two seats on the panel, beside the guest judge who is still in the vault",
-      "Your name read out with Best in Show and with every category winner",
+      "Your name read out with Best in Show, and on the panel’s own introduction",
       "Your banner at the prop check, where the 1.2m rule gets enforced",
       "Credited in the results that go up the same evening",
-      "Three entries to give away",
+      "Three entries waived by the council for you to give away",
     ].join("\n"),
   },
   {
@@ -88,7 +88,7 @@ const COSPLAY_TIER_SEED = [
       "One category is yours \u2014 Anime, Comic, Original Design or Group Act",
       "Your name on that category\u2019s card and in the entry dropdown",
       "Read out with the winner when your category is called",
-      "Two entries to give away, and first refusal on the same category next year",
+      "Two entries waived by the council, and first refusal on the same category next year",
     ].join("\n"),
   },
   {
@@ -98,7 +98,7 @@ const COSPLAY_TIER_SEED = [
     badge: "",
     featured: false,
     perks: [
-      "The repair table behind the science block carries your name, hot glue included",
+      "The repair table behind the science block carries your name, and the hot glue the Art Club always runs out of",
       "Your banner behind it, in every panic photo taken that afternoon",
       "Named in the 1:45 backstage call every entrant is sent",
       "Every cosplayer whose armour gives up by noon meets you first",
@@ -146,7 +146,7 @@ const SPONSOR_TIER_SEED = [
       "The main stage carries your name",
       "Logo on the backdrop and every reveal post",
       "Stall space in the main row",
-      "You hand over the trophies on stage",
+      "You hand over the fest-wide trophies on stage",
     ].join("\n"),
   },
   {
@@ -301,7 +301,7 @@ export const CONTENT: ContentCollectionDef[] = [
       { q: "Is there parking?", a: "Yes, on the far field off the service gate, free with any pass. It fills by 11 AM, so carpool or get dropped at the main gate." },
       { q: "When are the guests revealed?", a: "Clues drop weekly on the Lineup page, then three full reveals — the third one takes the lid off the date as well. No calendar yet, on purpose: the council will not name a day it might have to move. Nobody will break early either, we tried." },
       { q: "What if it rains?", a: "The fete and arena move under the assembly canopy and the concert runs in the auditorium. The fest happens regardless." },
-      { q: "Can my company set up a stall?", a: "Yes — sponsor, cosplay-carnival and vendor slots are all on the Sponsors page. Stall setup closes three weeks before gates; the exact cut-off goes out with the date." },
+      { q: "Can my company set up a stall?", a: "Yes — sponsor and vendor slots are on the Sponsors page, along with a separate ladder for backing the cosplay carnival on its own. Stall setup closes three weeks before gates; the exact cut-off goes out with the date." },
     ],
   },
   {
