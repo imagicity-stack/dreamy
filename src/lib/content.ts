@@ -48,6 +48,65 @@ export type ContentCollectionDef = {
 };
 
 /** The tiers as the council first wrote them, before anyone edited the page. */
+const COSPLAY_TIER_SEED = [
+  {
+    name: "CARNIVAL TITLE PARTNER",
+    price: "\u20B950,000",
+    sub: "FIFTY THOUSAND \u00B7 CONTEST NAMING RIGHTS",
+    badge: "1 SLOT ONLY",
+    featured: true,
+    perks: [
+      "The contest runs as \u201CCosplay Carnival, presented by you\u201D",
+      "Your name on the entry form and on the confirmation every entrant gets",
+      "A seat on the judging panel that actually votes",
+      "A table beside the arena for the day, staffed by your own people",
+      "The 2:30 stage walk opens in your name and you read out People\u2019s Choice",
+      "Six entries to give away, and first refusal on the carnival next year",
+    ].join("\n"),
+  },
+  {
+    name: "JUDGES\u2019 PANEL PARTNER",
+    price: "\u20B935,000",
+    sub: "THIRTY-FIVE THOUSAND \u00B7 2 SLOTS",
+    badge: "",
+    featured: false,
+    perks: [
+      "Two seats on the panel, beside the guest judge who is still in the vault",
+      "Your name read out with Best in Show and with every category winner",
+      "Your banner at the prop check, where the 1.2m rule gets enforced",
+      "Credited in the results that go up the same evening",
+      "Three entries to give away",
+    ].join("\n"),
+  },
+  {
+    name: "CATEGORY PARTNER",
+    price: "\u20B925,000",
+    sub: "TWENTY-FIVE THOUSAND \u00B7 ONE CATEGORY EACH",
+    badge: "4 SLOTS",
+    featured: false,
+    perks: [
+      "One category is yours \u2014 Anime, Comic, Original Design or Group Act",
+      "Your name on that category\u2019s card and in the entry dropdown",
+      "Read out with the winner when your category is called",
+      "Two entries to give away, and first refusal on the same category next year",
+    ].join("\n"),
+  },
+  {
+    name: "REPAIR TABLE PARTNER",
+    price: "\u20B915,000",
+    sub: "FIFTEEN THOUSAND \u00B7 OPEN",
+    badge: "",
+    featured: false,
+    perks: [
+      "The repair table behind the science block carries your name, hot glue included",
+      "Your banner behind it, in every panic photo taken that afternoon",
+      "Named in the 1:45 backstage call every entrant is sent",
+      "Every cosplayer whose armour gives up by noon meets you first",
+      "A table by the queue, not a stall \u2014 you are there to fix wings",
+    ].join("\n"),
+  },
+];
+
 const SPONSOR_TIER_SEED = [
   {
     name: "TITLE PARTNER",
@@ -56,7 +115,7 @@ const SPONSOR_TIER_SEED = [
     badge: "1 SLOT ONLY",
     featured: true,
     perks: [
-      "Fest is billed \u201CMADOOZA, presented by you\u201D everywhere",
+      "Fest is billed \u201CMADOOZA, presented by you\u201D on every fest-wide surface",
       "Your name locked to the concert and the sealed singer",
       "Logo on every banner, pass, tee and the stage backdrop",
       "Main stage mentions before each act, plus a speaking slot",
@@ -78,13 +137,13 @@ const SPONSOR_TIER_SEED = [
     ].join("\n"),
   },
   {
-    name: "STAGE / ARENA PARTNER",
+    name: "STAGE PARTNER",
     price: "\u20B92,50,000",
-    sub: "2.5 LAKH \u00B7 2 SLOTS",
+    sub: "2.5 LAKH \u00B7 1 SLOT",
     badge: "",
     featured: false,
     perks: [
-      "The main stage or the cosplay arena carries your name",
+      "The main stage carries your name",
       "Logo on the backdrop and every reveal post",
       "Stall space in the main row",
       "You hand over the trophies on stage",
@@ -97,7 +156,7 @@ const SPONSOR_TIER_SEED = [
     badge: "",
     featured: false,
     perks: [
-      "One named zone \u2014 food court, arcade, arena queue or fete lane",
+      "One named zone \u2014 food court, arcade, gate plaza or fete lane",
       "Logo on the grounds map, gate signage and coin counters",
       "Stall space inside your zone",
       "Branded coin tokens for the zone",
@@ -106,12 +165,12 @@ const SPONSOR_TIER_SEED = [
   {
     name: "ASSOCIATE PARTNER",
     price: "\u20B950,000",
-    sub: "FIFTY THOUSAND \u00B7 OPEN",
+    sub: "FIFTY THOUSAND \u00B7 FEST-WIDE \u00B7 OPEN",
     badge: "",
     featured: false,
     perks: [
       "Logo on the sponsor wall and in the programme",
-      "One contest or competition named after you",
+      "One day-stage contest named after you \u2014 the cosplay carnival has its own ladder",
       "Stall space on the fete lane",
       "Ten Concert Passes for your team",
     ].join("\n"),
@@ -119,11 +178,11 @@ const SPONSOR_TIER_SEED = [
   {
     name: "IN-KIND & VENDORS",
     price: "TALK TO US",
-    sub: "VALUED AGAINST A TIER",
+    sub: "VALUED AGAINST A FEST TIER",
     badge: "",
     featured: false,
     perks: [
-      "Sound, lights, printing, water, transport, prizes",
+      "Sound, lights, printing, water, transport, fest-wide prizes",
       "Food and retail vendors \u2014 stall fee, no sponsorship",
       "Credit on the sponsor wall and in the programme",
       "Setup closes three weeks before gates",
@@ -242,7 +301,7 @@ export const CONTENT: ContentCollectionDef[] = [
       { q: "Is there parking?", a: "Yes, on the far field off the service gate, free with any pass. It fills by 11 AM, so carpool or get dropped at the main gate." },
       { q: "When are the guests revealed?", a: "Clues drop weekly on the Lineup page, then three full reveals — the third one takes the lid off the date as well. No calendar yet, on purpose: the council will not name a day it might have to move. Nobody will break early either, we tried." },
       { q: "What if it rains?", a: "The fete and arena move under the assembly canopy and the concert runs in the auditorium. The fest happens regardless." },
-      { q: "Can my company set up a stall?", a: "Yes — sponsor and vendor slots are on the Sponsors page. Stall setup closes three weeks before gates; the exact cut-off goes out with the date." },
+      { q: "Can my company set up a stall?", a: "Yes — sponsor, cosplay-carnival and vendor slots are all on the Sponsors page. Stall setup closes three weeks before gates; the exact cut-off goes out with the date." },
     ],
   },
   {
@@ -272,7 +331,7 @@ export const CONTENT: ContentCollectionDef[] = [
     imageFolder: "sponsors",
     fields: [
       { name: "name", label: "Sponsor", type: "text" },
-      { name: "tier", label: "Tier line", type: "text", hint: "TITLE PARTNER, STAGE PARTNER…" },
+      { name: "tier", label: "Tier line", type: "text", hint: "TITLE PARTNER, COSPLAY TITLE PARTNER, STAGE PARTNER…" },
       { name: "logo", label: "Logo", type: "image", hint: "A transparent PNG sits best on the tiles." },
       { name: "href", label: "Website", type: "text", hint: "Optional. Makes the tile a link." },
       { name: "placeholder", label: "Placeholder text", type: "text", hint: "Shown until a logo is uploaded." },
@@ -282,6 +341,7 @@ export const CONTENT: ContentCollectionDef[] = [
       { name: "", tier: "STAGE PARTNER", logo: null, href: "", placeholder: "STAGE PARTNER LOGO" },
       { name: "", tier: "FOOD PARTNER", logo: null, href: "", placeholder: "FOOD PARTNER LOGO" },
       { name: "", tier: "MEDIA PARTNER", logo: null, href: "", placeholder: "MEDIA PARTNER LOGO" },
+      { name: "", tier: "COSPLAY TITLE PARTNER", logo: null, href: "", placeholder: "COSPLAY TITLE LOGO" },
     ],
   },
   {
@@ -300,6 +360,23 @@ export const CONTENT: ContentCollectionDef[] = [
       { name: "featured", label: "Headline tier", type: "boolean", hint: "Spans the full width at the top." },
     ],
     seed: SPONSOR_TIER_SEED,
+  },
+  {
+    key: "cosplayTiers",
+    title: "Cosplay carnival tiers",
+    itemNoun: "tier",
+    blurb: "The second price list on the Sponsors page, for backing the cosplay contest on its own. One perk per line.",
+    labelField: "name",
+    imageFolder: "sponsors",
+    fields: [
+      { name: "name", label: "Tier", type: "text" },
+      { name: "price", label: "Price", type: "text", hint: "\u20B950,000 \u2014 or TALK TO US." },
+      { name: "sub", label: "Sub-line", type: "text", hint: "FIFTY THOUSAND \u00B7 CONTEST NAMING RIGHTS" },
+      { name: "badge", label: "Badge", type: "text", hint: "Optional pill, e.g. 1 SLOT ONLY." },
+      { name: "perks", label: "What they get", type: "longtext", hint: "One perk per line." },
+      { name: "featured", label: "Headline tier", type: "boolean", hint: "Spans the full width at the top." },
+    ],
+    seed: COSPLAY_TIER_SEED,
   },
   {
     key: "cosplayCategories",
