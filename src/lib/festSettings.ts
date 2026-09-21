@@ -16,6 +16,14 @@ export type FestSettings = {
   cosplayFee: number;
   concertCapacity: number;
   interestBase: number;
+  /** Convenience fee charged on top of every online payment, as a percentage. */
+  convenienceFeePercent: number;
+  /** GST charged on the convenience fee, as a percentage of that fee. */
+  gstPercent: number;
+  /** Fete Passes that may be sold in total. 0 means no limit. */
+  fetePassCapacity: number;
+  /** Cosplay entries that may be sold in total. 0 means no limit. */
+  cosplayCapacity: number;
   lineupUnlocked: boolean;
   /** Fete passes sold out — checkout closes, the page says so. */
   soldOut: boolean;
@@ -68,6 +76,10 @@ export const DEFAULT_SETTINGS: FestSettings = {
   cosplayFee: FEST.cosplayFee,
   concertCapacity: FEST.concertCapacity,
   interestBase: FEST.interestBase,
+  convenienceFeePercent: FEST.convenienceFeePercent,
+  gstPercent: FEST.gstPercent,
+  fetePassCapacity: 0,
+  cosplayCapacity: 0,
   lineupUnlocked: FEST.lineupUnlocked,
   soldOut: FEST.soldOut,
   merchOpen: true,
@@ -96,6 +108,13 @@ function asNumber(value: unknown, fallback: number, max = 1_000_000): number {
   return rounded;
 }
 
+/** A percentage: decimals kept, negatives and nonsense refused. */
+function asRate(value: unknown, fallback: number): number {
+  const n = Number(value);
+  if (!Number.isFinite(n) || n < 0 || n > 100) return fallback;
+  return Math.round(n * 100) / 100;
+}
+
 function asBool(value: unknown, fallback: boolean): boolean {
   return typeof value === "boolean" ? value : fallback;
 }
@@ -114,6 +133,12 @@ export function normalizeSettings(raw: unknown): FestSettings {
     cosplayFee: asNumber(data.cosplayFee, DEFAULT_SETTINGS.cosplayFee),
     concertCapacity: asNumber(data.concertCapacity, DEFAULT_SETTINGS.concertCapacity),
     interestBase: asNumber(data.interestBase, DEFAULT_SETTINGS.interestBase),
+    // Rates are percentages, so they carry decimals and cannot go through
+    // asNumber() — that rounds, and a 2.5% fee would quietly become 3%.
+    convenienceFeePercent: asRate(data.convenienceFeePercent, DEFAULT_SETTINGS.convenienceFeePercent),
+    gstPercent: asRate(data.gstPercent, DEFAULT_SETTINGS.gstPercent),
+    fetePassCapacity: asNumber(data.fetePassCapacity, DEFAULT_SETTINGS.fetePassCapacity, 100_000),
+    cosplayCapacity: asNumber(data.cosplayCapacity, DEFAULT_SETTINGS.cosplayCapacity, 100_000),
     lineupUnlocked: asBool(data.lineupUnlocked, DEFAULT_SETTINGS.lineupUnlocked),
     soldOut: asBool(data.soldOut, DEFAULT_SETTINGS.soldOut),
     merchOpen: asBool(data.merchOpen, DEFAULT_SETTINGS.merchOpen),

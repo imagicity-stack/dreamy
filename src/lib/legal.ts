@@ -1,6 +1,7 @@
 import type { FestSettings } from "./festSettings";
 import { describeDate } from "./festSettings";
 import { formatInr } from "@/data/fest";
+import { formatPaise, formatPercent, priceWithFees, rupeesToPaise } from "./pricing";
 
 /**
  * The site's legal pages: privacy, terms, refunds.
@@ -66,6 +67,11 @@ export const OFFICE_LINE =
 export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
   const fete = formatInr(settings.fetePrice);
   const cosplay = formatInr(settings.cosplayFee);
+  // Quoted with the fee on, because the price a policy names should be the one
+  // that leaves the buyer's account.
+  const rates = { convenienceFeePercent: settings.convenienceFeePercent, gstPercent: settings.gstPercent };
+  const feteTotal = formatPaise(priceWithFees(rupeesToPaise(settings.fetePrice), rates).totalPaise);
+  const cosplayTotal = formatPaise(priceWithFees(rupeesToPaise(settings.cosplayFee), rates).totalPaise);
   const date = describeDate(settings);
   const email = settings.contactEmail;
   const phone = settings.contactPhone;
@@ -114,7 +120,7 @@ export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
                 `Fete Pass purchases — your name, your school (optional), your phone number, how many passes you bought, the amount paid, the Razorpay order and payment reference, and the pass code we issue you.`,
                 `Cosplay contest entries — your name, your school (optional), your phone number, whether you are walking solo or as a squad, your category, and the entry fee payment reference.`,
                 `The concert interest list — your name, one contact detail you choose to give, who you are hoping the act is, how many seats you would want, and the queue number we give you.`,
-                `Merch pre-orders — the items and quantities you reserved and the total. No payment is taken online for merch, so no payment details are involved.`,
+                `Merch orders — your name and phone number, the items and quantities you bought, the amount paid, the Razorpay payment reference, and the collection code we issue you.`,
                 `Anything you send us — the contents of an email, a message or a phone call, if you start one.`,
               ],
             },
@@ -150,7 +156,7 @@ export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
                 "To issue your pass code and check it at the gate on the day.",
                 "To run the cosplay contest — your category, your slot, and calling your name out.",
                 "To hold a seat for you when concert passes open, and to tell you first when they do.",
-                "To have the merch you reserved waiting at the tent when you come to collect it.",
+                "To have the merch you paid for waiting at the tent when you come to collect it.",
                 "To reach you if something changes: a time, a date, a stage, a cancellation.",
                 "To count how many passes, entries and pre-orders there are, so the fest can be planned and accounted for.",
               ],
@@ -370,10 +376,16 @@ export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
             {
               kind: "p",
               text:
-                `A pre-order is a reservation, not a purchase. Nothing is charged online. You pay at the ` +
-                `merch tent when you collect, and you will need your pass code. Sizes and stock are ` +
-                `limited and printed in one run; if what you reserved cannot be supplied, you pay nothing ` +
-                `for it. Anything left uncollected by the end of the fest goes back on sale.`,
+                `Merch is paid for online at the time of ordering, and collected at the merch tent on the ` +
+                `day with the collection code your receipt carries. Sizes and stock are limited and printed ` +
+                `in one run; if what you paid for cannot be supplied, you choose another size or item of ` +
+                `the same value, or the office refunds it in full.`,
+            },
+            {
+              kind: "p",
+              text:
+                `Anything left uncollected by the end of the fest is held at the fest office for 30 days. ` +
+                `After that it goes back on sale and the money is not refundable, so come and collect it.`,
             },
           ],
         },
@@ -384,9 +396,17 @@ export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
             {
               kind: "p",
               text:
-                `Online payments are processed by Razorpay. All prices are in Indian Rupees and include ` +
-                `whatever taxes apply. The amount you are charged is worked out on our server from the ` +
-                `prices published here, so it cannot be altered in your browser.`,
+                `Online payments are processed by Razorpay. All prices are in Indian Rupees. The amount ` +
+                `you are charged is worked out on our server from the prices published here, so it cannot ` +
+                `be altered in your browser.`,
+            },
+            {
+              kind: "p",
+              text:
+                `Every online payment carries a convenience fee of ${formatPercent(settings.convenienceFeePercent)}% of the ` +
+                `price, and GST of ${formatPercent(settings.gstPercent)}% on that fee. Both are itemised on screen before ` +
+                `you pay and on the receipt afterwards — a ${fete} Fete Pass is charged at ${feteTotal}, ` +
+                `and a ${cosplay} cosplay entry at ${cosplayTotal}. There is nothing else added at the end.`,
             },
             {
               kind: "p",
@@ -593,12 +613,14 @@ export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
           heading: "6. Merch pre-orders",
           blocks: [
             {
-              kind: "p",
-              text:
-                `No money is taken online for merch, so there is nothing to refund. If you change your ` +
-                `mind, simply do not collect; nothing is charged. If you pay at the tent and the item is ` +
-                `faulty, take it back to the merch tent on the day and it is replaced or your money is ` +
-                `returned there.`,
+              kind: "list",
+              items: [
+                `Merch is paid for online, so a refund is an office matter like any other: bring the collection code and the payment reference.`,
+                `Before the fest, a merch order can be cancelled and refunded in full at any time up to 7 days before the day, while the print run can still absorb it.`,
+                `Faulty or wrong on the day — take it back to the merch tent there and then; it is exchanged, or refunded at the office if nothing suits.`,
+                `Sizes are swapped at the counter for free while stock lasts. If your size cannot be supplied at all, you take another item of the same value or the office refunds it in full.`,
+                `Uncollected merch is held at the office for 30 days and is not refundable after that — it goes back on sale.`,
+              ],
             },
           ],
         },
@@ -645,7 +667,9 @@ export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
             {
               kind: "p",
               text:
-                `Refunds are of the amount you paid. No fee is deducted by us.`,
+                `A refund is of the whole amount you were charged, the ${formatPercent(settings.convenienceFeePercent)}% convenience fee ` +
+                `and the GST on it included. We do not keep the fee on a refunded order and we deduct ` +
+                `nothing for handling it.`,
             },
           ],
         },
