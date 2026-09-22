@@ -387,16 +387,16 @@ export const CONTENT: ContentCollectionDef[] = [
     labelField: "title",
     imageFolder: "cosplay",
     fields: [
-      { name: "title", label: "Category", type: "text", hint: "ANIME & MANGA" },
-      { name: "value", label: "Saved as", type: "text", hint: "The short word stored with each entry, e.g. Anime." },
+      { name: "title", label: "Category", type: "text", hint: "ANIME" },
+      { name: "value", label: "Saved as", type: "text", hint: "The short word stored with each entry, e.g. Anime. It also picks the card's photo out of public/assets/cosplay — \"Anime\" looks for anime.jpg." },
       { name: "body", label: "What counts", type: "longtext" },
-      { name: "image", label: "Photo", type: "image", hint: "Optional. Fills the card behind the text." },
+      { name: "image", label: "Photo", type: "image", hint: "Optional, and only needed to override the file in public/assets/cosplay. Uploading one here wins over the file." },
     ],
     seed: [
-      { title: "ANIME & MANGA", value: "Anime", body: "Anything from the shelves — shounen, shoujo, that one obscure 90s OVA nobody will recognise.", image: null },
-      { title: "COMIC & SCREEN", value: "Comic", body: "Capes, villains, sitcom characters, and the entire cast of whatever your family binge-watched.", image: null },
-      { title: "ORIGINAL DESIGN", value: "Original", body: "You invented them. Bring a one-line backstory — the judges will absolutely ask.", image: null },
-      { title: "GROUP ACT", value: "Group", body: "Three to six people, one theme, 90 seconds on stage. Choreography optional but heavily rewarded.", image: null },
+      { title: "ANIME", value: "Anime", body: "Shounen, shoujo, that one obscure 90s OVA nobody in the field will recognise. Manga-only characters count.", image: null },
+      { title: "MARVEL", value: "Marvel", body: "Heroes, villains and the ones who were briefly both. Comic panel or film still — either is a source.", image: null },
+      { title: "DISNEY", value: "Disney", body: "Animated, live action, Pixar, the villains especially. Sidekicks are a legitimate strategy.", image: null },
+      { title: "MYTHOLOGY", value: "Mythology", body: "Gods, demons and heroes from any telling — Indian, Greek, Norse, or the ones your grandmother swears by.", image: null },
     ],
   },
   {
