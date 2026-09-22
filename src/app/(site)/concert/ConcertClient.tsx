@@ -64,6 +64,9 @@ function noteBody(text: string, lineupLive: boolean) {
   );
 }
 
+/** Good enough to catch a typo; the server checks it again. */
+const EMAIL_RE = /^[^@\s]+@[^@\s.]+\.[^@\s]+$/;
+
 export default function ConcertClient({
   settings,
   words,
@@ -78,7 +81,7 @@ export default function ConcertClient({
   lineupLive: boolean;
 }) {
   const [interestCount, setInterestCount] = useState(settings.interestBase.toLocaleString("en-IN"));
-  const [form, setForm] = useState({ name: "", contact: "", pick: "", guess: "", seats: "1" });
+  const [form, setForm] = useState({ name: "", phone: "", email: "", pick: "", guess: "", seats: "1" });
   const [ticket, setTicket] = useState<Ticket | null>(null);
   const [status, setStatus] = useState<"idle" | "submitting" | "error">("idle");
   const [error, setError] = useState("");
@@ -91,7 +94,14 @@ export default function ConcertClient({
   }, []);
 
   async function submit() {
-    if (form.name.trim().length < 2 || form.contact.trim().length < 5 || form.pick.trim().length < 2) return;
+    if (
+      form.name.trim().length < 2 ||
+      form.phone.replace(/\D/g, "").length < 10 ||
+      !EMAIL_RE.test(form.email.trim()) ||
+      form.pick.trim().length < 2
+    ) {
+      return;
+    }
     setStatus("submitting");
     setError("");
     try {
@@ -235,8 +245,25 @@ export default function ConcertClient({
                   <input className="mz-input" value={form.name} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} placeholder="First name is enough" />
                 </div>
                 <div>
-                  <label style={{ display: "block", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--purple)", marginBottom: 6 }}>PHONE OR EMAIL</label>
-                  <input className="mz-input" value={form.contact} onChange={(e) => setForm((f) => ({ ...f, contact: e.target.value }))} placeholder="Where the reveal should land" />
+                  <label style={{ display: "block", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--purple)", marginBottom: 6 }}>PHONE</label>
+                  <input
+                    className="mz-input"
+                    value={form.phone}
+                    onChange={(e) => setForm((f) => ({ ...f, phone: e.target.value }))}
+                    type="tel"
+                    inputMode="tel"
+                    placeholder="10 digits — the 48-hour window is texted here"
+                  />
+                  <label style={{ display: "block", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--purple)", margin: "14px 0 6px" }}>EMAIL</label>
+                  <input
+                    className="mz-input"
+                    value={form.email}
+                    onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))}
+                    type="email"
+                    inputMode="email"
+                    autoCapitalize="off"
+                    placeholder="Where the reveal lands first"
+                  />
                   <div style={{ marginTop: 10 }}>
                     <FormNote text={words.contactAccuracyNote} />
                   </div>
@@ -308,7 +335,7 @@ export default function ConcertClient({
                 <button
                   onClick={() => {
                     setTicket(null);
-                    setForm({ name: "", contact: "", pick: "", guess: "", seats: "1" });
+                    setForm({ name: "", phone: "", email: "", pick: "", guess: "", seats: "1" });
                   }}
                   style={{ fontWeight: 700, fontSize: 12, letterSpacing: "0.14em", background: "transparent", border: "2px solid var(--teal-light)", borderRadius: 14, padding: "13px 16px", cursor: "pointer", color: "var(--teal-light)" }}
                 >

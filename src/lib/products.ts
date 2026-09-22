@@ -280,7 +280,11 @@ export function readCustomer(
   // Ten digits, however they were typed — spaces, dashes, a +91 in front.
   const digits = phone.replace(/\D/g, "");
   if (digits.length < 10 || digits.length > 13) return { error: "That phone number doesn't look right." };
-  if (email && !/^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(email)) {
+  // Both are required, and for the same reason: the pass goes to the address
+  // and the day's messages go to the number, so an order missing either is one
+  // the fest cannot deliver and cannot chase.
+  if (!email) return { error: "We need an email address — it is where your pass is sent." };
+  if (!/^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(email)) {
     return { error: "That email address doesn't look right." };
   }
 

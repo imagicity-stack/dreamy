@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import PriceLines from "@/components/PriceLines";
 import FormNote from "@/components/FormNote";
-import WhatsAppOptIn from "@/components/WhatsAppOptIn";
 import { isPageHidden, type FestSettings } from "@/lib/festSettings";
 import { LEGAL_PAGES } from "@/lib/legal";
 import { formatPaise } from "@/lib/pricing";
@@ -170,6 +169,9 @@ type Entry = {
   mode: "solo" | "team"; team: string; members: string; whatsappOptIn: boolean;
 };
 
+/** Good enough to catch a typo; the server checks it again. */
+const EMAIL_RE = /^[^@\s]+@[^@\s.]+\.[^@\s]+$/;
+
 export default function CosplayClient({
   settings,
   words,
@@ -216,6 +218,9 @@ export default function CosplayClient({
     entry.name.trim().length > 1 &&
     entry.character.trim().length > 1 &&
     entry.phone.trim().length >= 10 &&
+    // Slot timings go to the number and the arena pass to the address, so both
+    // are required — the server refuses an entry without them either way.
+    EMAIL_RE.test(entry.email.trim()) &&
     !!quote;
   const entryLabel = entry.mode === "team" ? "SQUAD ENTRY" : "SOLO ENTRY";
 
@@ -433,7 +438,7 @@ export default function CosplayClient({
                   </div>
                   <div>
                     <label style={{ display: "block", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--purple)", marginBottom: 6 }}>EMAIL</label>
-                    <input className="mz-input" value={entry.email} onChange={set("email")} placeholder="Optional — where the receipt goes" />
+                    <input className="mz-input" value={entry.email} onChange={set("email")} placeholder="Where your arena pass is sent" type="email" inputMode="email" autoCapitalize="off" />
                   </div>
                   <div>
                     <label style={{ display: "block", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--purple)", marginBottom: 6 }}>WHO ARE YOU COMING AS</label>
@@ -474,12 +479,6 @@ export default function CosplayClient({
                     )}
                   </div>
                   <FormNote text={words.contactAccuracyNote} tone="light" />
-                  <WhatsAppOptIn
-                    checked={entry.whatsappOptIn}
-                    onChange={(next) => setEntry((prev) => ({ ...prev, whatsappOptIn: next }))}
-                    phone={entry.phone}
-                    tone="light"
-                  />
                   <button
                     onClick={submitCos}
                     disabled={!canSubmit || status === "processing"}

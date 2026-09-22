@@ -6,7 +6,6 @@ import { formatInr } from "@/data/fest";
 import { SealedDateStamp, SealedDateTiles } from "@/components/SealedDate";
 import PriceLines from "@/components/PriceLines";
 import FormNote from "@/components/FormNote";
-import WhatsAppOptIn from "@/components/WhatsAppOptIn";
 import { isPageHidden, type DateDisplay, type FestSettings } from "@/lib/festSettings";
 import { LEGAL_PAGES } from "@/lib/legal";
 import { formatPaise } from "@/lib/pricing";
@@ -37,6 +36,9 @@ function passRulesLine(text: string, linked: boolean) {
     </>
   );
 }
+
+/** Good enough to catch a typo; the server checks it again. */
+const EMAIL_RE = /^[^@\s]+@[^@\s.]+\.[^@\s]+$/;
 
 export default function TicketsClient({
   settings,
@@ -81,6 +83,10 @@ export default function TicketsClient({
   const canBuy =
     buyer.name.trim().length > 1 &&
     buyer.phone.trim().length >= 10 &&
+    // The pass is sent to the address and the day's messages to the number, so
+    // neither is optional — checked here as well as on the server so the button
+    // stays honest about why it will not go.
+    EMAIL_RE.test(buyer.email.trim()) &&
     !settings.soldOut &&
     // A quote for a different quantity is a stale price; wait for the live one.
     quote?.units === qty;
@@ -448,16 +454,14 @@ export default function TicketsClient({
                     className="mz-input"
                     value={buyer.email}
                     onChange={(e) => setBuyer((b) => ({ ...b, email: e.target.value }))}
-                    placeholder="Optional &mdash; where the receipt goes"
+                    placeholder="Where your pass is sent"
+                    type="email"
+                    inputMode="email"
+                    autoCapitalize="off"
                   />
                 </div>
 
                 <FormNote text={words.contactAccuracyNote} />
-                <WhatsAppOptIn
-                  checked={buyer.whatsappOptIn}
-                  onChange={(next) => setBuyer((b) => ({ ...b, whatsappOptIn: next }))}
-                  phone={buyer.phone}
-                />
 
                 {!settings.soldOut ? (
                   <button

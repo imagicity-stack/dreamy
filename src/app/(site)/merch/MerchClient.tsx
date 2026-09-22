@@ -5,7 +5,6 @@ import Image from "next/image";
 import { formatInr } from "@/data/fest";
 import PriceLines from "@/components/PriceLines";
 import FormNote from "@/components/FormNote";
-import WhatsAppOptIn from "@/components/WhatsAppOptIn";
 import { formatPaise } from "@/lib/pricing";
 import {
   CheckoutDismissed,
@@ -22,6 +21,9 @@ export type MerchRecord = {
   note: string;
   image: { path: string; url: string } | null;
 };
+
+/** Good enough to catch a typo; the server checks it again. */
+const EMAIL_RE = /^[^@\s]+@[^@\s.]+\.[^@\s]+$/;
 
 export default function MerchClient({
   merchItems,
@@ -66,7 +68,13 @@ export default function MerchClient({
   // Same rule as the passes page: a quote for a different bag is a stale price.
   const quoteMatchesBag = !!quote && quote.units === cartCount;
   const canPay =
-    cartCount > 0 && quoteMatchesBag && buyer.name.trim().length > 1 && buyer.phone.trim().length >= 10;
+    cartCount > 0 &&
+    quoteMatchesBag &&
+    buyer.name.trim().length > 1 &&
+    buyer.phone.trim().length >= 10 &&
+    // The collection code is emailed and the tent calls the number, so both are
+    // required here as they are on the server.
+    EMAIL_RE.test(buyer.email.trim());
 
   function add(id: string) {
     setCart((c) => ({ ...c, [id]: (c[id] || 0) + 1 }));
@@ -239,14 +247,12 @@ export default function MerchClient({
                       className="mz-input"
                       value={buyer.email}
                       onChange={(e) => setBuyer((b) => ({ ...b, email: e.target.value }))}
-                      placeholder="Email (optional)"
+                      placeholder="Email — where the collection code goes"
+                      type="email"
+                      inputMode="email"
+                      autoCapitalize="off"
                     />
                     <FormNote text={words.contactAccuracyNote} />
-                    <WhatsAppOptIn
-                      checked={buyer.whatsappOptIn}
-                      onChange={(next) => setBuyer((b) => ({ ...b, whatsappOptIn: next }))}
-                      phone={buyer.phone}
-                    />
                   </div>
                 )}
                 {open ? (

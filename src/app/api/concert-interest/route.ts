@@ -8,17 +8,25 @@ export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
   const name = String(body?.name ?? "").trim();
-  const contact = String(body?.contact ?? "").trim();
+  const phone = String(body?.phone ?? "").trim();
+  const email = String(body?.email ?? "").trim().toLowerCase();
   const pick = String(body?.pick ?? "").trim();
   const guess = String(body?.guess ?? "").trim();
   const seats = String(body?.seats ?? "1");
 
-  if (name.length < 2 || contact.length < 5 || pick.length < 2) {
+  // Both, not either: the reveal goes out by mail and the 48-hour window on the
+  // seats is worth a text, and a list the fest cannot reach twice is not a list.
+  if (
+    name.length < 2 ||
+    phone.replace(/\D/g, "").length < 10 ||
+    !/^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(email) ||
+    pick.length < 2
+  ) {
     return NextResponse.json({ error: "Invalid request" }, { status: 400 });
   }
 
   const settings = await getSettings();
-  const entry = { name, contact, pick, guess: guess || "Kept to yourself", seats };
+  const entry = { name, phone, email, pick, guess: guess || "Kept to yourself", seats };
 
   // The queue number is the council's starting number plus the number of real
   // signups — worked out in one place, in interest.ts.

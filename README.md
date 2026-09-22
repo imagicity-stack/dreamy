@@ -452,9 +452,18 @@ The pass is uploaded to Meta's media endpoint and sent by id rather than as a li
 the alternative is a URL Meta's servers can fetch, and the token on a pass exists precisely so that
 nothing unauthenticated can print somebody else's ticket.
 
-**Consent.** Meta requires an opt-in before a business may message anyone, and typing a phone number
-into a checkout is not it. Every form carries a checkbox, ticked by default and showing the number it
-applies to, and the answer is stored with the order. Untick it and nothing is sent.
+**Consent, and why nothing sends today.** Meta requires an opt-in before a business may message
+anyone, and typing a phone number into a checkout is not one. That opt-in came from a checkbox on each
+checkout form, and the checkbox has been taken off while WhatsApp is switched off — so every order now
+records a no and `notifyOrderPaid` skips the send.
+
+Turning WhatsApp on is therefore **two** steps, not one:
+
+1. Put `<WhatsAppOptIn>` (still in `src/components/`) back into the three checkout forms, so buyers can
+   actually consent. Setting the Meta credentials alone will not send anything.
+2. Set `WHATSAPP_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID`.
+
+The sending code, the number normalising and the template payload are all still here and tested.
 
 ## Advertising
 
