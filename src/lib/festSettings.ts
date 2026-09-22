@@ -87,9 +87,12 @@ export const DEFAULT_SETTINGS: FestSettings = {
   soldOut: FEST.soldOut,
   merchOpen: true,
   merchClosedNote: "Pre-orders are closed. Whatever is left goes on sale at the merch tent on the day.",
-  dateMode: "sealed",
+  // The month is announced; the day is not. "month" mode prints NOVEMBER 2026
+  // everywhere a date appears — hero, ticker, passes, PDFs, email — and keeps
+  // the day as ?? until the council sets dateMode to "full".
+  dateMode: "month",
   festDay: 0,
-  festMonth: 0,
+  festMonth: 11,
   festYear: 2026,
   countdownEnabled: false,
   countdownTarget: "",

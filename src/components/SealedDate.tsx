@@ -2,8 +2,11 @@ import type { DateDisplay } from "@/lib/settings";
 
 /**
  * The date treatment used wherever the fest's day would otherwise be printed.
- * The day and month are held back until the last guest reveal, so the site
- * shows them as sealed tiles rather than naming a month.
+ *
+ * The reveal happens in two steps, so these have to read correctly at each:
+ * nothing named, then the month named with the day still held back, then the
+ * whole date. The tiles fill in one at a time on their own; the stamp has to
+ * be told, because "DATE SEALED" is a lie once the month is public.
  */
 
 type TileProps = {
@@ -81,7 +84,10 @@ export function SealedDateStamp({ date, rotate = -3 }: { date: DateDisplay; rota
         transform: `rotate(${rotate}deg)`,
       }}
     >
-      {date.sealed ? "DATE SEALED" : date.short}
+      {/* Only a fully sealed date is a secret. Once the month is out, say it —
+          date.short is "NOVEMBER 2026", and its own line elsewhere carries the
+          fact that the day is still coming. */}
+      {date.mode === "sealed" ? "DATE SEALED" : date.short}
     </div>
   );
 }
