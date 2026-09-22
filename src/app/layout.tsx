@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Bowlby_One, Karla } from "next/font/google";
 import "./globals.css";
+import { siteUrl } from "@/lib/site";
 
 const bowlbyOne = Bowlby_One({
   variable: "--font-display",
@@ -15,6 +16,9 @@ const karla = Karla({
 });
 
 export const metadata: Metadata = {
+  // Without this, every relative URL Next writes into the page head — the
+  // canonical link, the Open Graph image — resolves against localhost.
+  metadataBase: new URL(siteUrl()),
   title: "MADOOZA — The Voice of Hazaribagh",
   description:
     "MADOOZA — The Elden Heights School's fest. Cosplay, fete, carnival stalls and a sealed concert reveal, in Hazaribagh. The date is sealed until the last guest reveal.",
