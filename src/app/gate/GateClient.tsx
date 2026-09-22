@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import jsQR from "jsqr";
 
 /**
@@ -19,6 +20,9 @@ export type Ticket = {
   code: string;
   tierLabel: string;
   holderName: string;
+  holderPhone?: string;
+  holderEmail?: string;
+  orderId?: string;
   index: number;
   of: number;
   status: string;
@@ -67,10 +71,11 @@ function feedback(good: boolean) {
 
 export default function GateClient({
   signedInAs,
-  pinIsSet,
+  ready,
 }: {
   signedInAs: string | null;
-  pinIsSet: boolean;
+  /** False when Firebase isn't configured, so the screen can say so. */
+  ready: boolean;
 }) {
   const [volunteer, setVolunteer] = useState(signedInAs);
   const [outcome, setOutcome] = useState<Outcome | null>(null);
@@ -195,7 +200,7 @@ export default function GateClient({
   }, [volunteer, refreshCounts]);
 
   if (!volunteer) {
-    return <SignIn pinIsSet={pinIsSet} onDone={setVolunteer} />;
+    return <SignIn ready={ready} onDone={setVolunteer} />;
   }
 
   return (
@@ -235,6 +240,14 @@ export default function GateClient({
 
       {outcome && <Result outcome={outcome} onDismiss={() => setOutcome(null)} />}
 
+      {manualOpen && (
+        <Registrations
+          onClose={() => setManualOpen(false)}
+          onAdmitted={refreshCounts}
+          onSignedOut={() => setVolunteer(null)}
+        />
+      )}
+
       {cameraError && (
         <div style={{ background: "var(--crimson)", padding: "12px 16px", fontSize: 13.5, lineHeight: 1.5 }}>
           {cameraError}
@@ -256,7 +269,7 @@ export default function GateClient({
         </div>
 
         <button
-          onClick={() => setManualOpen((v) => !v)}
+          onClick={() => setManualOpen(true)}
           className="font-display mz-pop"
           style={{
             marginTop: 14,
@@ -272,10 +285,8 @@ export default function GateClient({
             ["--mz-shadow" as string]: "5px",
           }}
         >
-          {manualOpen ? "HIDE SEARCH" : "PHONE DEAD? FIND BY NAME"}
+          PHONE DEAD? SEARCH THE REGISTRATIONS
         </button>
-
-        {manualOpen && <ManualSearch onAdmitted={refreshCounts} onSignedOut={() => setVolunteer(null)} />}
       </div>
     </main>
   );
@@ -395,24 +406,27 @@ function Mark({ kind }: { kind: "tick" | "warn" | "cross" }) {
   );
 }
 
-function SignIn({ pinIsSet, onDone }: { pinIsSet: boolean; onDone: (name: string) => void }) {
-  const [name, setName] = useState("");
+function SignIn({ ready, onDone }: { ready: boolean; onDone: (name: string) => void }) {
+  const [email, setEmail] = useState("");
   const [pin, setPin] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
 
+  const canGo = ready && email.includes("@") && pin.length >= 6;
+
   async function go() {
+    if (!canGo) return;
     setBusy(true);
     setError("");
     try {
       const res = await fetch("/api/gate/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ pin, volunteer: name }),
+        body: JSON.stringify({ email, pin }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Could not sign in");
-      onDone(data.volunteer);
+      onDone(data.session?.volunteer ?? "Gate");
     } catch (e) {
       setError(e instanceof Error ? e.message : "Could not sign in");
     } finally {
@@ -420,62 +434,168 @@ function SignIn({ pinIsSet, onDone }: { pinIsSet: boolean; onDone: (name: string
     }
   }
 
+  const label = {
+    display: "block",
+    fontSize: 10.5,
+    fontWeight: 700,
+    letterSpacing: "0.18em",
+    color: "var(--lilac)",
+    marginBottom: 7,
+  } as const;
+
   return (
-    <main style={{ background: "var(--bg)", minHeight: "100dvh", padding: "40px 18px", color: "var(--lilac)" }}>
-      <div style={{ maxWidth: 360, margin: "0 auto" }}>
-        <div className="font-display" style={{ fontSize: 26, color: "var(--teal)" }}>MADOOZA GATE</div>
-        <p style={{ fontSize: 14.5, lineHeight: 1.6, color: "var(--lilac-text)", margin: "10px 0 22px" }}>
-          {pinIsSet
-            ? "Your name, and the PIN the fest office gave you this morning."
-            : "No gate PIN has been set yet. Somebody needs to set one in the admin panel before this will work."}
-        </p>
-
-        <label style={{ display: "block", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", marginBottom: 7 }}>YOUR NAME</label>
-        <input className="mz-input" value={name} onChange={(e) => setName(e.target.value)} placeholder="So the log knows who scanned" />
-
-        <label style={{ display: "block", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", margin: "16px 0 7px" }}>GATE PIN</label>
-        <input
-          className="mz-input"
-          value={pin}
-          onChange={(e) => setPin(e.target.value)}
-          inputMode="numeric"
-          autoComplete="off"
-          type="password"
-          placeholder="4 to 8 digits"
-        />
-
-        <button
-          onClick={go}
-          disabled={busy || !pinIsSet || pin.length < 4}
-          className="font-display mz-pop"
+    <main
+      style={{
+        background: "var(--ink)",
+        minHeight: "100dvh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        padding: "24px 16px",
+      }}
+    >
+      <div style={{ width: "100%", maxWidth: 380 }}>
+        <div
           style={{
-            marginTop: 20,
-            width: "100%",
-            fontSize: 15,
-            color: "var(--ink)",
-            background: "var(--teal)",
-            border: "3px solid var(--ink)",
-            borderRadius: 18,
-            boxShadow: "6px 6px 0 var(--ink)",
-            padding: "16px 18px",
-            cursor: "pointer",
-            opacity: !pinIsSet || pin.length < 4 ? 0.6 : 1,
-            ["--mz-shadow" as string]: "6px",
+            background: "var(--bg)",
+            border: "3px solid var(--purple)",
+            borderRadius: 24,
+            boxShadow: "10px 10px 0 rgba(74, 19, 130, 0.5)",
+            overflow: "hidden",
           }}
         >
-          {busy ? "CHECKING…" : "START SCANNING"}
-        </button>
+          {/* The band is the logo's own purple, so the crest sits on it seamlessly. */}
+          <div
+            style={{
+              background: "#26064a",
+              borderBottom: "3px solid var(--purple)",
+              padding: "10px 16px 10px 10px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 10,
+            }}
+          >
+            <Image
+              src="/assets/madooza-logo.png"
+              alt="MADOOZA"
+              width={58}
+              height={58}
+              priority
+              style={{ display: "block", width: 58, height: 58 }}
+            />
+            <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.2em", color: "var(--teal)" }}>
+              GATE SCANNER
+            </span>
+          </div>
 
-        {error && <div style={{ color: "var(--pink)", fontSize: 13.5, marginTop: 14 }}>{error}</div>}
+          <div style={{ padding: "22px 20px 24px" }}>
+            <h1 className="font-display" style={{ fontSize: 24, color: "var(--lilac)", margin: "0 0 8px" }}>
+              SIGN IN TO SCAN
+            </h1>
+            <p style={{ fontSize: 13.5, lineHeight: 1.6, color: "var(--muted-lilac)", margin: "0 0 20px" }}>
+              {ready
+                ? "Use the email and PIN the fest office gave you. Every scan is recorded against your name, so don't lend your phone out signed in."
+                : "The gate isn't connected to Firebase yet, so nobody can sign in. The fest office needs to finish the setup."}
+            </p>
+
+            <label style={label}>YOUR EMAIL</label>
+            <input
+              className="mz-input"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              type="email"
+              inputMode="email"
+              autoComplete="username"
+              autoCapitalize="off"
+              placeholder="the address the office added"
+            />
+
+            <label style={{ ...label, marginTop: 16 }}>YOUR PIN</label>
+            <input
+              className="mz-input"
+              value={pin}
+              onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 8))}
+              onKeyDown={(e) => e.key === "Enter" && go()}
+              type="password"
+              inputMode="numeric"
+              autoComplete="current-password"
+              placeholder="6 digits"
+            />
+
+            <button
+              onClick={go}
+              disabled={busy || !canGo}
+              className="font-display mz-pop"
+              style={{
+                marginTop: 22,
+                width: "100%",
+                fontSize: 15,
+                color: "var(--ink)",
+                background: "var(--teal)",
+                border: "3px solid var(--ink)",
+                borderRadius: 18,
+                boxShadow: "6px 6px 0 var(--ink)",
+                padding: "16px 18px",
+                cursor: canGo ? "pointer" : "not-allowed",
+                opacity: canGo ? 1 : 0.55,
+                ["--mz-shadow" as string]: "6px",
+              }}
+            >
+              {busy ? "CHECKING…" : "START SCANNING"}
+            </button>
+
+            {error && (
+              <div
+                style={{
+                  marginTop: 14,
+                  background: "rgba(223, 2, 92, 0.16)",
+                  border: "2px solid var(--crimson)",
+                  borderRadius: 12,
+                  padding: "10px 12px",
+                  fontSize: 13,
+                  lineHeight: 1.5,
+                  color: "#FFD9E4",
+                }}
+              >
+                {error}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div style={{ fontSize: 11, lineHeight: 1.7, color: "var(--muted-lilac)", marginTop: 16, textAlign: "center" }}>
+          Lost your PIN? The fest office can set a new one in seconds.
+        </div>
       </div>
     </main>
   );
 }
 
-function ManualSearch({ onAdmitted, onSignedOut }: { onAdmitted: () => void; onSignedOut: () => void }) {
+/**
+ * The registrations, as a screen of their own.
+ *
+ * The camera handles the ordinary case. This is for everything else: a flat
+ * battery, a screenshot that will not scan, a name somebody is sure they
+ * booked under. It searches by name, phone or pass code, shows the whole
+ * registration rather than a row of initials — so the person at the desk can
+ * ask a question only the real holder could answer — and admits from there,
+ * recorded as a manual admit so the log never pretends a QR was scanned.
+ */
+export function Registrations({
+  onClose,
+  onAdmitted,
+  onSignedOut,
+}: {
+  onClose: () => void;
+  onAdmitted: () => void;
+  onSignedOut: () => void;
+}) {
   const [q, setQ] = useState("");
   const [rows, setRows] = useState<Ticket[]>([]);
+  const [open, setOpen] = useState<string | null>(null);
   const [note, setNote] = useState("");
+  const [searching, setSearching] = useState(false);
 
   useEffect(() => {
     if (q.trim().length < 3) {
@@ -483,6 +603,7 @@ function ManualSearch({ onAdmitted, onSignedOut }: { onAdmitted: () => void; onS
       return;
     }
     let live = true;
+    setSearching(true);
     const timer = setTimeout(async () => {
       try {
         const res = await fetch(`/api/gate/search?q=${encodeURIComponent(q.trim())}`);
@@ -491,6 +612,8 @@ function ManualSearch({ onAdmitted, onSignedOut }: { onAdmitted: () => void; onS
         if (live) setRows(data.tickets ?? []);
       } catch {
         /* a failed search just shows nothing */
+      } finally {
+        if (live) setSearching(false);
       }
     }, 250);
     return () => {
@@ -514,64 +637,192 @@ function ManualSearch({ onAdmitted, onSignedOut }: { onAdmitted: () => void; onS
         : data.result === "already"
           ? `${ticket.holderName} was already admitted at ${timeOf("usedAt" in data ? data.usedAt : null)}.`
           : data.result === "void"
-            ? `${ticket.holderName}'s pass was refunded.`
+            ? `${ticket.holderName}'s pass was refunded — do not admit.`
             : "That pass is not one of ours.",
     );
-    setRows((list) => list.map((r) => (r.id === ticket.id ? { ...r, status: "used" } : r)));
+    setRows((list) => list.map((r) => (r.id === ticket.id ? { ...r, status: data.result === "admitted" ? "used" : r.status } : r)));
     onAdmitted();
   }
 
+  const chip = (text: string, tone: "live" | "used" | "void") => (
+    <span
+      style={{
+        fontSize: 9.5,
+        fontWeight: 800,
+        letterSpacing: "0.14em",
+        padding: "4px 8px",
+        borderRadius: 999,
+        color: tone === "live" ? "var(--ink)" : "var(--lilac)",
+        background: tone === "live" ? "var(--teal)" : tone === "used" ? "#6b5292" : "var(--crimson)",
+      }}
+    >
+      {text}
+    </span>
+  );
+
   return (
-    <div style={{ marginTop: 14 }}>
-      <input
-        className="mz-input"
-        value={q}
-        onChange={(e) => setQ(e.target.value)}
-        placeholder="Name, phone or pass code"
-        autoComplete="off"
-      />
-      {note && <div style={{ fontSize: 13, color: "var(--teal)", marginTop: 10 }}>{note}</div>}
-      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 12 }}>
-        {rows.map((t) => (
-          <div
-            key={t.id}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 12,
-              background: "var(--bg)",
-              border: "2px solid #4A2A73",
-              borderRadius: 14,
-              padding: "11px 13px",
-            }}
-          >
-            <div style={{ minWidth: 0 }}>
-              <div style={{ fontWeight: 700, fontSize: 15 }}>{t.holderName}</div>
-              <div style={{ fontSize: 11, letterSpacing: "0.1em", color: "var(--muted-lilac)" }}>
-                {t.code}
-                {t.of > 1 ? ` · ${t.index}/${t.of}` : ""} · {t.status.toUpperCase()}
-              </div>
-            </div>
-            <button
-              onClick={() => admit(t)}
-              disabled={t.status !== "valid"}
-              className="font-display"
-              style={{
-                flexShrink: 0,
-                fontSize: 12,
-                color: "var(--ink)",
-                background: t.status === "valid" ? "var(--teal)" : "#6b5292",
-                border: "2px solid var(--ink)",
-                borderRadius: 12,
-                padding: "10px 13px",
-                cursor: t.status === "valid" ? "pointer" : "not-allowed",
-              }}
-            >
-              {t.status === "valid" ? "LET IN" : "USED"}
-            </button>
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-label="Registrations"
+      style={{
+        position: "fixed",
+        inset: 0,
+        zIndex: 110,
+        background: "var(--ink)",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <header
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          gap: 12,
+          padding: "14px 16px",
+          borderBottom: "2px solid #351059",
+        }}
+      >
+        <div>
+          <div className="font-display" style={{ fontSize: 17, color: "var(--teal)" }}>REGISTRATIONS</div>
+          <div style={{ fontSize: 11, letterSpacing: "0.1em", color: "var(--muted-lilac)", marginTop: 2 }}>
+            NAME, PHONE OR PASS CODE
           </div>
-        ))}
+        </div>
+        <button
+          onClick={onClose}
+          aria-label="Close"
+          style={{
+            width: 40,
+            height: 40,
+            fontSize: 19,
+            lineHeight: 1,
+            color: "var(--ink)",
+            background: "var(--lilac)",
+            border: "2px solid var(--ink)",
+            borderRadius: 12,
+            cursor: "pointer",
+          }}
+        >
+          &times;
+        </button>
+      </header>
+
+      <div style={{ padding: "14px 16px 6px" }}>
+        <input
+          className="mz-input"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder="Start typing a name…"
+          autoFocus
+          autoComplete="off"
+        />
+        {note && (
+          <div style={{ fontSize: 13, color: "var(--teal)", marginTop: 10, lineHeight: 1.5 }}>{note}</div>
+        )}
+      </div>
+
+      <div style={{ flex: 1, overflowY: "auto", padding: "8px 16px 28px" }}>
+        {q.trim().length < 3 && (
+          <p style={{ fontSize: 13.5, lineHeight: 1.6, color: "var(--muted-lilac)" }}>
+            Three letters is enough. Everything here is somebody who has paid — if a name is not in this
+            list, they have not bought a pass, whatever they are showing you.
+          </p>
+        )}
+        {q.trim().length >= 3 && rows.length === 0 && !searching && (
+          <p style={{ fontSize: 13.5, lineHeight: 1.6, color: "var(--muted-lilac)" }}>
+            Nobody by that. Try their phone number, or the code on their pass.
+          </p>
+        )}
+
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {rows.map((t) => {
+            const expanded = open === t.id;
+            const tone = t.status === "valid" ? "live" : t.status === "used" ? "used" : "void";
+            return (
+              <div
+                key={t.id}
+                style={{
+                  background: "var(--bg)",
+                  border: `2px solid ${expanded ? "var(--teal)" : "#4A2A73"}`,
+                  borderRadius: 16,
+                  overflow: "hidden",
+                }}
+              >
+                <button
+                  onClick={() => setOpen(expanded ? null : t.id)}
+                  style={{
+                    width: "100%",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 12,
+                    padding: "13px 14px",
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    textAlign: "left",
+                    color: "var(--lilac)",
+                  }}
+                >
+                  <span style={{ minWidth: 0 }}>
+                    <span style={{ display: "block", fontWeight: 700, fontSize: 15.5 }}>{t.holderName}</span>
+                    <span style={{ display: "block", fontSize: 11, letterSpacing: "0.1em", color: "var(--muted-lilac)", marginTop: 3 }}>
+                      {t.code}
+                      {t.of > 1 ? ` · ${t.index} OF ${t.of}` : ""}
+                    </span>
+                  </span>
+                  {chip(t.status.toUpperCase(), tone)}
+                </button>
+
+                {expanded && (
+                  <div style={{ borderTop: "1px solid #351059", padding: "12px 14px 14px" }}>
+                    <dl style={{ margin: 0, display: "grid", gridTemplateColumns: "auto 1fr", gap: "7px 14px", fontSize: 13 }}>
+                      {[
+                        ["PASS", t.tierLabel],
+                        ["PHONE", t.holderPhone || "—"],
+                        ["EMAIL", t.holderEmail || "—"],
+                        ["ADMITTED", t.usedAt ? `${timeOf(t.usedAt)}${t.usedBy ? ` by ${t.usedBy}` : ""}` : "not yet"],
+                        ["ORDER", t.orderId || "—"],
+                      ].map(([k, v]) => (
+                        <Fragment key={k}>
+                          <dt style={{ fontSize: 10, letterSpacing: "0.14em", color: "var(--muted-lilac)", paddingTop: 2 }}>{k}</dt>
+                          <dd style={{ margin: 0, color: "var(--lilac)", wordBreak: "break-word" }}>{v}</dd>
+                        </Fragment>
+                      ))}
+                    </dl>
+
+                    <button
+                      onClick={() => admit(t)}
+                      disabled={t.status !== "valid"}
+                      className="font-display mz-pop"
+                      style={{
+                        marginTop: 14,
+                        width: "100%",
+                        fontSize: 14,
+                        color: "var(--ink)",
+                        background: t.status === "valid" ? "var(--teal)" : "#6b5292",
+                        border: "3px solid var(--ink)",
+                        borderRadius: 16,
+                        boxShadow: "5px 5px 0 var(--ink)",
+                        padding: "14px 16px",
+                        cursor: t.status === "valid" ? "pointer" : "not-allowed",
+                        ["--mz-shadow" as string]: "5px",
+                      }}
+                    >
+                      {t.status === "valid"
+                        ? "LET THEM IN"
+                        : t.status === "used"
+                          ? "ALREADY ADMITTED"
+                          : "REFUNDED — DO NOT ADMIT"}
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { gatePinIsSet, readGateSession } from "@/lib/gateAuth";
+import { gateReady, readGateSession } from "@/lib/gateAuth";
 import GateClient from "./GateClient";
 
 export const dynamic = "force-dynamic";
@@ -14,6 +14,6 @@ export const metadata: Metadata = {
  * address and the PIN on the morning.
  */
 export default async function GatePage() {
-  const [session, pinIsSet] = await Promise.all([readGateSession(), gatePinIsSet()]);
-  return <GateClient signedInAs={session?.volunteer ?? null} pinIsSet={pinIsSet} />;
+  const [session, ready] = await Promise.all([readGateSession(), gateReady()]);
+  return <GateClient signedInAs={session?.volunteer ?? null} ready={ready} />;
 }

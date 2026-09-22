@@ -32,7 +32,7 @@ type Summary = {
   };
   records: { passes: number; cosplayEntries: number; merchOrders: number };
   orders: { total: number; byStatus: Record<string, number> };
-  gate: { issued: number; admitted: number; voided: number; pinSet: boolean };
+  gate: { issued: number; admitted: number; voided: number; staff: number };
   webhookConfigured: boolean;
   mailMissing: string[];
 };
@@ -104,8 +104,8 @@ export default function OverviewTab() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-      {summary.gate.issued > 0 && !summary.gate.pinSet && (
-        <Notice text="No gate PIN is set, so nobody can sign into the scanner. Set one in Settings before the gates open." />
+      {summary.gate.issued > 0 && summary.gate.staff === 0 && (
+        <Notice text="Nobody is on the gate list, so the scanner cannot be signed into. Add the volunteers under Gate before the gates open." />
       )}
 
       {summary.mailMissing.length > 0 && (
