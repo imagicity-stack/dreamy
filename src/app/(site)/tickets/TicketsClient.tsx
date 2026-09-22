@@ -5,6 +5,7 @@ import Link from "next/link";
 import { formatInr } from "@/data/fest";
 import { SealedDateStamp, SealedDateTiles } from "@/components/SealedDate";
 import PriceLines from "@/components/PriceLines";
+import FormNote from "@/components/FormNote";
 import { isPageHidden, type DateDisplay, type FestSettings } from "@/lib/festSettings";
 import { LEGAL_PAGES } from "@/lib/legal";
 import { formatPaise } from "@/lib/pricing";
@@ -51,6 +52,10 @@ export default function TicketsClient({
 }) {
   const [qty, setQty] = useState(1);
   const [buyer, setBuyer] = useState({ name: "", school: "", phone: "", email: "" });
+  // One name per pass beyond the first: a pass is scanned per person and shows
+  // a name at the gate, so three passes are three people rather than three
+  // copies of the buyer. Index 0 is the buyer and is filled from their name.
+  const [attendees, setAttendees] = useState<string[]>([]);
   const [pass, setPass] = useState<Receipt | null>(null);
   const [quote, setQuote] = useState<Quote | null>(null);
   const [status, setStatus] = useState<"idle" | "processing" | "error">("idle");
@@ -87,7 +92,12 @@ export default function TicketsClient({
       const receipt = await startCheckout({
         product: "fetePass",
         input: { qty },
-        customer: buyer,
+        customer: {
+          ...buyer,
+          // The server counts these against the quantity and falls back to the
+          // buyer's name for any left blank.
+          attendees: [buyer.name, ...attendees.slice(0, qty - 1)],
+        },
         title: "MADOOZA",
       });
       setPass(receipt);
@@ -243,6 +253,7 @@ export default function TicketsClient({
                   setPass(null);
                   setQty(1);
                   setBuyer({ name: "", school: "", phone: "", email: "" });
+                  setAttendees([]);
                 }}
                 style={{ fontWeight: 700, fontSize: 12, letterSpacing: "0.14em", background: "transparent", border: "2px solid var(--ink)", borderRadius: 14, padding: "14px 18px", cursor: "pointer", color: "var(--ink)" }}
               >
@@ -382,9 +393,36 @@ export default function TicketsClient({
                     className="mz-input"
                     value={buyer.name}
                     onChange={(e) => setBuyer((b) => ({ ...b, name: e.target.value }))}
-                    placeholder="As it should read on the pass"
+                    placeholder={qty > 1 ? "Yours — this is pass 1" : "As it should read on the pass"}
                   />
                 </div>
+                {qty > 1 && (
+                  <div>
+                    <label style={{ display: "block", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--lilac)", marginBottom: 7 }}>
+                      WHO ARE THE OTHER {qty - 1} PASSES FOR
+                    </label>
+                    <div style={{ fontSize: 12, lineHeight: 1.55, color: "#C4AAE4", marginBottom: 10 }}>
+                      {words.attendeeNamesNote}
+                    </div>
+                    <div style={{ display: "flex", flexDirection: "column", gap: 9 }}>
+                      {Array.from({ length: qty - 1 }, (_, i) => (
+                        <input
+                          key={i}
+                          className="mz-input"
+                          value={attendees[i] ?? ""}
+                          onChange={(e) =>
+                            setAttendees((list) => {
+                              const next = [...list];
+                              next[i] = e.target.value;
+                              return next;
+                            })
+                          }
+                          placeholder={`Pass ${i + 2} of ${qty} — full name`}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
                 <div>
                   <label style={{ display: "block", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--lilac)", marginBottom: 7 }}>SCHOOL OR ORGANISATION</label>
                   <input
@@ -412,6 +450,8 @@ export default function TicketsClient({
                     placeholder="Optional &mdash; where the receipt goes"
                   />
                 </div>
+
+                <FormNote text={words.contactAccuracyNote} />
 
                 {!settings.soldOut ? (
                   <button

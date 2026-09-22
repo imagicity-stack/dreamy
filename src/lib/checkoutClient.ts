@@ -91,8 +91,10 @@ export type CustomerInput = {
   phone: string;
   email?: string;
   school?: string;
+  /** One name per pass, when an order is buying several. */
+  attendees?: string[];
   /** Product extras — the cosplay character, the squad list. */
-  [key: string]: string | undefined;
+  [key: string]: string | string[] | undefined;
 };
 
 /** Thrown when the buyer closed the Razorpay window; not an error to shout about. */

@@ -17,7 +17,9 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unknown product" }, { status: 400 });
   }
 
-  const read = readCustomer(product, body?.customer);
+  // The names are counted against the quantity, so the quantity is read first.
+  const units = Number((body?.input as { qty?: unknown } | undefined)?.qty ?? 1);
+  const read = readCustomer(product, body?.customer, Number.isFinite(units) ? units : 1);
   if ("error" in read) {
     return NextResponse.json({ error: read.error }, { status: 400 });
   }

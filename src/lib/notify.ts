@@ -63,7 +63,7 @@ function words(product: string) {
 }
 
 function buyerRows(receipt: Receipt): DetailRow[] {
-  const rows: DetailRow[] = [{ label: "Name", value: receipt.customer.name }];
+  const rows: DetailRow[] = [{ label: "Booked by", value: receipt.customer.name }];
   const extra = receipt.customer.extra ?? {};
   if (extra.character) rows.push({ label: "Walking as", value: extra.character });
   if (extra.category) rows.push({ label: "Category", value: extra.category });
@@ -82,9 +82,12 @@ function buyerRows(receipt: Receipt): DetailRow[] {
 function officeRows(receipt: Receipt): DetailRow[] {
   const extra = receipt.customer.extra ?? {};
   const rows: DetailRow[] = [
-    { label: "Name", value: receipt.customer.name },
+    { label: "Booked by", value: receipt.customer.name },
     { label: "Phone", value: receipt.customer.phone },
   ];
+  if (receipt.customer.attendees?.length > 1) {
+    rows.push({ label: "Passes for", value: receipt.customer.attendees.join(", ") });
+  }
   if (receipt.customer.email) rows.push({ label: "Email", value: receipt.customer.email });
   if (receipt.customer.school) rows.push({ label: "School", value: receipt.customer.school });
   if (extra.character) rows.push({ label: "Character", value: extra.character });
@@ -104,6 +107,11 @@ function officeRows(receipt: Receipt): DetailRow[] {
     { label: "Payment", value: receipt.paymentId },
   );
   return rows;
+}
+
+/** Whose pass this one is: the name given for it, or the buyer's. */
+function holderFor(receipt: Receipt, index: number): string {
+  return receipt.customer.attendees?.[index]?.trim() || receipt.customer.name;
 }
 
 /**
@@ -137,7 +145,7 @@ async function ticketsFor(receipt: Receipt): Promise<{ blocks: TicketBlock[]; fi
     blocks.push({
       cid,
       code: ticket.code,
-      holderName: receipt.customer.name,
+      holderName: holderFor(receipt, i),
       tierLabel: receipt.label,
       index: i + 1,
       of: receipt.tickets.length,
@@ -155,7 +163,7 @@ async function ticketsFor(receipt: Receipt): Promise<{ blocks: TicketBlock[]; fi
         receipt.tickets.map((t, i) => ({
           code: t.code,
           url: t.url,
-          holderName: receipt.customer.name,
+          holderName: holderFor(receipt, i),
           tierLabel: receipt.label,
           index: i + 1,
           of: receipt.tickets.length,

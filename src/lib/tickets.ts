@@ -91,9 +91,12 @@ export type TicketOrder = {
   product: string;
   tierLabel: string;
   codes: string[];
+  /** The buyer, and the fallback for any pass nobody was named for. */
   holderName: string;
   holderPhone: string;
   holderEmail: string;
+  /** One name per code, when the order named the people it is for. */
+  attendees?: string[];
 };
 
 /**
@@ -124,7 +127,7 @@ export async function issueTickets(order: TicketOrder): Promise<IssuedTicket[]> 
       orderId: order.orderId,
       product: order.product,
       tierLabel,
-      holderName: order.holderName,
+      holderName: order.attendees?.[i]?.trim() || order.holderName,
       holderPhone: order.holderPhone,
       holderEmail: order.holderEmail,
       index: i + 1,

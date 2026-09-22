@@ -434,6 +434,7 @@ export async function fulfilOrder(args: {
         holderName: result.customer.name,
         holderPhone: result.customer.phone,
         holderEmail: result.customer.email,
+        attendees: result.customer.attendees,
       });
       result.tickets = issued.map((t) => ({ code: t.code, token: t.token, url: t.url }));
     } catch (e) {
@@ -473,6 +474,8 @@ function buildRecord(order: StoredOrder, codes: string[], paymentId: string) {
       passCodes: codes,
       tier: "fete",
       qty: order.units,
+      // Who each pass is for, in the same order as the codes above.
+      attendees: order.customer.attendees ?? [],
       total: paiseToRupees(order.amount.totalPaise),
       buyer,
     };

@@ -180,7 +180,9 @@ encodes `<site>/t/<token>`, a URL, so a scan from a plain camera app lands on th
 showing a string of gibberish.
 
 **One ticket per person, not per payment.** An order of three passes issues three tickets with three QRs,
-all in the one receipt email, because three different people walk through the gate.
+all in the one receipt email, because three different people walk through the gate — and the checkout asks
+for each of their names, so the pass, the PDF and the gate screen all say who is actually holding it. A
+name left blank falls back to the buyer's: a pass in the wrong name beats no pass at all.
 
 **The day, end to end.**
 
