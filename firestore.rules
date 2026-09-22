@@ -1,0 +1,25 @@
+rules_version = '2';
+
+// MADOOZA reaches Firestore only through the Firebase Admin SDK, running on the
+// server with a service account — which bypasses these rules entirely. There is
+// no Firebase SDK in the browser bundle and no path by which a visitor's page
+// talks to the database directly.
+//
+// So the rules are a lock, not a filter: nothing that is not the Admin SDK gets
+// in. That matters more than it looks. The project id is discoverable from any
+// image URL the site serves, and the collections below hold buyers' names,
+// phone numbers and email addresses, every pass ever issued, and the list of
+// people who may work the gate. A database left in test mode is all of that,
+// readable by anybody who thinks to ask for it.
+//
+// It also covers the one door Firebase Auth leaves open: gate staff have real
+// Auth accounts, so somebody with a volunteer's email and PIN could sign in
+// against the Identity Toolkit and hold a valid ID token. Denying everything
+// here means that token is worth nothing — it cannot read a single document.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
