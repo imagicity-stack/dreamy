@@ -8,6 +8,7 @@ import {
   markOrderRefunded,
   releaseWebhookEvent,
 } from "@/lib/orders";
+import { voidTicketsForOrder } from "@/lib/tickets";
 import {
   notifyOrderPaid,
   notifyOversold,
@@ -134,6 +135,8 @@ export async function POST(req: NextRequest) {
           amountPaise: Number(refund?.amount ?? 0),
         });
         if (refunded) {
+          // A refunded pass must stop working at the gate, not just in the ledger.
+          after(() => voidTicketsForOrder(orderId));
           after(() =>
             notifyRefund({
               orderId,

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { isPageHidden, type FestSettings } from "@/lib/festSettings";
+import FormNote from "@/components/FormNote";
 
 const SEAT_LABELS: Record<string, string> = {
   "1": "1 seat",
@@ -230,6 +231,9 @@ export default function ConcertClient({
                 <div>
                   <label style={{ display: "block", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--purple)", marginBottom: 6 }}>PHONE OR EMAIL</label>
                   <input className="mz-input" value={form.contact} onChange={(e) => setForm((f) => ({ ...f, contact: e.target.value }))} placeholder="Where the reveal should land" />
+                  <div style={{ marginTop: 10 }}>
+                    <FormNote text={words.contactAccuracyNote} />
+                  </div>
                 </div>
                 <div style={{ gridColumn: "1 / -1" }}>
                   <label style={{ display: "block", fontSize: 10.5, fontWeight: 700, letterSpacing: "0.18em", color: "var(--purple)", marginBottom: 6 }}>WHICH SINGER DO YOU WANT ON THAT STAGE</label>

@@ -2,6 +2,7 @@ import { cache } from "react";
 import { getDb } from "./firebaseAdmin";
 import { applyTokens, getSettings } from "./settings";
 import { COPY_GROUPS, type CopyGroup } from "./copyText";
+import { cachedCopyRead, dropCopyCache } from "./cache";
 
 /**
  * The site's writing.
@@ -55,12 +56,17 @@ export const getCopy = cache(async (key: string): Promise<Words> => {
 
   let words = copyDefaults(key);
   if (db) {
-    try {
-      const snap = await db.collection("copy").doc(key).get();
-      if (snap.exists) words = merge(group, snap.data());
-    } catch {
-      // Leave the seed in place rather than showing a page with no words on it.
-    }
+    const read = cachedCopyRead(key, async () => {
+      try {
+        const snap = await db.collection("copy").doc(key).get();
+        return snap.exists ? merge(group, snap.data()) : null;
+      } catch {
+        // Leave the seed in place rather than showing a page with no words on it.
+        return null;
+      }
+    });
+    const stored = await read();
+    if (stored) words = stored;
   }
 
   return Object.fromEntries(
@@ -82,6 +88,7 @@ export async function saveCopy(key: string, patch: unknown): Promise<Words | nul
   }
 
   await db.collection("copy").doc(key).set(next, { merge: true });
+  dropCopyCache(key);
   return next;
 }
 

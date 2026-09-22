@@ -42,16 +42,59 @@ export type Receipt = {
   lines: QuoteLine[];
   amount: PriceBreakdown & { currency: string };
   customerName: string;
+  /** Present only on the request that issued them; empty if the webhook won. */
+  tickets: { code: string; token: string; url: string }[];
   firstTime: boolean;
 };
+
+/**
+ * Fetches the passes as a PDF and hands it to the browser.
+ *
+ * Done as a blob rather than a link to the endpoint because the download starts
+ * from a payment callback rather than a click, and a navigation there would
+ * lose the confirmation page. Returns false when the browser refuses, which is
+ * why the page always shows the button as well — on iOS this often opens a
+ * preview instead of saving, and that is fine.
+ */
+export async function downloadPasses(
+  tokens: string[],
+  filename = "madooza-passes.pdf",
+): Promise<boolean> {
+  if (!tokens.length) return false;
+  try {
+    const res = await fetch("/api/tickets/pdf", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ tokens }),
+    });
+    if (!res.ok) return false;
+
+    const blob = await res.blob();
+    const href = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = href;
+    a.download = filename;
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    // Revoked late: Safari reads the blob after the click returns.
+    setTimeout(() => URL.revokeObjectURL(href), 20_000);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 export type CustomerInput = {
   name: string;
   phone: string;
   email?: string;
   school?: string;
+  /** One name per pass, when an order is buying several. */
+  attendees?: string[];
   /** Product extras — the cosplay character, the squad list. */
-  [key: string]: string | undefined;
+  [key: string]: string | string[] | undefined;
 };
 
 /** Thrown when the buyer closed the Razorpay window; not an error to shout about. */

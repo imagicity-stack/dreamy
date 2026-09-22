@@ -59,7 +59,7 @@ function when(row: Row): string {
 }
 
 export type RecordView = {
-  key: "passes" | "cosplayEntries" | "concertInterest" | "merchOrders" | "orders";
+  key: "passes" | "cosplayEntries" | "concertInterest" | "merchOrders" | "orders" | "tickets";
   title: string;
   blurb: string;
   columns: Column[];
@@ -111,10 +111,12 @@ export const RECORD_VIEWS: RecordView[] = [
   {
     key: "concertInterest",
     title: "Concert interest list",
-    blurb: "Who wants the reveal first, in queue order.",
+    blurb:
+      "Who wants the reveal first, in queue order. Every row here is one real person; the number the site quotes is these plus the start set in Settings.",
     columns: [
       { label: "WHEN", get: when },
       { label: "QUEUE", get: (r) => text(r, "queueNumber") },
+      { label: "SIGNUP #", get: (r) => text(r, "signupNumber") },
       { label: "NAME", get: (r) => text(r, "name") },
       { label: "CONTACT", get: (r) => text(r, "contact") },
       { label: "WANTS", get: (r) => text(r, "pick") },
@@ -148,6 +150,30 @@ export const RECORD_VIEWS: RecordView[] = [
       { label: "TOTAL", get: (r) => money(r, "total") },
       { label: "STATUS", get: liveOrRefunded },
       { label: "PAYMENT", get: (r) => text(r, "razorpay.paymentId") },
+    ],
+  },
+  {
+    key: "tickets",
+    title: "Gate tickets",
+    blurb:
+      "One row per person through the gate, with when they were scanned and by whom. This is the visitor count.",
+    columns: [
+      { label: "CODE", get: (r) => text(r, "code") },
+      { label: "NAME", get: (r) => text(r, "holderName") },
+      { label: "PHONE", get: (r) => text(r, "holderPhone") },
+      { label: "OF", get: (r) => `${text(r, "index")} of ${text(r, "of")}` },
+      { label: "STATUS", get: (r) => text(r, "status").toUpperCase() },
+      {
+        label: "ADMITTED",
+        get: (r) => {
+          const at = path(r, "usedAt");
+          if (typeof at !== "string") return "—";
+          const d = new Date(at);
+          return Number.isNaN(d.getTime()) ? "—" : d.toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" });
+        },
+      },
+      { label: "SCANNED BY", get: (r) => text(r, "usedBy") },
+      { label: "ORDER", get: (r) => text(r, "orderId") },
     ],
   },
   {

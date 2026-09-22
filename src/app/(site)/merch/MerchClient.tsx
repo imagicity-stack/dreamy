@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import { formatInr } from "@/data/fest";
 import PriceLines from "@/components/PriceLines";
+import FormNote from "@/components/FormNote";
 import { formatPaise } from "@/lib/pricing";
 import {
   CheckoutDismissed,
@@ -239,6 +240,7 @@ export default function MerchClient({
                       onChange={(e) => setBuyer((b) => ({ ...b, email: e.target.value }))}
                       placeholder="Email (optional)"
                     />
+                    <FormNote text={words.contactAccuracyNote} />
                   </div>
                 )}
                 {open ? (

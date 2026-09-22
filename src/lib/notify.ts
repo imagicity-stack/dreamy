@@ -1,6 +1,17 @@
+import { readFileSync } from "fs";
+import path from "path";
 import { formatPaise } from "./pricing";
-import { renderEmail, type DetailRow } from "./mailTemplates";
-import { officeAddress, sendAll, sendMail, type MailMessage, type MailResult } from "./mail";
+import { LOGO_CID, renderEmail, type DetailRow, type TicketBlock } from "./mailTemplates";
+import {
+  officeAddress,
+  sendAll,
+  sendMail,
+  type MailAttachment,
+  type MailMessage,
+  type MailResult,
+} from "./mail";
+import { qrPng } from "./tickets";
+import { ticketsPdf } from "./ticketPdf";
 import { getSettings } from "./settings";
 import type { Receipt } from "./orders";
 
@@ -17,6 +28,30 @@ import type { Receipt } from "./orders";
  * nobody's confirmation page.
  */
 
+/**
+ * The logo, read once and attached to every mail. An inline attachment rather
+ * than a link to the site, for the same reason the QR is one: mail clients
+ * block remote images, and a letterhead nobody can see is not a letterhead.
+ */
+let logoFile: Buffer | null = null;
+function logoAttachment(): MailAttachment[] {
+  try {
+    if (!logoFile) {
+      logoFile = readFileSync(path.join(process.cwd(), "public", "assets", "madooza-logo-small.png"));
+    }
+    return [{ filename: "madooza.png", content: logoFile, contentType: "image/png", cid: LOGO_CID }];
+  } catch {
+    // The mail is still worth sending without its letterhead.
+    return [];
+  }
+}
+
+/** Every message goes out wearing the logo. */
+function brand(messages: MailMessage[]): MailMessage[] {
+  const logo = logoAttachment();
+  return messages.map((m) => ({ ...m, attachments: [...(m.attachments ?? []), ...logo] }));
+}
+
 const PRODUCT_WORDS: Record<string, { buyerTitle: string; officeNoun: string; codeLabel: string }> = {
   fetePass: { buyerTitle: "YOU'RE IN", officeNoun: "Fete Pass", codeLabel: "PASS CODE" },
   cosplayEntry: { buyerTitle: "THE ARENA HAS YOUR NAME", officeNoun: "Cosplay entry", codeLabel: "ENTRY CODE" },
@@ -28,7 +63,7 @@ function words(product: string) {
 }
 
 function buyerRows(receipt: Receipt): DetailRow[] {
-  const rows: DetailRow[] = [{ label: "Name", value: receipt.customer.name }];
+  const rows: DetailRow[] = [{ label: "Booked by", value: receipt.customer.name }];
   const extra = receipt.customer.extra ?? {};
   if (extra.character) rows.push({ label: "Walking as", value: extra.character });
   if (extra.category) rows.push({ label: "Category", value: extra.category });
@@ -47,9 +82,12 @@ function buyerRows(receipt: Receipt): DetailRow[] {
 function officeRows(receipt: Receipt): DetailRow[] {
   const extra = receipt.customer.extra ?? {};
   const rows: DetailRow[] = [
-    { label: "Name", value: receipt.customer.name },
+    { label: "Booked by", value: receipt.customer.name },
     { label: "Phone", value: receipt.customer.phone },
   ];
+  if (receipt.customer.attendees?.length > 1) {
+    rows.push({ label: "Passes for", value: receipt.customer.attendees.join(", ") });
+  }
   if (receipt.customer.email) rows.push({ label: "Email", value: receipt.customer.email });
   if (receipt.customer.school) rows.push({ label: "School", value: receipt.customer.school });
   if (extra.character) rows.push({ label: "Character", value: extra.character });
@@ -71,12 +109,86 @@ function officeRows(receipt: Receipt): DetailRow[] {
   return rows;
 }
 
+/** Whose pass this one is: the name given for it, or the buyer's. */
+function holderFor(receipt: Receipt, index: number): string {
+  return receipt.customer.attendees?.[index]?.trim() || receipt.customer.name;
+}
+
+/**
+ * Turns a paid order into scannable tickets and their QR images.
+ *
+ * Only passes get them: a cosplay entry is a slot at a desk and a merch order
+ * is a bag at a tent, neither of which is a turnstile. Returns empty for
+ * everything else, and the mail falls back to its plain code block.
+ */
+async function ticketsFor(receipt: Receipt): Promise<{ blocks: TicketBlock[]; files: MailAttachment[] }> {
+  // Fulfilment issues the tickets, so the tokens are already in hand; a call
+  // that did not issue them (the webhook arriving second) has none and falls
+  // back to the plain code block.
+  if (!receipt.tickets.length) return { blocks: [], files: [] };
+
+  const blocks: TicketBlock[] = [];
+  const files: MailAttachment[] = [];
+
+  for (const [i, ticket] of receipt.tickets.entries()) {
+    const cid = `qr-${ticket.code.toLowerCase()}@madooza`;
+    try {
+      files.push({
+        filename: `${ticket.code}.png`,
+        content: await qrPng(ticket.url),
+        contentType: "image/png",
+        cid,
+      });
+    } catch {
+      continue; // No image, no card: better a missing stub than a broken one.
+    }
+    blocks.push({
+      cid,
+      code: ticket.code,
+      holderName: holderFor(receipt, i),
+      tierLabel: receipt.label,
+      index: i + 1,
+      of: receipt.tickets.length,
+      url: ticket.url,
+    });
+  }
+
+  // The same passes as one printable file, so the mail is worth keeping even
+  // when the phone it arrived on is flat.
+  try {
+    const settings = await getSettings();
+    files.push({
+      filename: "madooza-passes.pdf",
+      content: await ticketsPdf(
+        receipt.tickets.map((t, i) => ({
+          code: t.code,
+          url: t.url,
+          holderName: holderFor(receipt, i),
+          tierLabel: receipt.label,
+          index: i + 1,
+          of: receipt.tickets.length,
+        })),
+        settings,
+      ),
+      contentType: "application/pdf",
+    });
+  } catch (e) {
+    console.error("could not build the pass PDF for", receipt.orderId, e);
+  }
+
+  return { blocks, files };
+}
+
 /** A paid pass, entry or merch order: the buyer's receipt and the office's copy. */
 export async function notifyOrderPaid(receipt: Receipt): Promise<MailResult[]> {
   const settings = await getSettings();
   const w = words(receipt.product);
   const office = officeAddress();
   const messages: MailMessage[] = [];
+
+  // Issued before either mail is built, so the office's copy can say whether
+  // the buyer's passes are scannable.
+  const { blocks, files } = await ticketsFor(receipt);
 
   if (office) {
     const doc = renderEmail(
@@ -88,8 +200,8 @@ export async function notifyOrderPaid(receipt: Receipt): Promise<MailResult[]> {
         rows: officeRows(receipt),
         money: { price: receipt.amount, baseLabel: receipt.product === "merch" ? "ITEMS" : "TICKETS" },
         outro: receipt.customer.email
-          ? `A receipt has gone to ${receipt.customer.email} as well.`
-          : `No email address was given, so the buyer has only the confirmation on screen and their phone number is the way to reach them.`,
+          ? `A receipt has gone to ${receipt.customer.email} as well${blocks.length ? `, with ${blocks.length === 1 ? "a scannable ticket" : `${blocks.length} scannable tickets`}` : ""}.`
+          : `No email address was given, so the buyer has only the confirmation on screen${blocks.length ? ` — their ${blocks.length === 1 ? "ticket is" : "tickets are"} still scannable at the gate by name or code` : ""}, and their phone number is the way to reach them.`,
       },
       settings,
     );
@@ -112,9 +224,12 @@ export async function notifyOrderPaid(receipt: Receipt): Promise<MailResult[]> {
           ? `Paid and reserved. Bring the code below to the merch tent on the day and it will be waiting for you.`
           : receipt.product === "cosplayEntry"
             ? `Your entry is in. Keep the code below — it is how the arena desk finds you on the day.`
-            : `That's ${receipt.units === 1 ? "your pass" : `all ${receipt.units} passes`} sorted. Show the code below at the gate, or just give your name.`,
-        code: { label: w.codeLabel, value: receipt.primaryCode },
-        codes: receipt.codes,
+            : blocks.length
+              ? `That's ${receipt.units === 1 ? "your pass" : `all ${receipt.units} passes`} sorted. Show the code${receipt.units === 1 ? "" : "s"} below at the gate and we'll scan ${receipt.units === 1 ? "it" : "them"} — screenshot ${receipt.units === 1 ? "it" : "them"} now, so a flat battery or no signal can't stop you getting in.`
+              : `That's ${receipt.units === 1 ? "your pass" : `all ${receipt.units} passes`} sorted. Show the code below at the gate, or just give your name.`,
+        code: blocks.length ? undefined : { label: w.codeLabel, value: receipt.primaryCode },
+        codes: blocks.length ? undefined : receipt.codes,
+        tickets: blocks,
         rows: buyerRows(receipt),
         money: { price: receipt.amount, baseLabel: isMerch ? "ITEMS" : "TICKETS" },
         outro: `Keep this mail — the payment reference on it is what the fest office needs if anything has to be sorted out.`,
@@ -126,10 +241,11 @@ export async function notifyOrderPaid(receipt: Receipt): Promise<MailResult[]> {
       subject: `${receipt.product === "fetePass" ? "Your MADOOZA pass" : `Your MADOOZA ${w.officeNoun.toLowerCase()}`} — ${receipt.primaryCode}`,
       html: doc.html,
       text: doc.text,
+      attachments: files,
     });
   }
 
-  return sendAll(messages);
+  return sendAll(brand(messages));
 }
 
 /** Somebody put their name down for the concert reveal. */
@@ -188,7 +304,7 @@ export async function notifyConcertInterest(entry: {
     messages.push({ to: entry.contact, subject: `You're number ${queue} on the MADOOZA list`, html: doc.html, text: doc.text });
   }
 
-  return sendAll(messages);
+  return sendAll(brand(messages));
 }
 
 /** Paid, but the last pass went while they were paying. The office owes a refund. */
@@ -217,7 +333,7 @@ export async function notifyOversold(args: {
     },
     settings,
   );
-  return sendMail({ to: office, subject: `REFUND NEEDED · oversold ${args.product} · ${args.paymentId}`, html: doc.html, text: doc.text });
+  return sendMail(brand([{ to: office, subject: `REFUND NEEDED · oversold ${args.product} · ${args.paymentId}`, html: doc.html, text: doc.text }])[0]);
 }
 
 /** Razorpay says a payment failed. Worth knowing; nothing to do. */
@@ -245,7 +361,7 @@ export async function notifyPaymentFailed(args: {
     },
     settings,
   );
-  return sendMail({ to: office, subject: `Payment failed · ${args.orderId}`, html: doc.html, text: doc.text });
+  return sendMail(brand([{ to: office, subject: `Payment failed · ${args.orderId}`, html: doc.html, text: doc.text }])[0]);
 }
 
 /** A refund came back through the webhook. */
@@ -298,7 +414,7 @@ export async function notifyRefund(args: {
     messages.push({ to: args.buyerEmail, subject: `Your MADOOZA refund of ${amount}`, html: doc.html, text: doc.text });
   }
 
-  return sendAll(messages);
+  return sendAll(brand(messages));
 }
 
 /** "Does the mailbox work?" — sent from the panel. */
@@ -321,5 +437,5 @@ export async function sendTestEmail(to?: string): Promise<MailResult> {
     },
     settings,
   );
-  return sendMail({ to: target, subject: "MADOOZA mail is working", html: doc.html, text: doc.text });
+  return sendMail(brand([{ to: target, subject: "MADOOZA mail is working", html: doc.html, text: doc.text }])[0]);
 }

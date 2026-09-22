@@ -3,6 +3,7 @@ import { getDb } from "./firebaseAdmin";
 import { getRazorpay } from "./razorpay";
 import { getSettings } from "./settings";
 import { paiseToRupees, type PriceBreakdown } from "./pricing";
+import { issueTickets, type IssuedTicket } from "./tickets";
 import {
   PRODUCTS,
   isQuoteError,
@@ -55,6 +56,12 @@ export type Receipt = {
   customerName: string;
   /** The buyer, so a receipt can be addressed without re-reading the order. */
   customer: Customer;
+  /**
+   * Scannable tickets, present only on the call that issued them. Tokens are
+   * never stored — only their hashes are — so the one request that created
+   * them is the only one that can hand them to a browser or a PDF.
+   */
+  tickets: { code: string; token: string; url: string }[];
   /** True when this call did the fulfilling, false when it was already done. */
   firstTime: boolean;
 };
@@ -267,6 +274,7 @@ function receiptFrom(order: StoredOrder, paymentId: string, firstTime: boolean):
     amount: order.amount,
     customerName: order.customer?.name ?? "",
     customer: order.customer ?? { name: "", phone: "", email: "", school: "", extra: {} },
+    tickets: [],
     firstTime,
   };
 }
@@ -412,6 +420,30 @@ export async function fulfilOrder(args: {
     if (fromPayment) result.customer = { ...result.customer, email: fromPayment };
   }
 
+  // Passes become scannable tickets here, before anyone is told the payment
+  // worked, so the browser can offer the PDF the moment the page turns green.
+  // Only a pass needs one: a cosplay entry is a slot at a desk and a merch
+  // order is a bag at a tent.
+  if (!isFailure(result) && result.firstTime && result.product === "fetePass") {
+    try {
+      const issued: IssuedTicket[] = await issueTickets({
+        orderId: result.orderId,
+        product: result.product,
+        tierLabel: result.label,
+        codes: result.codes,
+        holderName: result.customer.name,
+        holderPhone: result.customer.phone,
+        holderEmail: result.customer.email,
+        attendees: result.customer.attendees,
+      });
+      result.tickets = issued.map((t) => ({ code: t.code, token: t.token, url: t.url }));
+    } catch (e) {
+      // A pass without a QR is still a pass: the code and the gate's name
+      // search both work, and the payment is already recorded.
+      console.error("could not issue tickets for", result.orderId, e);
+    }
+  }
+
   return result;
 }
 
@@ -442,6 +474,8 @@ function buildRecord(order: StoredOrder, codes: string[], paymentId: string) {
       passCodes: codes,
       tier: "fete",
       qty: order.units,
+      // Who each pass is for, in the same order as the codes above.
+      attendees: order.customer.attendees ?? [],
       total: paiseToRupees(order.amount.totalPaise),
       buyer,
     };

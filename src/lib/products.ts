@@ -219,6 +219,15 @@ export type Customer = {
   phone: string;
   email: string;
   school: string;
+  /**
+   * Who each pass is for, when an order buys more than one.
+   *
+   * A pass is scanned per person and carries a name at the gate, so three
+   * passes bought together are three different people — not three copies of
+   * the buyer. The first entry is the buyer themselves; the rest are whoever
+   * they are bringing. Empty for a product where the idea does not apply.
+   */
+  attendees: string[];
   /** Product-specific extras — the cosplay character, the squad, and so on. */
   extra: Record<string, string>;
 };
@@ -237,6 +246,8 @@ function clean(value: unknown, max = 200): string {
 export function readCustomer(
   product: ProductKey,
   raw: unknown,
+  /** How many passes this order is for, so the names can be counted against it. */
+  units = 1,
 ): { customer: Customer } | { error: string } {
   const body = (raw ?? {}) as Record<string, unknown>;
   const name = clean(body.name, 120);
@@ -261,7 +272,19 @@ export function readCustomer(
     return { error: "Tell us who you are walking as." };
   }
 
+  // One name per pass, the buyer first. A blank later box falls back to the
+  // buyer's name rather than refusing the sale: a pass in somebody's name is
+  // better than no pass, and the gate can be told who is actually holding it.
+  const attendees: string[] = [];
+  if (product === "fetePass" && units > 1) {
+    const given = Array.isArray(body.attendees) ? body.attendees : [];
+    for (let i = 0; i < units; i++) {
+      const value = clean(given[i], 120);
+      attendees.push(i === 0 ? value || name : value || name);
+    }
+  }
+
   return {
-    customer: { name, phone, email, school: clean(body.school, 160), extra },
+    customer: { name, phone, email, school: clean(body.school, 160), attendees, extra },
   };
 }

@@ -44,6 +44,9 @@ settings for deployment:
   to check an admin's password against Firebase Auth; the Admin SDK can mint tokens but cannot verify a
   password, so this one call goes through the Identity Toolkit REST API.
 - `ADMIN_EMAILS` — comma-separated emails allowed into `/admin`.
+- `NEXT_PUBLIC_SITE_URL` — the site's own address, e.g. `https://madooza.com`. QR codes encode
+  `<this>/t/<token>`, so it has to be reachable from a visitor's phone. Falls back to Vercel's production
+  URL. Compiled into the bundle, so changing it needs a redeploy.
 - `SMTP_USER` / `SMTP_PASS` / `MAIL_FROM` / `MAIL_TO` — the Google Workspace mailbox that sends the
   fest's mail, and the inbox that gets a copy of everything. `SMTP_HOST` and `SMTP_PORT` default to
   `smtp.gmail.com` and `465`. See **Mail** below.
@@ -168,6 +171,52 @@ Prices are always taken from the server. The order route computes the amount fro
 fulfilment re-fetches the payment from Razorpay and checks its amount against the stored order, so a
 tampered request body can't change what gets charged or recorded.
 
+## Tickets and the gate
+
+A pass code like `MDZ-F-0042` is fine for a human to read out, but it is sequential: anybody holding one
+can guess the next. So the code is not what the QR carries. Each ticket also gets a random 128-bit token,
+and **only the token's hash is stored** — a copy of the database is not a stack of working tickets. The QR
+encodes `<site>/t/<token>`, a URL, so a scan from a plain camera app lands on the ticket rather than
+showing a string of gibberish.
+
+**One ticket per person, not per payment.** An order of three passes issues three tickets with three QRs,
+all in the one receipt email, because three different people walk through the gate — and the checkout asks
+for each of their names, so the pass, the PDF and the gate screen all say who is actually holding it. A
+name left blank falls back to the buyer's: a pass in the wrong name beats no pass at all.
+
+**The day, end to end.**
+
+1. Payment clears → fulfilment issues the codes → `issueTickets()` writes one `tickets` row per pass and
+   the receipt goes out with a QR per pass, each a card with the holder's name and `ADMIT ONE · 1 OF 3`.
+2. The QR is an **inline attachment**, not a link to an image — every mail client blocks remote images by
+   default, and a pass nobody can see is not a pass. Each card also links to `/t/<token>`, which is the
+   real ticket: one screen, QR large, the code underneath, and a line telling the holder to screenshot it.
+3. The same passes go out as a **PDF**, one page per pass: attached to the mail, downloaded automatically
+   on the confirmation screen the moment payment clears, and saveable from the ticket page by a plain form
+   post that needs no JavaScript. The PDF is a pass and not a receipt — no prices on it. That is partly
+   design and partly a limit worth naming: the fonts built into a PDF have no rupee sign, so the money
+   stays in the email, where it can be printed properly.
+4. Volunteers open **`/gate`** on their own phones, sign in once with their name and the gate PIN, and the
+   camera starts. No app to install and no hardware to buy.
+5. A scan calls `/api/gate/check-in`. The answer fills the screen in one colour and one phrase — green
+   **LET THEM IN** with the holder's name, amber **ALREADY IN** with the time it was first scanned, red
+   **NOT OURS** — because a volunteer in a queue reads a colour, not a sentence. There is a blip and a
+   buzz, since a gate is loud and nobody is watching the screen.
+6. Admission is a Firestore transaction on the ticket, so two gates scanning the same code at the same
+   moment produce one entry and one "already admitted".
+7. A dead phone is not a dead end: **Phone dead? Find by name** searches by name, phone or pass code and
+   admits from the list, recorded as a manual admit.
+8. Every scan records the ticket, the time, the volunteer and the answer. That log **is** the visitor
+   count — counted at the gate rather than inferred from sales — and it shows in the panel as ADMITTED,
+   with how many are still to arrive.
+
+**Before the gates open:** set the PIN in `/admin` → Settings → Scanner PIN. It is stored hashed and never
+shown again; changing it signs out every phone at once, which is what you want if a phone goes missing.
+The overview warns if tickets exist and no PIN has been set.
+
+**A refund voids its tickets** through the webhook, so a refunded pass stops working at the gate rather
+than only in the ledger.
+
 ## Mail
 
 Everything that happens sends mail, from one Workspace mailbox to the fest inbox — and to the buyer as
@@ -202,9 +251,12 @@ receipt cannot disagree with the screen the buyer saw.
 
 - `passes` — Fete Pass purchases (buyer info, qty, total, Razorpay order/payment ids, pass code).
 - `cosplayEntries` — cosplay contest registrations (solo/squad, category, entry fee payment ids).
-- `concertInterest` — "Guess Who" interest-list signups, plus `counters/concertInterest` for the running
-  count used both as the public "X have already put their name down" figure and each signup's queue
-  number.
+- `concertInterest` — "Guess Who" interest-list signups. `counters/concertInterest` holds `signups`: the
+  number of real people who used the form, and nothing else. The figure the concert page quotes is that
+  plus **Interest list start** from the panel, added at read time (`src/lib/interest.ts`), so the start is
+  a live setting rather than something baked into the tally on the first signup. Move it and the public
+  number moves with it; the record of who actually signed up is untouched. A counter left in the old
+  shape repairs itself on the first read by counting the entries.
 - `merchOrders` — paid merch orders (line items, total, collection code, buyer).
 - `orders` — one document per checkout, keyed by the Razorpay order id: the priced lines, the buyer, the
   status (`created`, `paid`, `failed`, `oversold`, `refunded`), the payment and the codes issued.
@@ -236,6 +288,31 @@ setting decides how much to give away — sealed, month only, or the full date �
 `src/lib/festSettings.ts` turns it into every form the site needs: the `?? · ?? · 26` tiles, the ticker
 line, the hero headline, the body-copy sentence. Revealing the month is a change in the panel, not a
 deploy, and nothing has to be hunted down page by page.
+
+## Speed
+
+Every public page is rendered per request, so that a price or a headline changed in the panel is live for
+the next visitor without a deploy. Read literally that meant six or seven Firestore round trips per page
+view — the settings, the page's words, the footer's words, the header ticker and two or three content
+lists — and on a bad day, with the function and the database in different parts of the world, that is a
+couple of seconds of a visitor looking at a page that hasn't changed yet.
+
+Two things fix it, and they work together:
+
+- **Reads go through Next's data cache, tagged** (`src/lib/cache.ts`). Between edits a page render costs
+  no Firestore round trips at all. Every write in the panel drops the tags it touched — and the dropping
+  happens inside `saveSettings()`, `saveCopy()`, `createRecord()`, `updateRecord()` and `deleteRecord()`
+  rather than in the routes that call them, so a new editing endpoint cannot forget to do it. Editing in
+  the panel is still live immediately. The `revalidate` windows are a safety net, not the mechanism.
+- **`src/app/(site)/loading.tsx`** fills the page area the moment a link is clicked, so a navigation that
+  still has to wait on the server shows movement rather than the old page. Measured with a 1.5s delay in
+  front of the navigation: something appears in 130ms instead of nothing for two seconds.
+
+**If it is still slow, look at where things are.** The function and Firestore should be in the same part
+of the world. Firestore's location is fixed when the database is created and cannot be moved afterwards;
+Vercel's function region is a setting (Project → Settings → Functions). A database in `asia-south1` with
+functions in Washington pays roughly a quarter of a second per round trip, and the first render after any
+edit makes several. Put `vercel.json`'s region — or the dashboard setting — next door to the database.
 
 ## Legal pages
 

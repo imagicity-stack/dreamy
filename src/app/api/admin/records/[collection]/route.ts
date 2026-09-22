@@ -6,7 +6,7 @@ import { getDb } from "@/lib/firebaseAdmin";
 export const dynamic = "force-dynamic";
 
 /** Only these collections can be read through the panel. */
-const READABLE = ["passes", "cosplayEntries", "concertInterest", "merchOrders", "orders"] as const;
+const READABLE = ["passes", "cosplayEntries", "concertInterest", "merchOrders", "orders", "tickets"] as const;
 type Readable = (typeof READABLE)[number];
 
 function isReadable(name: string): name is Readable {

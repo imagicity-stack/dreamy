@@ -1,18 +1,15 @@
 import { NextResponse } from "next/server";
-import { getDb } from "@/lib/firebaseAdmin";
 import { getSettings } from "@/lib/settings";
+import { readInterest } from "@/lib/interest";
 
 export const dynamic = "force-dynamic";
 
+/** The live figure the concert page quotes: the start plus the real signups. */
 export async function GET() {
   const settings = await getSettings();
-  const db = getDb();
-  let interestCount = settings.interestBase;
+  const interest = await readInterest(settings);
 
-  if (db) {
-    const snap = await db.collection("counters").doc("concertInterest").get();
-    interestCount = snap.exists ? Number(snap.data()?.count ?? settings.interestBase) : settings.interestBase;
-  }
-
-  return NextResponse.json({ interestCount: interestCount.toLocaleString("en-IN") });
+  return NextResponse.json({
+    interestCount: interest.shown.toLocaleString("en-IN"),
+  });
 }

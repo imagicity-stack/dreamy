@@ -3,6 +3,7 @@ import { FieldValue } from "firebase-admin/firestore";
 import { getDb } from "./firebaseAdmin";
 import { deleteMedia } from "./media";
 import { lineup, supportActs, merchItems, stalls } from "@/data/fest";
+import { cachedContentRead, dropContentCache } from "./cache";
 
 export { applyTokens } from "./festSettings";
 
@@ -646,18 +647,25 @@ export const listContent = cache(async (key: string): Promise<ContentRecord[]> =
   const db = getDb();
   if (!db) return seedRecords(def);
 
-  try {
-    const snap = await db.collection(`content_${def.key}`).get();
-    if (snap.empty) {
-      // Deliberately emptied stays empty; never touched falls back to the seed.
-      return (await isSeeded(def.key)) ? [] : seedRecords(def);
+  // Shared across requests until an edit to this list drops its tag, so a page
+  // that shows three lists costs three round trips on the first render after a
+  // change and none at all on the ones after it.
+  const read = cachedContentRead(def.key, async (): Promise<ContentRecord[]> => {
+    try {
+      const snap = await db.collection(`content_${def.key}`).get();
+      if (snap.empty) {
+        // Deliberately emptied stays empty; never touched falls back to the seed.
+        return (await isSeeded(def.key)) ? [] : seedRecords(def);
+      }
+      return snap.docs
+        .map((doc) => ({ id: doc.id, ...(doc.data() as object) }) as ContentRecord)
+        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    } catch {
+      return seedRecords(def);
     }
-    return snap.docs
-      .map((doc) => ({ id: doc.id, ...(doc.data() as object) }) as ContentRecord)
-      .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
-  } catch {
-    return seedRecords(def);
-  }
+  });
+
+  return read();
 });
 
 /** What the public site renders: visible records only. */
@@ -681,6 +689,7 @@ export async function createRecord(key: string, raw: unknown): Promise<ContentRe
   // A list built by hand is just as taken over as a seeded one, so emptying it
   // later must not bring the seed back either.
   await markSeeded(key);
+  dropContentCache(key);
   return { id: ref.id, ...data } as ContentRecord;
 }
 
@@ -691,6 +700,7 @@ export async function updateRecord(key: string, id: string, raw: unknown): Promi
 
   const data = normalizeRecord(def, raw);
   await db.collection(`content_${key}`).doc(id).set({ ...data, updatedAt: FieldValue.serverTimestamp() }, { merge: true });
+  dropContentCache(key);
   return { id, ...data } as ContentRecord;
 }
 
@@ -710,6 +720,7 @@ export async function deleteRecord(key: string, id: string): Promise<boolean> {
     }
   }
   await ref.delete();
+  dropContentCache(key);
   return true;
 }
 
@@ -732,6 +743,7 @@ export async function seedCollection(key: string): Promise<number> {
   });
   await batch.commit();
   await markSeeded(key);
+  dropContentCache(key);
   return def.seed.length;
 }
 

@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import PriceLines from "@/components/PriceLines";
+import FormNote from "@/components/FormNote";
 import { isPageHidden, type FestSettings } from "@/lib/festSettings";
 import { LEGAL_PAGES } from "@/lib/legal";
 import { formatPaise } from "@/lib/pricing";
@@ -289,6 +290,7 @@ export default function CosplayClient({
                       </div>
                     )}
                   </div>
+                  <FormNote text={words.contactAccuracyNote} tone="light" />
                   <button
                     onClick={submitCos}
                     disabled={!canSubmit || status === "processing"}

@@ -1,8 +1,7 @@
 import { after, NextRequest, NextResponse } from "next/server";
-import { getDb } from "@/lib/firebaseAdmin";
 import { getSettings } from "@/lib/settings";
+import { addInterestSignup } from "@/lib/interest";
 import { notifyConcertInterest } from "@/lib/notify";
-import { FieldValue } from "firebase-admin/firestore";
 
 export const dynamic = "force-dynamic";
 
@@ -19,45 +18,18 @@ export async function POST(req: NextRequest) {
   }
 
   const settings = await getSettings();
-  const db = getDb();
-  let queueNumber = settings.interestBase + 1;
+  const entry = { name, contact, pick, guess: guess || "Kept to yourself", seats };
 
-  if (db) {
-    const counterRef = db.collection("counters").doc("concertInterest");
-    queueNumber = await db.runTransaction(async (tx) => {
-      const snap = await tx.get(counterRef);
-      const current = snap.exists ? Number(snap.data()?.count ?? settings.interestBase) : settings.interestBase;
-      const next = current + 1;
-      tx.set(counterRef, { count: next }, { merge: true });
-      return next;
-    });
-
-    await db.collection("concertInterest").add({
-      queueNumber,
-      name,
-      contact,
-      pick,
-      guess: guess || "Kept to yourself",
-      seats,
-      createdAt: FieldValue.serverTimestamp(),
-    });
-  }
+  // The queue number is the council's starting number plus the number of real
+  // signups — worked out in one place, in interest.ts.
+  const { queueNumber, persisted } = await addInterestSignup(settings, entry);
 
   // The council reads every one of these, so every one of them gets mailed
   // over — after the response, so the page answers at once.
-  after(() =>
-    notifyConcertInterest({
-      queueNumber,
-      name,
-      contact,
-      pick,
-      guess: guess || "Kept to yourself",
-      seats,
-    }),
-  );
+  after(() => notifyConcertInterest({ queueNumber, ...entry }));
 
   return NextResponse.json({
     queueNumber: queueNumber.toLocaleString("en-IN"),
-    persisted: !!db,
+    persisted,
   });
 }
