@@ -263,6 +263,11 @@ export function renderEmail(parts: EmailParts, settings: FestSettings): { html: 
             <strong style="color:${LILAC};">MADOOZA</strong> · ${escape(date.short)}<br>
             Hosted by ${escape(HOST_NAME)} · ${escape(ORGANIZER_ROLE)}: ${escape(ORGANIZER_NAME)}<br>
             ${escape(settings.contactEmail)} · ${escape(settings.contactPhone)}
+            ${
+              settings.instagram
+                ? `<br><a href="https://instagram.com/${escape(settings.instagram)}" style="color:${TEAL};text-decoration:none;">@${escape(settings.instagram)}</a> on Instagram`
+                : ""
+            }
           </td>
         </tr>
         <tr>
@@ -307,6 +312,7 @@ export function renderEmail(parts: EmailParts, settings: FestSettings): { html: 
   lines.push(
     `Hosted by ${HOST_NAME} · ${ORGANIZER_ROLE}: ${ORGANIZER_NAME}`,
     `${settings.contactEmail} · ${settings.contactPhone}`,
+    ...(settings.instagram ? [`Instagram: @${settings.instagram} (instagram.com/${settings.instagram})`] : []),
     "Refunds are handled in person at the school office.",
   );
 
