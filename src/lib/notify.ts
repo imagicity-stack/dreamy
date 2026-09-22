@@ -198,6 +198,12 @@ async function ticketsFor(receipt: Receipt): Promise<{ blocks: TicketBlock[]; fi
  */
 async function whatsappPass(receipt: Receipt, settings: FestSettings): Promise<void> {
   if (!whatsappReady()) return;
+  // Nothing sets this at the moment: the consent checkbox was taken off the
+  // forms while WhatsApp is switched off, so every order records a no. Putting
+  // <WhatsAppOptIn> back into the three checkout forms is what turns this on
+  // again — configuring the Meta credentials alone will not, and that is the
+  // right way round, because Meta requires the buyer's own opt-in and a phone
+  // number typed into a checkout is not one.
   if (!receipt.customer.whatsappOptIn) return;
   if (!receipt.tickets.length) return;
   if (!PRODUCTS[receipt.product].ticketed) return;
@@ -308,7 +314,8 @@ export async function notifyOrderPaid(receipt: Receipt): Promise<MailResult[]> {
 export async function notifyConcertInterest(entry: {
   queueNumber: number;
   name: string;
-  contact: string;
+  phone: string;
+  email: string;
   pick: string;
   guess: string;
   seats: string;
@@ -328,7 +335,8 @@ export async function notifyConcertInterest(entry: {
         rows: [
           { label: "Queue number", value: queue },
           { label: "Name", value: entry.name },
-          { label: "Contact", value: entry.contact },
+          { label: "Phone", value: entry.phone },
+          { label: "Email", value: entry.email },
           { label: "Hoping for", value: entry.pick },
           { label: "Their guess", value: entry.guess },
           { label: "Seats wanted", value: entry.seats },
@@ -340,8 +348,9 @@ export async function notifyConcertInterest(entry: {
     messages.push({ to: office, subject: `Concert interest #${queue} · ${entry.name}`, html: doc.html, text: doc.text });
   }
 
-  // The contact field takes a phone or an email, so only mail the ones we can.
-  if (/^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(entry.contact)) {
+  // The form requires an address now, so this always has somewhere to go — the
+  // test stays because an older signup in Firestore may predate that.
+  if (/^[^@\s]+@[^@\s.]+\.[^@\s]+$/.test(entry.email)) {
     const doc = renderEmail(
       {
         subject: `You're number ${queue} on the MADOOZA list`,
@@ -357,7 +366,7 @@ export async function notifyConcertInterest(entry: {
       },
       settings,
     );
-    messages.push({ to: entry.contact, subject: `You're number ${queue} on the MADOOZA list`, html: doc.html, text: doc.text });
+    messages.push({ to: entry.email, subject: `You're number ${queue} on the MADOOZA list`, html: doc.html, text: doc.text });
   }
 
   return sendAll(brand(messages));

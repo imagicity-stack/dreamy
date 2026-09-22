@@ -201,5 +201,16 @@ function describe(data: unknown, status: number): string {
   const error = (data as { error?: { message?: string; code?: number; error_subcode?: number } })?.error;
   if (!error?.message) return `WhatsApp refused it (HTTP ${status})`;
   const code = error.code ? ` [${error.code}${error.error_subcode ? `/${error.error_subcode}` : ""}]` : "";
-  return `${error.message}${code}`;
+
+  // Meta answers "object does not exist or does not support this operation"
+  // whenever the id in the URL is not a WhatsApp phone number. A Meta Pixel id
+  // and a phone number id are both sixteen anonymous digits from different
+  // corners of the same dashboard, so this is the mistake that actually gets
+  // made — and Meta's own wording gives no hint which field to look at.
+  const wrongObject = error.code === 100 && error.error_subcode === 33;
+  const hint = wrongObject
+    ? " — check WHATSAPP_PHONE_NUMBER_ID: it must be the phone number id from WhatsApp Manager, not the Meta Pixel id or the phone number itself"
+    : "";
+
+  return `${error.message}${code}${hint}`;
 }

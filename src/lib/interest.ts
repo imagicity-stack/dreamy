@@ -81,7 +81,8 @@ export async function addInterestSignup(
   settings: FestSettings,
   entry: {
     name: string;
-    contact: string;
+    phone: string;
+    email: string;
     pick: string;
     guess: string;
     seats: string;
@@ -113,7 +114,8 @@ export async function addInterestSignup(
     queueNumber,
     signupNumber: signups,
     name: entry.name,
-    contact: entry.contact,
+    phone: entry.phone,
+    email: entry.email,
     pick: entry.pick,
     guess: entry.guess,
     seats: entry.seats,
