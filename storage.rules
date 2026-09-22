@@ -1,0 +1,12 @@
+rules_version = '2';
+
+// Uploads happen server-side from the admin panel, and images are served
+// through per-object download tokens, which carry their own authorization and
+// keep working with everything below denied. Nothing needs client access.
+service firebase.storage {
+  match /b/{bucket}/o {
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}

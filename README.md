@@ -304,6 +304,41 @@ setting decides how much to give away — sealed, month only, or the full date �
 line, the hero headline, the body-copy sentence. Revealing the month is a change in the panel, not a
 deploy, and nothing has to be hunted down page by page.
 
+## Firestore rules
+
+**Everything is denied.** `firestore.rules` and `storage.rules` in this repo refuse every read and write,
+and that is correct rather than an oversight: MADOOZA reaches Firestore only through the Firebase Admin
+SDK, running on the server with a service account, which bypasses security rules entirely. There is no
+Firebase SDK in the browser bundle and no path by which a visitor's page talks to the database.
+
+So the rules are a lock, not a filter — and the lock matters:
+
+- The project id is discoverable from any image the site serves (`firebasestorage.googleapis.com/v0/b/<project>…`),
+  so "nobody knows the address" was never a defence.
+- The collections hold buyers' names, phone numbers and email addresses, every pass ever issued with the
+  name it belongs to, and the list of people who may work the gate.
+- Gate staff have real Firebase Auth accounts, so somebody holding a volunteer's email and PIN can sign in
+  against the Identity Toolkit and end up with a valid ID token. Denying everything here is what makes
+  that token worthless: it cannot read a single document.
+
+A database created in **test mode** allows the world to read and write it for thirty days. Check
+Firebase Console → Firestore → Rules; if you see `allow read, write: if request.time < timestamp.date(…)`,
+that is what you have.
+
+Deploy them with the Firebase CLI:
+
+```bash
+firebase deploy --only firestore:rules,storage
+```
+
+or paste the contents of each file into the console's Rules tab. Afterwards, confirm two things: the site
+still sells a pass (it will — the Admin SDK ignores rules), and the gallery images still load (they will —
+a download token is its own authorization).
+
+`firestore.indexes.json` is deliberately empty. Every query this codebase runs is a single field — a
+`where` on one field, or an `orderBy` on one — and Firestore builds those indexes on its own. If a query
+ever needs two, the error in the logs will contain a link that creates it.
+
 ## Speed
 
 Every public page is rendered per request, so that a price or a headline changed in the panel is live for
