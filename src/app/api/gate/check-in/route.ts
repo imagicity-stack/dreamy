@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { readGateSession } from "@/lib/gateAuth";
 import { checkIn } from "@/lib/tickets";
+import { countScan } from "@/lib/gateStaff";
 
 export const dynamic = "force-dynamic";
 
@@ -21,5 +22,8 @@ export async function POST(req: NextRequest) {
   // whole link. Take the last path segment and treat everything else the same.
   const value = token.includes("/t/") ? token.split("/t/").pop()!.split(/[?#]/)[0] : token;
 
-  return NextResponse.json(await checkIn(value, session.volunteer));
+  const result = await checkIn(value, session.volunteer);
+  // Counted per person, so the panel can show who worked which gate.
+  if (result.result === "admitted") await countScan(session.uid);
+  return NextResponse.json(result);
 }

@@ -4,7 +4,7 @@ import { getDb } from "@/lib/firebaseAdmin";
 import { getCounters, liveUnits } from "@/lib/orders";
 import { readInterest } from "@/lib/interest";
 import { gateCounts } from "@/lib/tickets";
-import { gatePinIsSet } from "@/lib/gateAuth";
+import { gateStaffCount } from "@/lib/gateStaff";
 import { webhookConfigured } from "@/lib/razorpay";
 import { missingMailConfig } from "@/lib/mail";
 import { getSettings } from "@/lib/settings";
@@ -34,14 +34,14 @@ export async function GET() {
   // have been sold, and none of these numbers needs the documents themselves.
   const ORDER_STATUSES = ["created", "paid", "failed", "oversold", "refunded"] as const;
 
-  const [counters, passes, cosplay, merch, interest, gate, gatePin, ...orderCounts] = await Promise.all([
+  const [counters, passes, cosplay, merch, interest, gate, gateStaff, ...orderCounts] = await Promise.all([
     getCounters(),
     db.collection("passes").count().get(),
     db.collection("cosplayEntries").count().get(),
     db.collection("merchOrders").count().get(),
     readInterest(settings),
     gateCounts(),
-    gatePinIsSet(),
+    gateStaffCount(),
     ...ORDER_STATUSES.map((status) => db.collection("orders").where("status", "==", status).count().get()),
   ]);
 
@@ -94,7 +94,7 @@ export async function GET() {
       merchOrders: merch.data().count,
     },
     orders: { total: totalOrders, byStatus },
-    gate: { ...gate, pinSet: gatePin },
+    gate: { ...gate, staff: gateStaff },
     webhookConfigured: webhookConfigured(),
     mailMissing: missingMailConfig(),
   });

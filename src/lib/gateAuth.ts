@@ -1,139 +1,111 @@
-import { createHash, createHmac, randomBytes, timingSafeEqual } from "crypto";
 import { cookies } from "next/headers";
-import { FieldValue } from "firebase-admin/firestore";
-import { getDb } from "./firebaseAdmin";
+import { getAuth } from "firebase-admin/auth";
+import { getAdminApp } from "./firebaseAdmin";
+import { gateStaffMember, noteGateSignIn, type GateStaff } from "./gateStaff";
 
 /**
- * Who is allowed to admit people.
+ * Signing in to work the gate.
  *
- * The gate is worked by volunteers on their own phones, so this is a PIN rather
- * than an account each: something a teacher can read out on the morning and
- * change if a phone goes missing. It buys the one property that matters —
- * somebody who finds the /gate URL cannot burn a day's tickets with it.
+ * It used to be one shared PIN for everybody, which meant the scan log could
+ * only record whatever name a volunteer typed into a box. Now each person has
+ * their own account: the fest office adds them by email and gives them a PIN,
+ * and the sign-in is checked against Firebase Auth the same way the admin
+ * panel's is — the Admin SDK can mint tokens but cannot verify a password, so
+ * the password goes to the Identity Toolkit and comes back as a token we turn
+ * into a session cookie.
  *
- * The PIN is never stored, only its hash with a per-fest salt, and it is kept
- * out of the settings document on purpose: that object is handed to client
- * components on every page, and a PIN that ships to the browser is not a PIN.
+ * The cookie is Firebase's own and is verified with checkRevoked on every
+ * request, so taking somebody off the list, disabling them, or changing their
+ * PIN ends their session at once rather than at the end of the day.
  */
 
-const GATE_DOC = { collection: "settings", doc: "gate" } as const;
 const COOKIE = "mz_gate";
 /** A fest is one day; a shift is not. */
-const SESSION_HOURS = 16;
+const SESSION_MS = 16 * 60 * 60 * 1000;
 
-type GateConfig = {
-  pinHash: string;
-  salt: string;
-  /** Signs session cookies. Rotating it signs every phone out. */
-  sessionSecret: string;
-};
+export type GateSession = { uid: string; volunteer: string; email: string };
 
-function hashPin(pin: string, salt: string): string {
-  return createHash("sha256").update(`${salt}:${pin}`).digest("hex");
+export type GateSignIn =
+  | { ok: true; cookie: string; maxAge: number; session: GateSession }
+  | { ok: false; status: number; error: string };
+
+/** Checks an email and PIN, and returns the cookie that lets them scan. */
+export async function signInGate(email: string, pin: string): Promise<GateSignIn> {
+  const app = getAdminApp();
+  const apiKey = process.env.FIREBASE_API_KEY;
+  if (!app || !apiKey) {
+    return { ok: false, status: 503, error: "The gate is not set up yet. Ask the fest office." };
+  }
+
+  const res = await fetch(
+    `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: email.trim().toLowerCase(), password: pin.trim(), returnSecureToken: true }),
+    },
+  );
+  const data = await res.json().catch(() => null);
+
+  if (!res.ok) {
+    const reason = String(data?.error?.message ?? "");
+    if (reason.startsWith("TOO_MANY_ATTEMPTS")) {
+      return { ok: false, status: 429, error: "Too many tries. Wait a few minutes." };
+    }
+    if (reason.startsWith("USER_DISABLED")) {
+      return { ok: false, status: 403, error: "That account has been switched off. Ask the fest office." };
+    }
+    // Deliberately vague: never confirm which half was wrong.
+    return { ok: false, status: 401, error: "That email and PIN don't match." };
+  }
+
+  const idToken = String(data?.idToken ?? "");
+  if (!idToken) return { ok: false, status: 502, error: "Firebase did not return a token" };
+
+  const auth = getAuth(app);
+  const decoded = await auth.verifyIdToken(idToken);
+
+  // Being able to sign in is not the same as being on the gate list: an admin's
+  // own account must not become a scanner just because it exists.
+  const staff = await gateStaffMember(decoded.uid);
+  if (!staff) {
+    return { ok: false, status: 403, error: "This account is not on the gate list." };
+  }
+
+  const cookie = await auth.createSessionCookie(idToken, { expiresIn: SESSION_MS });
+  await noteGateSignIn(decoded.uid);
+
+  return {
+    ok: true,
+    cookie,
+    maxAge: SESSION_MS / 1000,
+    session: { uid: staff.uid, volunteer: staff.name, email: staff.email },
+  };
 }
 
-async function readConfig(): Promise<GateConfig | null> {
-  const db = getDb();
-  if (!db) return null;
+/**
+ * Who is scanning, or null. Read on every gate request, so a volunteer removed
+ * from the list mid-shift stops being able to admit people immediately.
+ */
+export async function readGateSession(): Promise<GateSession | null> {
+  const app = getAdminApp();
+  const value = (await cookies()).get(COOKIE)?.value;
+  if (!app || !value) return null;
+
   try {
-    const snap = await db.collection(GATE_DOC.collection).doc(GATE_DOC.doc).get();
-    if (!snap.exists) return null;
-    const data = snap.data() as Partial<GateConfig>;
-    if (!data?.pinHash || !data.salt || !data.sessionSecret) return null;
-    return { pinHash: data.pinHash, salt: data.salt, sessionSecret: data.sessionSecret };
+    const claims = await getAuth(app).verifySessionCookie(value, true);
+    const staff = await gateStaffMember(claims.uid);
+    if (!staff) return null;
+    return { uid: staff.uid, volunteer: staff.name, email: staff.email };
   } catch {
     return null;
   }
 }
 
-/** True once a PIN has been set, so the panel can say when it hasn't. */
-export async function gatePinIsSet(): Promise<boolean> {
-  return (await readConfig()) !== null;
-}
-
-/**
- * Sets the gate PIN. A new session secret is minted each time, so changing the
- * PIN signs out every phone that was using the old one — which is the point of
- * changing it.
- */
-export async function setGatePin(pin: string): Promise<{ ok: true } | { error: string }> {
-  const db = getDb();
-  if (!db) return { error: "Firestore is not configured" };
-
-  const clean = pin.trim();
-  if (!/^\d{4,8}$/.test(clean)) return { error: "The PIN must be 4 to 8 digits." };
-
-  const salt = randomBytes(16).toString("hex");
-  await db.collection(GATE_DOC.collection).doc(GATE_DOC.doc).set(
-    {
-      pinHash: hashPin(clean, salt),
-      salt,
-      sessionSecret: randomBytes(32).toString("hex"),
-      updatedAt: FieldValue.serverTimestamp(),
-    },
-    { merge: true },
-  );
-  return { ok: true };
-}
-
-function sign(secret: string, payload: string): string {
-  return createHmac("sha256", secret).update(payload).digest("hex");
-}
-
-function safeEqual(a: string, b: string): boolean {
-  const x = Buffer.from(a, "utf8");
-  const y = Buffer.from(b, "utf8");
-  if (x.length !== y.length) return false;
-  return timingSafeEqual(x, y);
-}
-
-/**
- * Checks the PIN and returns a signed session value.
- *
- * The cookie carries who is on the gate and when it expires, signed — so it can
- * be read back without a database round trip on every scan, and cannot be
- * edited into a longer session or a different name.
- */
-export async function openGateSession(
-  pin: string,
-  volunteer: string,
-): Promise<{ value: string; maxAge: number } | { error: string }> {
-  const config = await readConfig();
-  if (!config) return { error: "No gate PIN has been set yet. Ask the fest office." };
-
-  if (!safeEqual(hashPin(pin.trim(), config.salt), config.pinHash)) {
-    return { error: "That PIN is not right." };
-  }
-
-  const name = volunteer.trim().slice(0, 40) || "Gate";
-  const expires = Date.now() + SESSION_HOURS * 3600_000;
-  const payload = `${encodeURIComponent(name)}.${expires}`;
-
-  return {
-    value: `${payload}.${sign(config.sessionSecret, payload)}`,
-    maxAge: SESSION_HOURS * 3600,
-  };
-}
-
-export type GateSession = { volunteer: string };
-
-/** Reads the cookie, or null when there isn't a valid one. */
-export async function readGateSession(): Promise<GateSession | null> {
-  const raw = (await cookies()).get(COOKIE)?.value;
-  if (!raw) return null;
-
-  const [name, expiresRaw, signature] = raw.split(".");
-  if (!name || !expiresRaw || !signature) return null;
-
-  const expires = Number(expiresRaw);
-  if (!Number.isFinite(expires) || expires < Date.now()) return null;
-
-  const config = await readConfig();
-  if (!config) return null;
-
-  if (!safeEqual(sign(config.sessionSecret, `${name}.${expiresRaw}`), signature)) return null;
-
-  return { volunteer: decodeURIComponent(name) };
+/** What the panel and the sign-in screen need to know before anybody tries. */
+export async function gateReady(): Promise<boolean> {
+  return !!getAdminApp() && !!process.env.FIREBASE_API_KEY;
 }
 
 export const GATE_COOKIE = COOKIE;
+export type { GateStaff };

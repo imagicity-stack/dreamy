@@ -1,25 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
-import { GATE_COOKIE, openGateSession } from "@/lib/gateAuth";
+import { GATE_COOKIE, signInGate } from "@/lib/gateAuth";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => null);
+  const email = String(body?.email ?? "");
   const pin = String(body?.pin ?? "");
-  const volunteer = String(body?.volunteer ?? "");
 
-  const session = await openGateSession(pin, volunteer);
-  if ("error" in session) {
-    return NextResponse.json({ error: session.error }, { status: 401 });
+  if (!email.trim() || !pin.trim()) {
+    return NextResponse.json({ error: "Enter your email and your PIN." }, { status: 400 });
   }
 
-  const res = NextResponse.json({ ok: true, volunteer: volunteer.trim() || "Gate" });
-  res.cookies.set(GATE_COOKIE, session.value, {
+  const result = await signInGate(email, pin);
+  if (!result.ok) {
+    return NextResponse.json({ error: result.error }, { status: result.status });
+  }
+
+  const res = NextResponse.json({ ok: true, session: result.session });
+  res.cookies.set(GATE_COOKIE, result.cookie, {
     httpOnly: true,
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
     path: "/",
-    maxAge: session.maxAge,
+    maxAge: result.maxAge,
   });
   return res;
 }

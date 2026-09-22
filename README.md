@@ -196,7 +196,7 @@ name left blank falls back to the buyer's: a pass in the wrong name beats no pas
    post that needs no JavaScript. The PDF is a pass and not a receipt — no prices on it. That is partly
    design and partly a limit worth naming: the fonts built into a PDF have no rupee sign, so the money
    stays in the email, where it can be printed properly.
-4. Volunteers open **`/gate`** on their own phones, sign in once with their name and the gate PIN, and the
+4. Volunteers open **`/gate`** on their own phones and sign in with **their own email and PIN**, and the
    camera starts. No app to install and no hardware to buy.
 5. A scan calls `/api/gate/check-in`. The answer fills the screen in one colour and one phrase — green
    **LET THEM IN** with the holder's name, amber **ALREADY IN** with the time it was first scanned, red
@@ -210,9 +210,24 @@ name left blank falls back to the buyer's: a pass in the wrong name beats no pas
    count — counted at the gate rather than inferred from sales — and it shows in the panel as ADMITTED,
    with how many are still to arrive.
 
-**Before the gates open:** set the PIN in `/admin` → Settings → Scanner PIN. It is stored hashed and never
-shown again; changing it signs out every phone at once, which is what you want if a phone goes missing.
-The overview warns if tickets exist and no PIN has been set.
+**Who may scan.** `/admin` → **Gate** is the list. Adding somebody by name and email creates a real
+Firebase Auth account for them with the PIN as its password, and a row in the `gates` collection keyed by
+their uid — so the list in the panel and the accounts in the Firebase console are the same thing.
+Switching somebody off, removing them or changing their PIN disables the Firebase account and revokes its
+tokens, which ends a session already open on their phone at its next request rather than at the end of the
+day. Firebase will not accept a password under six characters, so gate PINs are six to eight digits; a PIN
+is shown once when it is set and can only be replaced after that, never read back.
+
+Because each person signs in as themselves, the scan log records who admitted whom without anybody typing
+their own name into a box, and the panel shows how many each of them has scanned in.
+
+**The registrations screen.** Inside the gate, *Phone dead? Search the registrations* opens a screen of
+its own: search by name, phone or pass code, expand somebody to see the whole registration — pass, phone,
+email, whether they have already been admitted and by whom, and the order it came from — and admit from
+there. It is recorded as a manual admit, so the log never pretends a QR was scanned. It is also the answer
+to "am I on the list?": everything in it is somebody who has paid.
+
+The overview warns if tickets exist and nobody is on the gate list.
 
 **A refund voids its tickets** through the webhook, so a refunded pass stops working at the gate rather
 than only in the ledger.

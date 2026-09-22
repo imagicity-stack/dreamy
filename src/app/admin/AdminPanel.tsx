@@ -6,9 +6,10 @@ import SettingsTab from "./SettingsTab";
 import ContentTab from "./ContentTab";
 import WordsTab from "./WordsTab";
 import RecordsTab from "./RecordsTab";
+import GateTab from "./GateTab";
 import * as ui from "./adminUi";
 
-type TabKey = "overview" | "settings" | "content" | "words" | "data";
+type TabKey = "overview" | "settings" | "content" | "words" | "data" | "gate";
 
 const TABS: { key: TabKey; label: string; blurb: string }[] = [
   { key: "overview", label: "OVERVIEW", blurb: "How the fest is selling." },
@@ -16,10 +17,11 @@ const TABS: { key: TabKey; label: string; blurb: string }[] = [
   { key: "content", label: "CONTENT", blurb: "Artists, photos, merch, stalls and the FAQ." },
   { key: "words", label: "WORDS", blurb: "The headings and paragraphs on each page." },
   { key: "data", label: "SIGN-UPS", blurb: "Everyone who has bought, entered or registered." },
+  { key: "gate", label: "GATE", blurb: "Who may scan people in on the day." },
 ];
 
 /**
- * The control room's four rooms. Everything below is a client component talking
+ * The control room's rooms. Everything below is a client component talking
  * to /api/admin/*, where the session cookie is checked again on every call.
  */
 export default function AdminPanel({
@@ -61,6 +63,7 @@ export default function AdminPanel({
       {tab === "content" && <ContentTab collections={collections} mediaReady={mediaReady} />}
       {tab === "words" && <WordsTab groups={copyGroups} />}
       {tab === "data" && <RecordsTab />}
+      {tab === "gate" && <GateTab />}
     </>
   );
 }
