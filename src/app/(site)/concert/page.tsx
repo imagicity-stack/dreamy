@@ -17,10 +17,17 @@ export default async function ConcertPage() {
   );
 
   // The date promise sits apart from the editable list because its wording has
-  // to change with how much of the date is out. Both versions are slots, so the
-  // sentence is still the council's to write.
+  // to change with how much of the date is out — nothing, the month, or all of
+  // it. All three versions are slots, so the sentence is still the council's to
+  // write.
   const date = describeDate(settings);
-  points.push(date.sealed ? words.confirmItemDateSealed : words.confirmItemDateRevealed);
+  points.push(
+    date.mode === "full"
+      ? words.confirmItemDateRevealed
+      : date.mode === "month"
+        ? words.confirmItemDateMonth
+        : words.confirmItemDateSealed,
+  );
 
   const info = (await publicContent("concertInfo")).map((r) => ({
     title: applyTokens(String(r.title ?? ""), settings),
