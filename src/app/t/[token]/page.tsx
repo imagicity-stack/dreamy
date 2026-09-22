@@ -90,6 +90,31 @@ export default async function TicketPage({ params }: { params: Promise<{ token: 
             </div>
           </div>
 
+          {/* A plain form post, so saving the pass needs no JavaScript at all —
+              the situation this file exists for is a phone that is barely
+              working. */}
+          <form action="/api/tickets/pdf" method="POST" style={{ padding: "0 20px 16px" }}>
+            <input type="hidden" name="token" value={token} />
+            <button
+              type="submit"
+              className="font-display mz-pop"
+              style={{
+                width: "100%",
+                fontSize: 14,
+                color: "var(--lilac)",
+                background: "var(--purple)",
+                border: "3px solid var(--ink)",
+                borderRadius: 16,
+                boxShadow: "5px 5px 0 var(--ink)",
+                padding: "14px 16px",
+                cursor: "pointer",
+                ["--mz-shadow" as string]: "5px",
+              }}
+            >
+              SAVE AS PDF
+            </button>
+          </form>
+
           <div
             style={{
               borderTop: "2px dashed var(--ink)",

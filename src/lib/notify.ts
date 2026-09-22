@@ -8,7 +8,8 @@ import {
   type MailMessage,
   type MailResult,
 } from "./mail";
-import { issueTickets, qrPng, type IssuedTicket } from "./tickets";
+import { qrPng } from "./tickets";
+import { ticketsPdf } from "./ticketPdf";
 import { getSettings } from "./settings";
 import type { Receipt } from "./orders";
 
@@ -87,21 +88,15 @@ function officeRows(receipt: Receipt): DetailRow[] {
  * everything else, and the mail falls back to its plain code block.
  */
 async function ticketsFor(receipt: Receipt): Promise<{ blocks: TicketBlock[]; files: MailAttachment[] }> {
-  if (receipt.product !== "fetePass") return { blocks: [], files: [] };
-
-  let issued: IssuedTicket[] = [];
-  try {
-    issued = await issueTickets(receipt);
-  } catch (e) {
-    // A pass without a QR is still a pass — the code and the gate list work.
-    console.error("could not issue tickets for", receipt.orderId, e);
-    return { blocks: [], files: [] };
-  }
+  // Fulfilment issues the tickets, so the tokens are already in hand; a call
+  // that did not issue them (the webhook arriving second) has none and falls
+  // back to the plain code block.
+  if (!receipt.tickets.length) return { blocks: [], files: [] };
 
   const blocks: TicketBlock[] = [];
   const files: MailAttachment[] = [];
 
-  for (const ticket of issued) {
+  for (const [i, ticket] of receipt.tickets.entries()) {
     const cid = `qr-${ticket.code.toLowerCase()}@madooza`;
     try {
       files.push({
@@ -116,12 +111,35 @@ async function ticketsFor(receipt: Receipt): Promise<{ blocks: TicketBlock[]; fi
     blocks.push({
       cid,
       code: ticket.code,
-      holderName: ticket.holderName,
-      tierLabel: ticket.tierLabel,
-      index: ticket.index,
-      of: ticket.of,
+      holderName: receipt.customer.name,
+      tierLabel: receipt.label,
+      index: i + 1,
+      of: receipt.tickets.length,
       url: ticket.url,
     });
+  }
+
+  // The same passes as one printable file, so the mail is worth keeping even
+  // when the phone it arrived on is flat.
+  try {
+    const settings = await getSettings();
+    files.push({
+      filename: "madooza-passes.pdf",
+      content: await ticketsPdf(
+        receipt.tickets.map((t, i) => ({
+          code: t.code,
+          url: t.url,
+          holderName: receipt.customer.name,
+          tierLabel: receipt.label,
+          index: i + 1,
+          of: receipt.tickets.length,
+        })),
+        settings,
+      ),
+      contentType: "application/pdf",
+    });
+  } catch (e) {
+    console.error("could not build the pass PDF for", receipt.orderId, e);
   }
 
   return { blocks, files };

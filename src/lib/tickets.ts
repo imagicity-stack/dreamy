@@ -2,7 +2,6 @@ import { createHash, randomBytes } from "crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import QRCode from "qrcode";
 import { getDb } from "./firebaseAdmin";
-import type { Receipt } from "./orders";
 
 /**
  * One ticket per person through the gate, and the scan that admits them.
@@ -87,37 +86,49 @@ export async function qrDataUrl(url: string): Promise<string> {
   });
 }
 
+export type TicketOrder = {
+  orderId: string;
+  product: string;
+  tierLabel: string;
+  codes: string[];
+  holderName: string;
+  holderPhone: string;
+  holderEmail: string;
+};
+
 /**
  * Creates the tickets for a paid order — one per pass, each with its own token.
  *
- * Called from fulfilment, which has already run inside a transaction and cannot
- * be replayed, so this is safe to do after it: a second call with the same
- * codes would find them present and do nothing.
+ * Called from fulfilment, immediately after its transaction commits, so the
+ * tokens exist before anybody is told the payment worked: the browser gets them
+ * in its receipt and can hand over a PDF on the spot. A second call for the
+ * same order finds the tickets present and returns nothing, which is what stops
+ * the webhook arriving second from issuing a duplicate set.
  */
-export async function issueTickets(receipt: Receipt): Promise<IssuedTicket[]> {
+export async function issueTickets(order: TicketOrder): Promise<IssuedTicket[]> {
   const db = getDb();
   if (!db) return [];
 
-  const existing = await db.collection(TICKETS).where("orderId", "==", receipt.orderId).limit(1).get();
+  const existing = await db.collection(TICKETS).where("orderId", "==", order.orderId).limit(1).get();
   if (!existing.empty) return []; // Already issued; nothing to do and nothing to send.
 
-  const tierLabel = receipt.label;
+  const tierLabel = order.tierLabel;
   const issued: IssuedTicket[] = [];
   const batch = db.batch();
 
-  receipt.codes.forEach((code, i) => {
+  order.codes.forEach((code, i) => {
     const token = newToken();
     const id = hashToken(token);
     const ticket: Omit<Ticket, "id"> = {
       code,
-      orderId: receipt.orderId,
-      product: receipt.product,
+      orderId: order.orderId,
+      product: order.product,
       tierLabel,
-      holderName: receipt.customer.name,
-      holderPhone: receipt.customer.phone,
-      holderEmail: receipt.customer.email,
+      holderName: order.holderName,
+      holderPhone: order.holderPhone,
+      holderEmail: order.holderEmail,
       index: i + 1,
-      of: receipt.codes.length,
+      of: order.codes.length,
       status: "valid",
       usedAt: null,
       usedBy: null,

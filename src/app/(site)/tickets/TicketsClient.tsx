@@ -10,6 +10,7 @@ import { LEGAL_PAGES } from "@/lib/legal";
 import { formatPaise } from "@/lib/pricing";
 import {
   CheckoutDismissed,
+  downloadPasses,
   fetchQuote,
   startCheckout,
   type Quote,
@@ -54,6 +55,7 @@ export default function TicketsClient({
   const [quote, setQuote] = useState<Quote | null>(null);
   const [status, setStatus] = useState<"idle" | "processing" | "error">("idle");
   const [error, setError] = useState("");
+  const [pdfState, setPdfState] = useState<"idle" | "working" | "saved" | "blocked">("idle");
 
   // What the passes cost is the server's answer, asked again whenever the
   // quantity changes. The browser never multiplies a price by a quantity — the
@@ -91,6 +93,15 @@ export default function TicketsClient({
       setPass(receipt);
       setStatus("idle");
       window.scrollTo(0, 0);
+
+      // The passes save themselves, because the moment somebody has paid is the
+      // moment they are most willing to keep the file — and a browser that
+      // refuses the automatic download leaves the button below.
+      if (receipt.tickets.length) {
+        setPdfState("working");
+        const ok = await downloadPasses(receipt.tickets.map((t) => t.token));
+        setPdfState(ok ? "saved" : "blocked");
+      }
     } catch (e) {
       if (e instanceof CheckoutDismissed) {
         setStatus("idle");
@@ -175,6 +186,44 @@ export default function TicketsClient({
                   PAYMENT {pass.paymentId}
                 </div>
               </div>
+              {pass.tickets.length > 0 && (
+                <div style={{ borderTop: "2px dashed var(--ink)", padding: "18px 26px" }}>
+                  <button
+                    onClick={async () => {
+                      setPdfState("working");
+                      const ok = await downloadPasses(pass.tickets.map((t) => t.token));
+                      setPdfState(ok ? "saved" : "blocked");
+                    }}
+                    disabled={pdfState === "working"}
+                    className="font-display mz-pop"
+                    style={{
+                      width: "100%",
+                      fontSize: 15,
+                      color: "var(--lilac)",
+                      background: "var(--purple)",
+                      border: "3px solid var(--ink)",
+                      borderRadius: 18,
+                      boxShadow: "6px 6px 0 var(--ink)",
+                      padding: "16px 18px",
+                      cursor: "pointer",
+                      ["--mz-shadow" as string]: "6px",
+                    }}
+                  >
+                    {pdfState === "working"
+                      ? "PREPARING…"
+                      : pass.units === 1
+                        ? "DOWNLOAD YOUR PASS (PDF)"
+                        : `DOWNLOAD ALL ${pass.units} PASSES (PDF)`}
+                  </button>
+                  <div style={{ fontSize: 13, lineHeight: 1.55, color: "#453063", marginTop: 12 }}>
+                    {pdfState === "saved"
+                      ? "Saved to your downloads — and sent to your email as well. Each pass has its own QR; show one per person at the gate."
+                      : pdfState === "blocked"
+                        ? "Your browser wouldn't save it on its own — tap the button above. It has also gone to your email."
+                        : "Your passes are on their way to your email too, QR codes and all."}
+                  </div>
+                </div>
+              )}
               <div style={{ borderTop: "2px dashed var(--ink)", padding: "20px 26px", fontSize: 14.5, lineHeight: 1.55, color: "#453063" }}>
                 {words.successNote}
               </div>

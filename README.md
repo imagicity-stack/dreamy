@@ -189,17 +189,22 @@ all in the one receipt email, because three different people walk through the ga
 2. The QR is an **inline attachment**, not a link to an image — every mail client blocks remote images by
    default, and a pass nobody can see is not a pass. Each card also links to `/t/<token>`, which is the
    real ticket: one screen, QR large, the code underneath, and a line telling the holder to screenshot it.
-3. Volunteers open **`/gate`** on their own phones, sign in once with their name and the gate PIN, and the
+3. The same passes go out as a **PDF**, one page per pass: attached to the mail, downloaded automatically
+   on the confirmation screen the moment payment clears, and saveable from the ticket page by a plain form
+   post that needs no JavaScript. The PDF is a pass and not a receipt — no prices on it. That is partly
+   design and partly a limit worth naming: the fonts built into a PDF have no rupee sign, so the money
+   stays in the email, where it can be printed properly.
+4. Volunteers open **`/gate`** on their own phones, sign in once with their name and the gate PIN, and the
    camera starts. No app to install and no hardware to buy.
-4. A scan calls `/api/gate/check-in`. The answer fills the screen in one colour and one phrase — green
+5. A scan calls `/api/gate/check-in`. The answer fills the screen in one colour and one phrase — green
    **LET THEM IN** with the holder's name, amber **ALREADY IN** with the time it was first scanned, red
    **NOT OURS** — because a volunteer in a queue reads a colour, not a sentence. There is a blip and a
    buzz, since a gate is loud and nobody is watching the screen.
-5. Admission is a Firestore transaction on the ticket, so two gates scanning the same code at the same
+6. Admission is a Firestore transaction on the ticket, so two gates scanning the same code at the same
    moment produce one entry and one "already admitted".
-6. A dead phone is not a dead end: **Phone dead? Find by name** searches by name, phone or pass code and
+7. A dead phone is not a dead end: **Phone dead? Find by name** searches by name, phone or pass code and
    admits from the list, recorded as a manual admit.
-7. Every scan records the ticket, the time, the volunteer and the answer. That log **is** the visitor
+8. Every scan records the ticket, the time, the volunteer and the answer. That log **is** the visitor
    count — counted at the gate rather than inferred from sales — and it shows in the panel as ADMITTED,
    with how many are still to arrive.
 
