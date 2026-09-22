@@ -1,6 +1,7 @@
 "use client";
 
 import { openRazorpayCheckout } from "./razorpayClient";
+import { toAmount, track } from "./pixel";
 import type { PriceBreakdown } from "./pricing";
 
 /**
@@ -93,8 +94,10 @@ export type CustomerInput = {
   school?: string;
   /** One name per pass, when an order is buying several. */
   attendees?: string[];
+  /** Whether they asked for the pass on WhatsApp as well. */
+  whatsappOptIn?: boolean;
   /** Product extras — the cosplay character, the squad list. */
-  [key: string]: string | string[] | undefined;
+  [key: string]: string | string[] | boolean | undefined;
 };
 
 /** Thrown when the buyer closed the Razorpay window; not an error to shout about. */
@@ -158,6 +161,20 @@ export async function startCheckout(args: {
   if (!orderRes.ok) throw new Error(await readError(orderRes, "Could not start checkout"));
   const order = await orderRes.json();
 
+  // Reported here rather than from the button, so it means what it says: the
+  // server priced the order and Razorpay is about to open. A click that failed
+  // validation never gets this far.
+  track(
+    "InitiateCheckout",
+    {
+      content_type: "product",
+      content_ids: [args.product],
+      value: toAmount(order.amount),
+      currency: order.currency ?? "INR",
+    },
+    order.orderId,
+  );
+
   return new Promise<Receipt>((resolve, reject) => {
     let settled = false;
     const finish = (fn: () => void) => {
@@ -204,6 +221,25 @@ export async function startCheckout(args: {
             return;
           }
           const { receipt } = (await verifyRes.json()) as { receipt: Receipt };
+
+          // The only event that matters to an ad account, and the only one
+          // reported from a server-verified result rather than from anything
+          // the browser decided for itself. The order id is passed as the
+          // event id so that adding the Conversions API later de-duplicates
+          // against this instead of counting every sale twice.
+          track(
+            "Purchase",
+            {
+              content_type: "product",
+              content_ids: [receipt.product],
+              contents: [{ id: receipt.product, quantity: receipt.units }],
+              num_items: receipt.units,
+              value: toAmount(receipt.amount.totalPaise),
+              currency: receipt.amount.currency ?? "INR",
+            },
+            receipt.orderId,
+          );
+
           finish(() => resolve(receipt));
         } catch {
           finish(() => reject(new PaidButUnconfirmed(response.razorpay_payment_id)));

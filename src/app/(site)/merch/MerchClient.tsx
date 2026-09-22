@@ -5,6 +5,7 @@ import Image from "next/image";
 import { formatInr } from "@/data/fest";
 import PriceLines from "@/components/PriceLines";
 import FormNote from "@/components/FormNote";
+import WhatsAppOptIn from "@/components/WhatsAppOptIn";
 import { formatPaise } from "@/lib/pricing";
 import {
   CheckoutDismissed,
@@ -34,7 +35,7 @@ export default function MerchClient({
   closedNote: string;
 }) {
   const [cart, setCart] = useState<Record<string, number>>({});
-  const [buyer, setBuyer] = useState({ name: "", phone: "", email: "" });
+  const [buyer, setBuyer] = useState({ name: "", phone: "", email: "", whatsappOptIn: true });
   const [receipt, setReceipt] = useState<Receipt | null>(null);
   const [quote, setQuote] = useState<Quote | null>(null);
   const [placing, setPlacing] = useState(false);
@@ -241,6 +242,11 @@ export default function MerchClient({
                       placeholder="Email (optional)"
                     />
                     <FormNote text={words.contactAccuracyNote} />
+                    <WhatsAppOptIn
+                      checked={buyer.whatsappOptIn}
+                      onChange={(next) => setBuyer((b) => ({ ...b, whatsappOptIn: next }))}
+                      phone={buyer.phone}
+                    />
                   </div>
                 )}
                 {open ? (

@@ -140,15 +140,44 @@ export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
             {
               kind: "p",
               text:
-                `This site has no visitor accounts, no advertising cookies, no third-party tracking pixels ` +
-                `and no analytics profile of you. The only cookie the site sets is the sign-in cookie for ` +
-                `the council's own admin panel, and only for a council member who signs into it.`,
+                `This site has no visitor accounts and builds no analytics profile of you. The only cookie ` +
+                `we set ourselves is the sign-in cookie for the council's own admin panel and gate scanner, ` +
+                `and only for a council member or volunteer who signs into one.`,
+            },
+          ],
+        },
+        {
+          id: "advertising",
+          heading: "4. Advertising measurement",
+          blocks: [
+            {
+              kind: "p",
+              text:
+                `The public pages carry the Meta Pixel, so that when the fest pays to advertise on Instagram ` +
+                `or Facebook it can tell whether the advertising worked. It records that a page was viewed, ` +
+                `that a checkout was opened, and that a purchase was completed along with its amount — and ` +
+                `it sets cookies of Meta's own to do so.`,
+            },
+            {
+              kind: "p",
+              text:
+                `Your name, your email address, your phone number and your pass codes are never sent to Meta. ` +
+                `Nor is it on the pages where those things appear: your own pass page, the gate scanner and ` +
+                `the admin panel carry no pixel at all.`,
+            },
+            {
+              kind: "p",
+              text:
+                `What Meta does with what it collects is governed by Meta's own privacy policy, not ours. ` +
+                `Blocking it is entirely your right and costs you nothing on this site — a browser set to ` +
+                `refuse third-party cookies or trackers, or any of the usual blocking extensions, will stop ` +
+                `it, and every page, pass and payment goes on working exactly as before.`,
             },
           ],
         },
         {
           id: "why",
-          heading: "4. Why we use it",
+          heading: "5. Why we use it",
           blocks: [
             {
               kind: "list",
@@ -171,7 +200,7 @@ export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
         },
         {
           id: "who-sees",
-          heading: "5. Who can see it",
+          heading: "6. Who can see it",
           blocks: [
             {
               kind: "list",
@@ -193,7 +222,7 @@ export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
         },
         {
           id: "students",
-          heading: "6. Students and anyone under 18",
+          heading: "7. Students and anyone under 18",
           blocks: [
             {
               kind: "p",
@@ -213,7 +242,7 @@ export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
         },
         {
           id: "keep",
-          heading: "7. How long we keep it",
+          heading: "8. How long we keep it",
           blocks: [
             {
               kind: "list",
@@ -227,7 +256,7 @@ export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
         },
         {
           id: "rights",
-          heading: "8. What you can ask us to do",
+          heading: "9. What you can ask us to do",
           blocks: [
             {
               kind: "p",
@@ -246,7 +275,7 @@ export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
         },
         {
           id: "security",
-          heading: "9. How it is kept",
+          heading: "10. How it is kept",
           blocks: [
             {
               kind: "p",
@@ -260,7 +289,7 @@ export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
         },
         {
           id: "changes",
-          heading: "10. Changes to this policy",
+          heading: "11. Changes to this policy",
           blocks: [
             {
               kind: "p",

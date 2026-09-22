@@ -243,6 +243,15 @@ export type Customer = {
   attendees: string[];
   /** Product-specific extras — the cosplay character, the squad, and so on. */
   extra: Record<string, string>;
+  /**
+   * Whether they agreed to the pass being sent over WhatsApp.
+   *
+   * Meta requires an opt-in before a business may message anybody, and it has
+   * to be the buyer's own answer rather than something inferred from the fact
+   * that they typed a number. Stored with the order so the record of consent
+   * sits beside the thing consented to.
+   */
+  whatsappOptIn: boolean;
 };
 
 const EXTRA_KEYS: Record<ProductKey, string[]> = {
@@ -298,6 +307,14 @@ export function readCustomer(
   }
 
   return {
-    customer: { name, phone, email, school: clean(body.school, 160), attendees, extra },
+    customer: {
+      name,
+      phone,
+      email,
+      school: clean(body.school, 160),
+      attendees,
+      extra,
+      whatsappOptIn: body.whatsappOptIn === true,
+    },
   };
 }

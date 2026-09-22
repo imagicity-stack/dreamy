@@ -13,6 +13,9 @@ import {
 import { qrPng } from "./tickets";
 import { ticketsPdf } from "./ticketPdf";
 import { getSettings } from "./settings";
+import { sendPass, whatsappReady } from "./whatsapp";
+import { PRODUCTS } from "./products";
+import type { FestSettings } from "./festSettings";
 import type { Receipt } from "./orders";
 
 /**
@@ -181,6 +184,55 @@ async function ticketsFor(receipt: Receipt): Promise<{ blocks: TicketBlock[]; fi
 }
 
 /** A paid pass, entry or merch order: the buyer's receipt and the office's copy. */
+/**
+ * The same pass, over WhatsApp.
+ *
+ * Runs beside the emails rather than instead of them: WhatsApp can fail for
+ * reasons nobody controls — the number is not on WhatsApp, the template is
+ * pending review, Meta is having an afternoon — and a buyer who paid is owed
+ * their pass regardless. So this never throws and never blocks; its worst case
+ * is a line in the log while the email goes out as it always did.
+ *
+ * Only for products that issue a scannable pass, and only when the buyer ticked
+ * the box. Merch has nothing to scan, and an unticked box is an answer.
+ */
+async function whatsappPass(receipt: Receipt, settings: FestSettings): Promise<void> {
+  if (!whatsappReady()) return;
+  if (!receipt.customer.whatsappOptIn) return;
+  if (!receipt.tickets.length) return;
+  if (!PRODUCTS[receipt.product].ticketed) return;
+
+  let pdf: { file: Buffer; filename: string } | undefined;
+  try {
+    const file = await ticketsPdf(
+      receipt.tickets.map((t, i) => ({
+        code: t.code,
+        url: t.url,
+        holderName: holderFor(receipt, i),
+        tierLabel: receipt.label,
+        index: i + 1,
+        of: receipt.tickets.length,
+        product: receipt.product,
+      })),
+      settings,
+    );
+    pdf = { file, filename: receipt.tickets.length === 1 ? `${receipt.primaryCode}.pdf` : "madooza-passes.pdf" };
+  } catch (e) {
+    // A pass with a code and a link still gets somebody through a gate.
+    console.error("[whatsapp] could not build the pass PDF:", e);
+  }
+
+  const result = await sendPass({
+    phone: receipt.customer.phone,
+    name: receipt.customer.name,
+    code: receipt.primaryCode,
+    url: receipt.tickets[0].url,
+    pdf,
+  });
+
+  if ("error" in result) console.error("[whatsapp] send failed:", result.error);
+}
+
 export async function notifyOrderPaid(receipt: Receipt): Promise<MailResult[]> {
   const settings = await getSettings();
   const w = words(receipt.product);
@@ -246,7 +298,10 @@ export async function notifyOrderPaid(receipt: Receipt): Promise<MailResult[]> {
     });
   }
 
-  return sendAll(brand(messages));
+  // Both go out; neither waits on the other, and a WhatsApp failure has already
+  // been swallowed by the time this resolves.
+  const [results] = await Promise.all([sendAll(brand(messages)), whatsappPass(receipt, settings)]);
+  return results;
 }
 
 /** Somebody put their name down for the concert reveal. */
