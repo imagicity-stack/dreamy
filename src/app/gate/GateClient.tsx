@@ -14,7 +14,7 @@ import jsQR from "jsqr";
  * one is a person arriving.
  */
 
-type Ticket = {
+export type Ticket = {
   id: string;
   code: string;
   tierLabel: string;
@@ -26,7 +26,7 @@ type Ticket = {
   usedBy: string | null;
 };
 
-type Outcome =
+export type Outcome =
   | { result: "admitted"; ticket: Ticket }
   | { result: "already"; ticket: Ticket; usedAt: string; usedBy: string }
   | { result: "void"; ticket: Ticket }
@@ -231,8 +231,9 @@ export default function GateClient({
           }}
         />
 
-        {outcome && <Result outcome={outcome} />}
       </div>
+
+      {outcome && <Result outcome={outcome} onDismiss={() => setOutcome(null)} />}
 
       {cameraError && (
         <div style={{ background: "var(--crimson)", padding: "12px 16px", fontSize: 13.5, lineHeight: 1.5 }}>
@@ -280,24 +281,38 @@ export default function GateClient({
   );
 }
 
-/** The full-screen answer. One colour, one word, one name. */
-function Result({ outcome }: { outcome: Outcome }) {
+/**
+ * The answer, over the whole screen.
+ *
+ * A volunteer working a queue is not reading; they are glancing. So the mark
+ * comes first and large — a tick means the person in front of them walks in,
+ * anything else means they do not — with the name under it so the volunteer can
+ * say it out loud and the holder can agree that it is theirs. It covers the
+ * whole viewport rather than just the camera, because a green strip at the top
+ * of a phone in sunlight is not an answer anybody can see.
+ *
+ * Tapping clears it early: at a busy gate, waiting out an animation is the
+ * difference between a queue moving and a queue not.
+ */
+export function Result({ outcome, onDismiss }: { outcome: Outcome; onDismiss: () => void }) {
   const skin =
     outcome.result === "admitted"
-      ? { bg: "#0f7a3d", word: "LET THEM IN" }
+      ? { bg: "#0b7a3b", word: "ENTRY GRANTED", mark: "tick" as const }
       : outcome.result === "already"
-        ? { bg: "#b8730a", word: "ALREADY IN" }
+        ? { bg: "#b8730a", word: "ALREADY IN", mark: "warn" as const }
         : outcome.result === "void"
-          ? { bg: "#8a0b3c", word: "REFUNDED" }
-          : { bg: "#a10a0a", word: "NOT OURS" };
+          ? { bg: "#8a0b3c", word: "REFUNDED", mark: "cross" as const }
+          : { bg: "#a10a0a", word: "NOT OURS", mark: "cross" as const };
 
   return (
     <div
       role="status"
       aria-live="assertive"
+      onClick={onDismiss}
       style={{
-        position: "absolute",
+        position: "fixed",
         inset: 0,
+        zIndex: 120,
         background: skin.bg,
         color: "#ffffff",
         display: "flex",
@@ -305,32 +320,78 @@ function Result({ outcome }: { outcome: Outcome }) {
         alignItems: "center",
         justifyContent: "center",
         textAlign: "center",
-        padding: 20,
-        gap: 10,
+        padding: 24,
+        gap: 12,
+        cursor: "pointer",
       }}
     >
-      <div className="font-display" style={{ fontSize: "clamp(30px, 11vw, 58px)", lineHeight: 1 }}>{skin.word}</div>
+      <Mark kind={skin.mark} />
+
+      <div className="font-display" style={{ fontSize: "clamp(32px, 11vw, 60px)", lineHeight: 1 }}>{skin.word}</div>
+
       {"ticket" in outcome && (
         <>
-          <div style={{ fontSize: 22, fontWeight: 800 }}>{outcome.ticket.holderName}</div>
-          <div style={{ fontSize: 13, letterSpacing: "0.14em", opacity: 0.9 }}>
+          <div style={{ fontSize: 26, fontWeight: 800, lineHeight: 1.2 }}>{outcome.ticket.holderName}</div>
+          <div style={{ fontSize: 13, letterSpacing: "0.14em", opacity: 0.92 }}>
             {outcome.ticket.tierLabel.toUpperCase()}
             {outcome.ticket.of > 1 ? ` · ${outcome.ticket.index} OF ${outcome.ticket.of}` : ""} · {outcome.ticket.code}
           </div>
         </>
       )}
+
       {outcome.result === "already" && (
-        <div style={{ fontSize: 14, lineHeight: 1.5, maxWidth: "26ch" }}>
+        <div style={{ fontSize: 14.5, lineHeight: 1.5, maxWidth: "28ch" }}>
           Scanned at {timeOf(outcome.usedAt)}{outcome.usedBy ? ` by ${outcome.usedBy}` : ""}. Your call — send them to the
           fest desk if you aren&rsquo;t sure.
         </div>
       )}
+      {outcome.result === "void" && (
+        <div style={{ fontSize: 14.5, lineHeight: 1.5, maxWidth: "28ch" }}>
+          This pass was refunded. Do not admit — the fest desk can explain it to them.
+        </div>
+      )}
       {outcome.result === "unknown" && (
-        <div style={{ fontSize: 14, lineHeight: 1.5, maxWidth: "26ch" }}>
+        <div style={{ fontSize: 14.5, lineHeight: 1.5, maxWidth: "28ch" }}>
           Not a MADOOZA pass. Send them to the fest desk.
         </div>
       )}
+
+      <div style={{ position: "absolute", bottom: 26, fontSize: 11, letterSpacing: "0.18em", opacity: 0.72 }}>
+        TAP TO SCAN THE NEXT ONE
+      </div>
     </div>
+  );
+}
+
+/** The tick, the warning and the cross, drawn big enough to read at arm's length. */
+function Mark({ kind }: { kind: "tick" | "warn" | "cross" }) {
+  const size = 132;
+  const common = {
+    fill: "none",
+    stroke: "#ffffff",
+    strokeWidth: 9,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+  };
+
+  return (
+    <svg width={size} height={size} viewBox="0 0 120 120" aria-hidden focusable="false">
+      <circle cx="60" cy="60" r="52" fill="rgba(255,255,255,0.14)" />
+      <circle cx="60" cy="60" r="52" {...common} strokeWidth={6} opacity={0.55} />
+      {kind === "tick" && <path d="M36 62 L53 79 L85 43" {...common} />}
+      {kind === "cross" && (
+        <>
+          <path d="M42 42 L78 78" {...common} />
+          <path d="M78 42 L42 78" {...common} />
+        </>
+      )}
+      {kind === "warn" && (
+        <>
+          <path d="M60 34 L60 68" {...common} />
+          <circle cx="60" cy="84" r="5" fill="#ffffff" stroke="none" />
+        </>
+      )}
+    </svg>
   );
 }
 
