@@ -28,5 +28,13 @@ export default async function FaqPage() {
     time: String(r.time ?? ""),
   }));
 
-  return <FaqClient faqs={faqs} venueTimes={venueTimes} words={words} contactEmail={settings.contactEmail} />;
+  return (
+    <FaqClient
+      faqs={faqs}
+      venueTimes={venueTimes}
+      words={words}
+      contactEmail={settings.contactEmail}
+      instagram={settings.instagram}
+    />
+  );
 }

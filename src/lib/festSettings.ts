@@ -51,6 +51,8 @@ export type FestSettings = {
   /** Written on the sponsors page, the FAQ, the gallery and the footer. */
   contactEmail: string;
   contactPhone: string;
+  /** Instagram handle, stored bare — no @, no URL. Empty hides the link. */
+  instagram: string;
 };
 
 export const MONTHS = [
@@ -104,6 +106,7 @@ export const DEFAULT_SETTINGS: FestSettings = {
     "MADOOZA — The Elden Heights School's fest. Cosplay, fete, carnival stalls and a sealed concert reveal, in Hazaribagh.",
   contactEmail: "hello@madooza.com",
   contactPhone: "+91 91222 80578",
+  instagram: "madooza.official",
 };
 
 function asNumber(value: unknown, fallback: number, max = 1_000_000): number {
@@ -127,6 +130,30 @@ function asBool(value: unknown, fallback: boolean): boolean {
 
 function asText(value: unknown, fallback: string, max = 300): string {
   return typeof value === "string" ? value.slice(0, max) : fallback;
+}
+
+/**
+ * A social handle, however it was typed.
+ *
+ * Somebody filling this in will paste the profile URL as often as they will
+ * type the name, and will write the @ about half the time. All three mean the
+ * same account, so all three are accepted and stored the same way — bare — and
+ * the link is built from it where it is needed. Deliberately cleared is a real
+ * answer, so an empty string stays empty rather than falling back to the
+ * default and reappearing on the site.
+ */
+function asHandle(value: unknown, fallback: string): string {
+  if (typeof value !== "string") return fallback;
+  const handle = value
+    .trim()
+    // The scheme is optional: a URL copied out of an address bar often arrives
+    // without it.
+    .replace(/^(https?:\/\/)?(www\.)?instagram\.com\//i, "")
+    .replace(/^@+/, "")
+    .replace(/[/?#].*$/, "")
+    .slice(0, 60);
+  // Instagram allows letters, digits, dots and underscores and nothing else.
+  return /^[A-Za-z0-9._]*$/.test(handle) ? handle : fallback;
 }
 
 /** Coerces whatever is in Firestore into a complete, sane settings object. */
@@ -167,6 +194,7 @@ export function normalizeSettings(raw: unknown): FestSettings {
     siteDescription: asText(data.siteDescription, DEFAULT_SETTINGS.siteDescription, 400),
     contactEmail: asText(data.contactEmail, DEFAULT_SETTINGS.contactEmail, 120),
     contactPhone: asText(data.contactPhone, DEFAULT_SETTINGS.contactPhone, 60),
+    instagram: asHandle(data.instagram, DEFAULT_SETTINGS.instagram),
   };
 }
 

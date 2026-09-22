@@ -365,7 +365,7 @@ export default function SettingsTab({ pages }: { pages: { key: string; label: st
 
       <Section kicker="THE OFFICE" title="HOW PEOPLE REACH YOU">
         <p style={{ fontSize: 14, color: "#5B4480", margin: "0 0 14px" }}>
-          Written on the sponsors page, the FAQ, the gallery and the footer.
+          Written on the sponsors page, the FAQ, the gallery, the footer and the bottom of every email.
         </p>
         <Grid>
           <div>
@@ -375,6 +375,21 @@ export default function SettingsTab({ pages }: { pages: { key: string; label: st
           <div>
             <label style={ui.label}>PHONE</label>
             <input className="mz-input" value={settings.contactPhone} onChange={(e) => edit({ contactPhone: e.target.value })} />
+          </div>
+          <div>
+            <label style={ui.label}>INSTAGRAM</label>
+            <input
+              className="mz-input"
+              value={settings.instagram}
+              onChange={(e) => edit({ instagram: e.target.value })}
+              placeholder="madooza.official"
+              autoCapitalize="off"
+              autoComplete="off"
+            />
+            <div style={{ fontSize: 12, lineHeight: 1.5, color: "#5B4480", marginTop: 6 }}>
+              Just the handle. An @ or a pasted profile link is fine too — both are tidied up on save.
+              Leave it empty to take the link off the site.
+            </div>
           </div>
         </Grid>
       </Section>

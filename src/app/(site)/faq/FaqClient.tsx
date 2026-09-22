@@ -10,11 +10,13 @@ export default function FaqClient({
   venueTimes,
   words,
   contactEmail,
+  instagram,
 }: {
   faqs: { q: string; a: string }[];
   venueTimes: VenueTime[];
   words: Record<string, string>;
   contactEmail: string;
+  instagram: string;
 }) {
   const [open, setOpen] = useState<number | null>(null);
 
@@ -83,7 +85,22 @@ export default function FaqClient({
               <p style={{ fontSize: 15, lineHeight: 1.55, margin: "0 0 14px", color: "var(--lilac-text)" }}>
                 {words.stillStuckBody}
               </p>
-              <a href={`mailto:${contactEmail}`} className="font-display" style={{ fontSize: 14, color: "var(--teal)" }}>{contactEmail}</a>
+              <div style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "flex-start" }}>
+                <a href={`mailto:${contactEmail}`} className="font-display" style={{ fontSize: 14, color: "var(--teal)" }}>{contactEmail}</a>
+                {/* A fest gets ten DMs for every email, so the handle belongs
+                    beside the address rather than only in the footer. */}
+                {instagram && (
+                  <a
+                    href={`https://instagram.com/${instagram}`}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="font-display"
+                    style={{ fontSize: 14, color: "var(--teal)" }}
+                  >
+                    @{instagram} on Instagram
+                  </a>
+                )}
+              </div>
             </div>
           </div>
         </div>

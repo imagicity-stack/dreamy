@@ -11,6 +11,23 @@ function legalLabel(words: Record<string, string>, key: string, fallback: string
   return value && value.trim() ? value : fallback;
 }
 
+/**
+ * Instagram's glyph, drawn rather than fetched.
+ *
+ * It is three shapes — a rounded square, a circle and a dot — so an icon font
+ * or an SVG file would both be more weight and one more thing that can fail to
+ * load than the twelve lines it takes to draw.
+ */
+function InstagramMark() {
+  return (
+    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden focusable="false">
+      <rect x="2.5" y="2.5" width="19" height="19" rx="5.5" stroke="currentColor" strokeWidth="2" />
+      <circle cx="12" cy="12" r="4.4" stroke="currentColor" strokeWidth="2" />
+      <circle cx="17.6" cy="6.4" r="1.4" fill="currentColor" />
+    </svg>
+  );
+}
+
 export default async function Footer() {
   const settings = await getSettings();
   const words = await getCopy("footer");
@@ -100,6 +117,29 @@ export default async function Footer() {
             <br />
             {settings.contactPhone}
           </div>
+
+          {settings.instagram && (
+            <a
+              href={`https://instagram.com/${settings.instagram}`}
+              target="_blank"
+              rel="noreferrer noopener"
+              className="mz-footer-link"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 9,
+                marginTop: 16,
+                padding: "8px 13px 8px 10px",
+                border: "2px solid var(--purple)",
+                borderRadius: 999,
+                fontSize: 13.5,
+                letterSpacing: "0.02em",
+              }}
+            >
+              <InstagramMark />
+              @{settings.instagram}
+            </a>
+          )}
         </div>
       </div>
       <div
