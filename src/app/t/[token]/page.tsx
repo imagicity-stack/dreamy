@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import { notFound } from "next/navigation";
 import { findTicket, qrDataUrl, ticketUrl } from "@/lib/tickets";
 import { getSettings, describeDate } from "@/lib/settings";
@@ -29,7 +30,7 @@ export default async function TicketPage({ params }: { params: Promise<{ token: 
 
   const used = ticket.status === "used";
   const voided = ticket.status === "void";
-  const bandColour = voided ? "var(--crimson)" : used ? "#8f74b5" : "var(--teal)";
+  const bandColour = voided ? "var(--crimson)" : used ? "#8f74b5" : "var(--bg)";
   const bandText = voided ? "THIS PASS HAS BEEN REFUNDED" : used ? "ALREADY ADMITTED" : "READY TO SCAN";
 
   return (
@@ -48,15 +49,29 @@ export default async function TicketPage({ params }: { params: Promise<{ token: 
             style={{
               background: bandColour,
               borderBottom: "3px solid var(--ink)",
-              padding: "14px 20px",
+              padding: "10px 16px 10px 10px",
               display: "flex",
               justifyContent: "space-between",
               alignItems: "center",
               gap: 10,
             }}
           >
-            <span className="font-display" style={{ fontSize: 19, color: "var(--ink)" }}>MADOOZA</span>
-            <span style={{ fontSize: 10, fontWeight: 800, letterSpacing: "0.16em", color: "var(--ink)" }}>
+            <Image
+              src="/assets/madooza-logo.png"
+              alt="MADOOZA"
+              width={54}
+              height={54}
+              priority
+              style={{ display: "block", width: 54, height: 54 }}
+            />
+            <span
+              style={{
+                fontSize: 10,
+                fontWeight: 800,
+                letterSpacing: "0.16em",
+                color: voided || used ? "var(--lilac)" : "var(--teal)",
+              }}
+            >
               {bandText}
             </span>
           </div>

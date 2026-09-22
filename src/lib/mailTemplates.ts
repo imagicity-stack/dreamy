@@ -25,6 +25,12 @@ const MUTED = "#b79bd8";
 
 const SANS = "'Helvetica Neue', Helvetica, Arial, sans-serif";
 
+/**
+ * The logo travels with every mail as an inline attachment under this id.
+ * notify.ts attaches it to each message; nothing else has to remember to.
+ */
+export const LOGO_CID = "madooza-logo@madooza";
+
 export type DetailRow = { label: string; value: string };
 
 /** One scannable ticket inside an email: the QR, the code and who it is for. */
@@ -138,8 +144,10 @@ function ticketCard(ticket: TicketBlock): string {
 
 /** The shell every mail is poured into. Returns both the HTML and its plain twin. */
 export function renderEmail(parts: EmailParts, settings: FestSettings): { html: string; text: string } {
-  const band = parts.tone === "alert" ? "#df025c" : TEAL;
-  const bandText = parts.tone === "alert" ? LILAC : INK;
+  // The band is painted the same purple the logo's own circle is filled with,
+  // so the two meet without an edge — the alert colour is the exception, and
+  // there the circle reading as a badge is no bad thing.
+  const band = parts.tone === "alert" ? "#df025c" : BG;
   const date = describeDate(settings);
 
   const html = `<!doctype html>
@@ -150,20 +158,22 @@ export function renderEmail(parts: EmailParts, settings: FestSettings): { html: 
 <meta name="color-scheme" content="light">
 <title>${escape(parts.subject)}</title>
 </head>
-<body style="margin:0;padding:0;background:${BG};">
+<body style="margin:0;padding:0;background:${INK};">
 <!-- Preheader: the grey line of text an inbox shows beside the subject. -->
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escape(parts.intro)}</div>
-<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${BG};padding:24px 12px;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${INK};padding:24px 12px;">
   <tr>
     <td align="center">
       <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:100%;">
 
         <tr>
-          <td style="background:${band};border:3px solid ${INK};border-radius:18px 18px 0 0;padding:18px 24px;">
+          <td style="background:${band};border:3px solid ${INK};border-radius:18px 18px 0 0;padding:14px 20px;">
             <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
               <tr>
-                <td style="font:800 22px/1 ${SANS};letter-spacing:0.08em;color:${bandText};">MADOOZA</td>
-                <td style="font:700 10px/1.4 ${SANS};letter-spacing:0.18em;color:${bandText};text-align:right;text-transform:uppercase;">${escape(parts.kicker)}</td>
+                <td style="width:86px;">
+                  <img src="cid:${LOGO_CID}" alt="MADOOZA" width="78" height="78" style="display:block;width:78px;height:78px;border:0;" />
+                </td>
+                <td style="font:700 10px/1.4 ${SANS};letter-spacing:0.18em;color:${parts.tone === "alert" ? LILAC : TEAL};text-align:right;text-transform:uppercase;">${escape(parts.kicker)}</td>
               </tr>
             </table>
           </td>

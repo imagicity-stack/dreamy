@@ -1,5 +1,7 @@
+import { readFileSync } from "fs";
+import path from "path";
 import { formatPaise } from "./pricing";
-import { renderEmail, type DetailRow, type TicketBlock } from "./mailTemplates";
+import { LOGO_CID, renderEmail, type DetailRow, type TicketBlock } from "./mailTemplates";
 import {
   officeAddress,
   sendAll,
@@ -25,6 +27,30 @@ import type { Receipt } from "./orders";
  * written and, on a route, from inside after(), so a slow mail server delays
  * nobody's confirmation page.
  */
+
+/**
+ * The logo, read once and attached to every mail. An inline attachment rather
+ * than a link to the site, for the same reason the QR is one: mail clients
+ * block remote images, and a letterhead nobody can see is not a letterhead.
+ */
+let logoFile: Buffer | null = null;
+function logoAttachment(): MailAttachment[] {
+  try {
+    if (!logoFile) {
+      logoFile = readFileSync(path.join(process.cwd(), "public", "assets", "madooza-logo-small.png"));
+    }
+    return [{ filename: "madooza.png", content: logoFile, contentType: "image/png", cid: LOGO_CID }];
+  } catch {
+    // The mail is still worth sending without its letterhead.
+    return [];
+  }
+}
+
+/** Every message goes out wearing the logo. */
+function brand(messages: MailMessage[]): MailMessage[] {
+  const logo = logoAttachment();
+  return messages.map((m) => ({ ...m, attachments: [...(m.attachments ?? []), ...logo] }));
+}
 
 const PRODUCT_WORDS: Record<string, { buyerTitle: string; officeNoun: string; codeLabel: string }> = {
   fetePass: { buyerTitle: "YOU'RE IN", officeNoun: "Fete Pass", codeLabel: "PASS CODE" },
@@ -211,7 +237,7 @@ export async function notifyOrderPaid(receipt: Receipt): Promise<MailResult[]> {
     });
   }
 
-  return sendAll(messages);
+  return sendAll(brand(messages));
 }
 
 /** Somebody put their name down for the concert reveal. */
@@ -270,7 +296,7 @@ export async function notifyConcertInterest(entry: {
     messages.push({ to: entry.contact, subject: `You're number ${queue} on the MADOOZA list`, html: doc.html, text: doc.text });
   }
 
-  return sendAll(messages);
+  return sendAll(brand(messages));
 }
 
 /** Paid, but the last pass went while they were paying. The office owes a refund. */
@@ -299,7 +325,7 @@ export async function notifyOversold(args: {
     },
     settings,
   );
-  return sendMail({ to: office, subject: `REFUND NEEDED · oversold ${args.product} · ${args.paymentId}`, html: doc.html, text: doc.text });
+  return sendMail(brand([{ to: office, subject: `REFUND NEEDED · oversold ${args.product} · ${args.paymentId}`, html: doc.html, text: doc.text }])[0]);
 }
 
 /** Razorpay says a payment failed. Worth knowing; nothing to do. */
@@ -327,7 +353,7 @@ export async function notifyPaymentFailed(args: {
     },
     settings,
   );
-  return sendMail({ to: office, subject: `Payment failed · ${args.orderId}`, html: doc.html, text: doc.text });
+  return sendMail(brand([{ to: office, subject: `Payment failed · ${args.orderId}`, html: doc.html, text: doc.text }])[0]);
 }
 
 /** A refund came back through the webhook. */
@@ -380,7 +406,7 @@ export async function notifyRefund(args: {
     messages.push({ to: args.buyerEmail, subject: `Your MADOOZA refund of ${amount}`, html: doc.html, text: doc.text });
   }
 
-  return sendAll(messages);
+  return sendAll(brand(messages));
 }
 
 /** "Does the mailbox work?" — sent from the panel. */
@@ -403,5 +429,5 @@ export async function sendTestEmail(to?: string): Promise<MailResult> {
     },
     settings,
   );
-  return sendMail({ to: target, subject: "MADOOZA mail is working", html: doc.html, text: doc.text });
+  return sendMail(brand([{ to: target, subject: "MADOOZA mail is working", html: doc.html, text: doc.text }])[0]);
 }
