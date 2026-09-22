@@ -22,16 +22,25 @@ export type Category = {
   value: string;
   body: string;
   image: { url: string } | null;
+  /** Where to put a photo for this category, when there isn't one yet. */
+  expectedImage: string;
 };
 
 export type Prize = { id: string; amount: string; title: string; note: string };
 
-/** Cycled so a fifth category still looks like it belongs to the set. */
+/**
+ * Cycled so a fifth category still looks like it belongs to the set.
+ *
+ * `tint` is the panel a card shows before its photo arrives, and `phDark`
+ * flips the big initial on it from white to ink. The fourth panel is light
+ * rather than another dark one: on the page's own deep purple, a near-black
+ * panel reads as a hole where the top of the card should be.
+ */
 const CARD_SKINS = [
-  { bg: "var(--purple)", fg: "var(--lilac)", nColor: "var(--teal)" },
-  { bg: "var(--lilac)", fg: "var(--ink)", nColor: "var(--purple)" },
-  { bg: "var(--paper)", fg: "var(--ink)", nColor: "var(--purple)" },
-  { bg: "var(--teal)", fg: "var(--ink)", nColor: "var(--purple)" },
+  { bg: "var(--purple)", fg: "var(--lilac)", nColor: "var(--teal)", tint: "#4a1382", phDark: false },
+  { bg: "var(--lilac)", fg: "var(--ink)", nColor: "var(--purple)", tint: "#df025c", phDark: false },
+  { bg: "var(--paper)", fg: "var(--ink)", nColor: "var(--purple)", tint: "#35c6d4", phDark: false },
+  { bg: "var(--teal)", fg: "var(--ink)", nColor: "var(--purple)", tint: "#efe3fb", phDark: true },
 ];
 
 const PRIZE_SKINS = [
@@ -40,6 +49,111 @@ const PRIZE_SKINS = [
   { bg: "var(--purple)", fg: "var(--lilac)", amountColor: "var(--teal)" },
   { bg: "var(--paper)", fg: "var(--ink)", amountColor: "var(--purple)" },
 ];
+
+type Skin = { bg: string; fg: string; nColor: string; tint: string; phDark: boolean };
+
+/**
+ * One category, photo-led.
+ *
+ * The photo is the point of these cards — a costume is a visual thing and four
+ * paragraphs of text is a poor way to sell one. But the photos are added by
+ * hand, one file at a time, so a card has to look deliberate before its picture
+ * exists. The empty state is therefore drawn rather than left blank: the
+ * category's own initial, big, on a tinted panel, which reads as a design
+ * choice to a visitor and as a gap to whoever is filling them in.
+ *
+ * In development it also prints the exact path the file belongs at, because
+ * that is the one moment the information is useful and the one audience it
+ * should never reach is somebody buying a ticket.
+ */
+function CategoryCard({ category, skin, kicker }: { category: Category; skin: Skin; kicker: string }) {
+  return (
+    <article
+      style={{
+        background: skin.bg,
+        color: skin.fg,
+        border: "3px solid var(--ink)",
+        borderRadius: 20,
+        boxShadow: "7px 7px 0 var(--ink)",
+        overflow: "hidden",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
+      <div style={{ position: "relative", aspectRatio: "4 / 3", borderBottom: "3px solid var(--ink)", background: skin.tint }}>
+        {category.image?.url ? (
+          <Image
+            src={category.image.url}
+            alt={category.title}
+            fill
+            sizes="(max-width: 700px) 100vw, 280px"
+            style={{ objectFit: "cover" }}
+          />
+        ) : (
+          <div
+            style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              backgroundImage: `repeating-linear-gradient(135deg, ${
+                skin.phDark ? "rgba(21,3,49,0.07)" : "rgba(255,255,255,0.09)"
+              } 0 10px, transparent 10px 20px)`,
+            }}
+          >
+            <span
+              className="font-display"
+              aria-hidden
+              style={{
+                fontSize: "clamp(40px, 13vw, 62px)",
+                lineHeight: 1,
+                color: skin.phDark ? "rgba(21,3,49,0.26)" : "rgba(255,255,255,0.42)",
+              }}
+            >
+              {category.title.trim().charAt(0) || "?"}
+            </span>
+          </div>
+        )}
+        <span
+          style={{
+            position: "absolute",
+            top: 10,
+            left: 10,
+            fontSize: 9.5,
+            fontWeight: 800,
+            letterSpacing: "0.18em",
+            background: "var(--ink)",
+            color: "var(--lilac)",
+            borderRadius: 999,
+            padding: "5px 10px",
+          }}
+        >
+          {kicker}
+        </span>
+      </div>
+
+      <div style={{ padding: "18px 18px 20px", flex: 1 }}>
+        <h3 className="font-display" style={{ fontSize: 21, margin: "0 0 8px" }}>{category.title}</h3>
+        <p style={{ fontSize: 14, lineHeight: 1.55, margin: 0 }}>{category.body}</p>
+        {!category.image?.url && process.env.NODE_ENV === "development" && (
+          <code
+            style={{
+              display: "block",
+              marginTop: 12,
+              fontSize: 10.5,
+              lineHeight: 1.5,
+              wordBreak: "break-all",
+              opacity: 0.7,
+            }}
+          >
+            add {category.expectedImage}
+          </code>
+        )}
+      </div>
+    </article>
+  );
+}
 
 /** The confirmation line names the character and the category the entrant chose, in bold. */
 function fillEntryTokens(text: string, values: { character: string; entryCategory: string }) {
@@ -178,24 +292,73 @@ export default function CosplayClient({
 
       <section style={{ background: "var(--bg)", padding: "54px 20px 60px" }}>
         <div style={{ maxWidth: 1180, margin: "0 auto" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(230px, 1fr))", gap: 18, marginBottom: 46 }}>
-            {categories.map((c, i) => {
-              const skin = CARD_SKINS[i % CARD_SKINS.length];
-              return (
-                <div key={c.id} style={{ background: skin.bg, color: skin.fg, border: "3px solid var(--ink)", borderRadius: 20, boxShadow: "7px 7px 0 var(--ink)", padding: "22px 20px" }}>
-                  <div style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: "0.2em", color: skin.nColor }}>
-                    {words.categoryCardKicker} {String(i + 1).padStart(2, "0")}
-                  </div>
-                  {c.image?.url && (
-                    <div style={{ position: "relative", height: 130, margin: "12px 0 4px", border: "2px solid var(--ink)", borderRadius: 14, overflow: "hidden" }}>
-                      <Image src={c.image.url} alt={c.title} fill sizes="(max-width: 700px) 100vw, 260px" style={{ objectFit: "cover" }} />
-                    </div>
-                  )}
-                  <h3 className="font-display" style={{ fontSize: 20, margin: "10px 0 8px" }}>{c.title}</h3>
-                  <p style={{ fontSize: 14, lineHeight: 1.5, margin: 0 }}>{c.body}</p>
-                </div>
-              );
-            })}
+          <header style={{ marginBottom: 24, maxWidth: "52ch" }}>
+            <h2 className="font-display" style={{ fontSize: "clamp(24px, 3.6vw, 36px)", margin: "0 0 10px", color: "var(--lilac)" }}>
+              {words.categoriesTitle}
+            </h2>
+            <p style={{ fontSize: 16, lineHeight: 1.6, color: "var(--lilac-text)", margin: 0 }}>
+              {words.categoriesIntro}
+            </p>
+          </header>
+
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(158px, 1fr))", gap: 18, marginBottom: 26 }}>
+            {categories.map((c, i) => (
+              <CategoryCard
+                key={c.id}
+                category={c}
+                skin={CARD_SKINS[i % CARD_SKINS.length]}
+                kicker={`${words.categoryCardKicker} ${String(i + 1).padStart(2, "0")}`}
+              />
+            ))}
+          </div>
+
+          {/* The four categories are how judging is organised, not a guest
+              list. In a first year that distinction is the whole point, so it
+              gets a panel rather than a line of small print. */}
+          <div
+            style={{
+              background: "var(--ink)",
+              border: "3px solid var(--purple)",
+              borderRadius: 22,
+              padding: "26px 24px",
+              marginBottom: 46,
+              position: "relative",
+              overflow: "hidden",
+            }}
+          >
+            <div
+              aria-hidden
+              style={{
+                position: "absolute", inset: 0,
+                backgroundImage: "repeating-linear-gradient(135deg, rgba(53,198,212,0.07) 0 12px, transparent 12px 24px)",
+                pointerEvents: "none",
+              }}
+            />
+            <div style={{ position: "relative", display: "flex", gap: 20, flexWrap: "wrap", alignItems: "flex-start" }}>
+              <span
+                className="font-display"
+                style={{
+                  fontSize: 11,
+                  letterSpacing: "0.18em",
+                  color: "var(--ink)",
+                  background: "var(--teal)",
+                  border: "2px solid var(--ink)",
+                  borderRadius: 999,
+                  padding: "7px 13px",
+                  flexShrink: 0,
+                }}
+              >
+                YEAR ONE
+              </span>
+              <div style={{ minWidth: 260, flex: 1 }}>
+                <h3 className="font-display" style={{ fontSize: 22, margin: "0 0 10px", color: "var(--teal)" }}>
+                  {words.openFloorTitle}
+                </h3>
+                <p style={{ fontSize: 15.5, lineHeight: 1.65, color: "var(--lilac-text)", margin: 0, maxWidth: "62ch" }}>
+                  {words.openFloorBody}
+                </p>
+              </div>
+            </div>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 26, alignItems: "start" }}>
