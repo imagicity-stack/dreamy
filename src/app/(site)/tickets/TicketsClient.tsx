@@ -6,6 +6,7 @@ import { formatInr } from "@/data/fest";
 import { SealedDateStamp, SealedDateTiles } from "@/components/SealedDate";
 import PriceLines from "@/components/PriceLines";
 import FormNote from "@/components/FormNote";
+import WhatsAppOptIn from "@/components/WhatsAppOptIn";
 import { isPageHidden, type DateDisplay, type FestSettings } from "@/lib/festSettings";
 import { LEGAL_PAGES } from "@/lib/legal";
 import { formatPaise } from "@/lib/pricing";
@@ -51,7 +52,7 @@ export default function TicketsClient({
   concertPassIncludes: PassLine[];
 }) {
   const [qty, setQty] = useState(1);
-  const [buyer, setBuyer] = useState({ name: "", school: "", phone: "", email: "" });
+  const [buyer, setBuyer] = useState({ name: "", school: "", phone: "", email: "", whatsappOptIn: true });
   // One name per pass beyond the first: a pass is scanned per person and shows
   // a name at the gate, so three passes are three people rather than three
   // copies of the buyer. Index 0 is the buyer and is filled from their name.
@@ -252,7 +253,7 @@ export default function TicketsClient({
                 onClick={() => {
                   setPass(null);
                   setQty(1);
-                  setBuyer({ name: "", school: "", phone: "", email: "" });
+                  setBuyer({ name: "", school: "", phone: "", email: "", whatsappOptIn: true });
                   setAttendees([]);
                 }}
                 style={{ fontWeight: 700, fontSize: 12, letterSpacing: "0.14em", background: "transparent", border: "2px solid var(--ink)", borderRadius: 14, padding: "14px 18px", cursor: "pointer", color: "var(--ink)" }}
@@ -452,6 +453,11 @@ export default function TicketsClient({
                 </div>
 
                 <FormNote text={words.contactAccuracyNote} />
+                <WhatsAppOptIn
+                  checked={buyer.whatsappOptIn}
+                  onChange={(next) => setBuyer((b) => ({ ...b, whatsappOptIn: next }))}
+                  phone={buyer.phone}
+                />
 
                 {!settings.soldOut ? (
                   <button

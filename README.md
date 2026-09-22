@@ -50,6 +50,10 @@ settings for deployment:
 - `SMTP_USER` / `SMTP_PASS` / `MAIL_FROM` / `MAIL_TO` — the Google Workspace mailbox that sends the
   fest's mail, and the inbox that gets a copy of everything. `SMTP_HOST` and `SMTP_PORT` default to
   `smtp.gmail.com` and `465`. See **Mail** below.
+- `WHATSAPP_TOKEN` / `WHATSAPP_PHONE_NUMBER_ID` — Meta WhatsApp Cloud API, for sending the pass over
+  WhatsApp as well. Optional; leave either empty and nothing is attempted. See **WhatsApp** below.
+- `NEXT_PUBLIC_META_PIXEL_ID` — Meta Pixel for ad conversion tracking. Empty turns it off. Compiled
+  into the bundle, so it needs a redeploy.
 
 All of the server-only ones are read at request time, so changing them takes effect on the next request
 rather than needing a rebuild. `NEXT_PUBLIC_RAZORPAY_KEY_ID` is compiled into the bundle, so that one
@@ -410,3 +414,64 @@ inline-style/template-binding format into React. The prototype's own scroll-trig
 animation was intentionally not ported (it was a fragile, previously-reworked-many-times entrance effect
 that doesn't change the final look of the page); everything else — the spinning badge, pulsing halo,
 drifting speckle textures, hover/press sticker-shadow lifts — is intact as plain CSS.
+
+## WhatsApp
+
+The pass goes out by email always, and over WhatsApp as well when the buyer ticks the box at checkout
+and the fest has finished its Meta setup. WhatsApp is never the only copy: it can fail because the
+number is not on WhatsApp, because the template is still in review, or because Meta is having an
+afternoon, and a buyer who paid is owed their pass regardless. A failure is logged and the email goes
+out as it always did.
+
+Getting it working is mostly Meta's paperwork, not code:
+
+1. A **Meta Business account**, verified with the organiser's incorporation documents. This is the slow
+   step — days to a couple of weeks.
+2. A **WhatsApp Business Account** with an approved display name.
+3. A **phone number** registered to the Cloud API. It cannot also be signed into the WhatsApp or
+   WhatsApp Business app; once it is on the API, it stays there.
+4. An **approved message template**. Business-initiated messages may not be free text. A pass
+   confirmation is the *Utility* category, which is the cheapest tier and usually approved in hours.
+5. A **System User token**. The 24-hour token shown in the dashboard is for testing and will expire
+   overnight.
+
+The template must have a **DOCUMENT header** — that is where the pass PDF goes — and exactly **three
+body variables**, in this order:
+
+| Variable | What the site fills in       |
+| -------- | ---------------------------- |
+| `{{1}}`  | the holder's name            |
+| `{{2}}`  | the pass code, e.g. MDZ-F-0042 |
+| `{{3}}`  | the link to the pass         |
+
+The wording around them is yours to write in the Meta dashboard; the site only supplies the values. If
+the upload of the PDF fails, the message still goes without it — a code and a working link are a usable
+ticket.
+
+The pass is uploaded to Meta's media endpoint and sent by id rather than as a link. That is deliberate:
+the alternative is a URL Meta's servers can fetch, and the token on a pass exists precisely so that
+nothing unauthenticated can print somebody else's ticket.
+
+**Consent.** Meta requires an opt-in before a business may message anyone, and typing a phone number
+into a checkout is not it. Every form carries a checkbox, ticked by default and showing the number it
+applies to, and the answer is stored with the order. Untick it and nothing is sent.
+
+## Advertising
+
+The public pages carry the Meta Pixel. It is deliberately absent from `/gate`, `/admin` and
+`/t/<token>` — the pixel reports the page's URL, and a pass page's URL contains the token that opens
+that pass.
+
+Beyond the automatic `PageView`, three events are reported from the code that already knows the truth
+rather than from guessed button clicks:
+
+- **InitiateCheckout** — the server has priced the order and Razorpay is about to open.
+- **Purchase** — the payment is server-verified, with the amount actually charged.
+- **Lead** — somebody joined the concert interest list.
+
+`InitiateCheckout` and `Purchase` pass the order id as Meta's `eventID`, so adding the Conversions API
+later de-duplicates against these rather than counting every sale twice.
+
+A single-page app breaks the stock snippet, which fires `PageView` once on load: moving between pages
+here never reloads the document. So the first `PageView` comes from the snippet and every later one
+from the route changing.

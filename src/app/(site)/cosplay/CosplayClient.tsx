@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import PriceLines from "@/components/PriceLines";
 import FormNote from "@/components/FormNote";
+import WhatsAppOptIn from "@/components/WhatsAppOptIn";
 import { isPageHidden, type FestSettings } from "@/lib/festSettings";
 import { LEGAL_PAGES } from "@/lib/legal";
 import { formatPaise } from "@/lib/pricing";
@@ -166,7 +167,7 @@ function fillEntryTokens(text: string, values: { character: string; entryCategor
 
 type Entry = {
   name: string; school: string; phone: string; email: string; character: string; category: string;
-  mode: "solo" | "team"; team: string; members: string;
+  mode: "solo" | "team"; team: string; members: string; whatsappOptIn: boolean;
 };
 
 export default function CosplayClient({
@@ -183,7 +184,7 @@ export default function CosplayClient({
   carnivalTiersLive: boolean;
 }) {
   const [entry, setEntry] = useState<Entry>({
-    name: "", school: "", phone: "", email: "", character: "", category: categories[0]?.value ?? "", mode: "solo", team: "", members: "",
+    name: "", school: "", phone: "", email: "", character: "", category: categories[0]?.value ?? "", mode: "solo", team: "", members: "", whatsappOptIn: true,
   });
   const [done, setDone] = useState(false);
   const [status, setStatus] = useState<"idle" | "processing" | "error">("idle");
@@ -244,6 +245,7 @@ export default function CosplayClient({
           mode: entry.mode,
           team: entry.team,
           members: entry.members,
+          whatsappOptIn: entry.whatsappOptIn,
         },
         title: "MADOOZA Cosplay Contest",
       });
@@ -472,6 +474,12 @@ export default function CosplayClient({
                     )}
                   </div>
                   <FormNote text={words.contactAccuracyNote} tone="light" />
+                  <WhatsAppOptIn
+                    checked={entry.whatsappOptIn}
+                    onChange={(next) => setEntry((prev) => ({ ...prev, whatsappOptIn: next }))}
+                    phone={entry.phone}
+                    tone="light"
+                  />
                   <button
                     onClick={submitCos}
                     disabled={!canSubmit || status === "processing"}
@@ -559,7 +567,7 @@ export default function CosplayClient({
                     setEntryTokens([]);
                     setEntryCode("");
                     setPdfState("idle");
-                    setEntry({ name: "", school: "", phone: "", email: "", character: "", category: categories[0]?.value ?? "", mode: "solo", team: "", members: "" });
+                    setEntry({ name: "", school: "", phone: "", email: "", character: "", category: categories[0]?.value ?? "", mode: "solo", team: "", members: "", whatsappOptIn: true });
                   }}
                   style={{ marginTop: 20, fontWeight: 700, fontSize: 12, letterSpacing: "0.14em", background: "transparent", border: "2px solid var(--ink)", borderRadius: 14, padding: "13px 16px", cursor: "pointer", color: "var(--ink)" }}
                 >
