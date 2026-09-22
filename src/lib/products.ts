@@ -58,6 +58,16 @@ export type Product = {
   collection: string;
   codePrefix: string;
   codesPerUnit: boolean;
+  /**
+   * Whether this is scanned at a door.
+   *
+   * A scanned product gets a ticket per code: a token, a QR, a page of the PDF
+   * and a card in the receipt. A merch order is a bag at a tent, so it keeps
+   * its collection code and nothing else. When concert passes go on sale they
+   * only have to say `ticketed: true` here to get the whole apparatus.
+   */
+  ticketed: boolean;
+
   /** Total units that may ever be sold; 0 means no limit. */
   capacity: (settings: FestSettings) => number;
   /** Why this product cannot be bought right now, or null when it can. */
@@ -85,6 +95,7 @@ export const PRODUCTS: Record<ProductKey, Product> = {
     collection: "passes",
     codePrefix: "MDZ-F",
     codesPerUnit: true,
+    ticketed: true,
     capacity: (s) => s.fetePassCapacity,
     closed: (s) => {
       if (isPageHidden(s, "tickets")) return "Passes are not on sale.";
@@ -119,6 +130,7 @@ export const PRODUCTS: Record<ProductKey, Product> = {
     collection: "cosplayEntries",
     codePrefix: "MDZ-C",
     codesPerUnit: true,
+    ticketed: true,
     capacity: (s) => s.cosplayCapacity,
     closed: (s) => (isPageHidden(s, "cosplay") ? "The cosplay contest is not open." : null),
     async quote(input, settings) {
@@ -155,6 +167,7 @@ export const PRODUCTS: Record<ProductKey, Product> = {
     collection: "merchOrders",
     codePrefix: "MDZ-M",
     codesPerUnit: false,
+    ticketed: false,
     capacity: () => 0,
     closed: (s) => {
       if (isPageHidden(s, "merch")) return "The merch shop is closed.";

@@ -420,11 +420,11 @@ export async function fulfilOrder(args: {
     if (fromPayment) result.customer = { ...result.customer, email: fromPayment };
   }
 
-  // Passes become scannable tickets here, before anyone is told the payment
-  // worked, so the browser can offer the PDF the moment the page turns green.
-  // Only a pass needs one: a cosplay entry is a slot at a desk and a merch
-  // order is a bag at a tent.
-  if (!isFailure(result) && result.firstTime && result.product === "fetePass") {
+  // Anything scanned at a door becomes a ticket here, before anyone is told the
+  // payment worked, so the browser can offer the PDF the moment the page turns
+  // green. Which products those are is declared in the registry, not decided
+  // again here.
+  if (!isFailure(result) && result.firstTime && PRODUCTS[result.product].ticketed) {
     try {
       const issued: IssuedTicket[] = await issueTickets({
         orderId: result.orderId,

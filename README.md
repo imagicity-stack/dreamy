@@ -179,6 +179,14 @@ and **only the token's hash is stored** — a copy of the database is not a stac
 encodes `<site>/t/<token>`, a URL, so a scan from a plain camera app lands on the ticket rather than
 showing a string of gibberish.
 
+**Which things are ticketed** is a property in the product registry, not a condition scattered through
+the code: `ticketed: true` on a product gets it a token per code, a QR, a page of the PDF, a card in the
+receipt and a download button on the confirmation. Fete passes and cosplay entries have it; a merch order
+is a bag at a tent and keeps its collection code alone. There is no concert pass yet — the concert page
+is an interest list and sells nothing — but when one goes on sale it inherits all of this by saying so in
+one line. A cosplay entry says ARENA ENTRY rather than ADMIT ONE everywhere it appears, including on the
+gate's own screen, so a volunteer cannot wave somebody in on one.
+
 **One ticket per person, not per payment.** An order of three passes issues three tickets with three QRs,
 all in the one receipt email, because three different people walk through the gate — and the checkout asks
 for each of their names, so the pass, the PDF and the gate screen all say who is actually holding it. A

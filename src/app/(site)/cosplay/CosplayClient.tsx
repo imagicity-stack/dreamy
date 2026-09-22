@@ -8,7 +8,13 @@ import FormNote from "@/components/FormNote";
 import { isPageHidden, type FestSettings } from "@/lib/festSettings";
 import { LEGAL_PAGES } from "@/lib/legal";
 import { formatPaise } from "@/lib/pricing";
-import { CheckoutDismissed, fetchQuote, startCheckout, type Quote } from "@/lib/checkoutClient";
+import {
+  CheckoutDismissed,
+  downloadPasses,
+  fetchQuote,
+  startCheckout,
+  type Quote,
+} from "@/lib/checkoutClient";
 
 export type Category = {
   id: string;
@@ -70,6 +76,8 @@ export default function CosplayClient({
   const [error, setError] = useState("");
   const [quote, setQuote] = useState<Quote | null>(null);
   const [entryCode, setEntryCode] = useState("");
+  const [entryTokens, setEntryTokens] = useState<string[]>([]);
+  const [pdfState, setPdfState] = useState<"idle" | "working" | "saved" | "blocked">("idle");
 
   // The fee, the convenience charge and the GST on it are priced by the server;
   // solo and squad cost the same today, but the quote is asked for either way
@@ -126,9 +134,19 @@ export default function CosplayClient({
         title: "MADOOZA Cosplay Contest",
       });
       setEntryCode(receipt.primaryCode);
+      setEntryTokens(receipt.tickets.map((t) => t.token));
       setDone(true);
       setStatus("idle");
       window.scrollTo(0, 0);
+
+      // The arena pass saves itself while they are still looking at the page,
+      // for the same reason the fete pass does: this is the moment somebody is
+      // most willing to keep the file.
+      if (receipt.tickets.length) {
+        setPdfState("working");
+        const ok = await downloadPasses(receipt.tickets.map((t) => t.token), "madooza-arena-entry.pdf");
+        setPdfState(ok ? "saved" : "blocked");
+      }
     } catch (e) {
       if (e instanceof CheckoutDismissed) {
         setStatus("idle");
@@ -334,12 +352,50 @@ export default function CosplayClient({
                     <span className="font-display" style={{ fontSize: 22 }}>{entryCode}</span>
                   </div>
                 )}
+
+                {entryTokens.length > 0 && (
+                  <div style={{ marginBottom: 12 }}>
+                    <button
+                      onClick={async () => {
+                        setPdfState("working");
+                        const ok = await downloadPasses(entryTokens, "madooza-arena-entry.pdf");
+                        setPdfState(ok ? "saved" : "blocked");
+                      }}
+                      disabled={pdfState === "working"}
+                      className="font-display mz-pop"
+                      style={{
+                        width: "100%",
+                        fontSize: 15,
+                        color: "var(--lilac)",
+                        background: "var(--purple)",
+                        border: "3px solid var(--ink)",
+                        borderRadius: 18,
+                        boxShadow: "6px 6px 0 var(--ink)",
+                        padding: "16px 18px",
+                        cursor: "pointer",
+                        ["--mz-shadow" as string]: "6px",
+                      }}
+                    >
+                      {pdfState === "working" ? "PREPARING…" : "DOWNLOAD YOUR ARENA PASS (PDF)"}
+                    </button>
+                    <div style={{ fontSize: 13, lineHeight: 1.55, color: "#453063", marginTop: 10 }}>
+                      {pdfState === "saved"
+                        ? "Saved to your downloads — and sent to your email as well. Show the QR at the arena desk."
+                        : pdfState === "blocked"
+                          ? "Your browser wouldn't save it on its own — tap the button above. It has also gone to your email."
+                          : "It's on its way to your email too, QR and all."}
+                    </div>
+                  </div>
+                )}
                 <div style={{ background: "var(--paper)", border: "3px solid var(--ink)", borderRadius: 20, padding: 16, fontSize: 14.5, lineHeight: 1.55 }}>
                   {words.doneRepairNote}
                 </div>
                 <button
                   onClick={() => {
                     setDone(false);
+                    setEntryTokens([]);
+                    setEntryCode("");
+                    setPdfState("idle");
                     setEntry({ name: "", school: "", phone: "", email: "", character: "", category: categories[0]?.value ?? "", mode: "solo", team: "", members: "" });
                   }}
                   style={{ marginTop: 20, fontWeight: 700, fontSize: 12, letterSpacing: "0.14em", background: "transparent", border: "2px solid var(--ink)", borderRadius: 14, padding: "13px 16px", cursor: "pointer", color: "var(--ink)" }}

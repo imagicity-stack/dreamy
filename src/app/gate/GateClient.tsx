@@ -18,6 +18,8 @@ import jsQR from "jsqr";
 export type Ticket = {
   id: string;
   code: string;
+  /** Which door it opens — a cosplay entry is the arena desk, not the gate. */
+  product?: string;
   tierLabel: string;
   holderName: string;
   holderPhone?: string;
@@ -306,9 +308,13 @@ export default function GateClient({
  * difference between a queue moving and a queue not.
  */
 export function Result({ outcome, onDismiss }: { outcome: Outcome; onDismiss: () => void }) {
+  // An arena entry scanned at the gate is valid and still not a gate pass, so
+  // the word says which one it is rather than a green light for both.
+  const arena = "ticket" in outcome && outcome.ticket.product === "cosplayEntry";
+
   const skin =
     outcome.result === "admitted"
-      ? { bg: "#0b7a3b", word: "ENTRY GRANTED", mark: "tick" as const }
+      ? { bg: "#0b7a3b", word: arena ? "ARENA ENTRY OK" : "ENTRY GRANTED", mark: "tick" as const }
       : outcome.result === "already"
         ? { bg: "#b8730a", word: "ALREADY IN", mark: "warn" as const }
         : outcome.result === "void"
@@ -359,6 +365,11 @@ export function Result({ outcome, onDismiss }: { outcome: Outcome; onDismiss: ()
       {outcome.result === "void" && (
         <div style={{ fontSize: 14.5, lineHeight: 1.5, maxWidth: "28ch" }}>
           This pass was refunded. Do not admit — the fest desk can explain it to them.
+        </div>
+      )}
+      {outcome.result === "admitted" && arena && (
+        <div style={{ fontSize: 14.5, lineHeight: 1.5, maxWidth: "28ch" }}>
+          This is a cosplay arena entry, not a gate pass. They still need a Fete Pass to be on the grounds.
         </div>
       )}
       {outcome.result === "unknown" && (
