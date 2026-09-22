@@ -117,9 +117,9 @@ function holderFor(receipt: Receipt, index: number): string {
 /**
  * Turns a paid order into scannable tickets and their QR images.
  *
- * Only passes get them: a cosplay entry is a slot at a desk and a merch order
- * is a bag at a tent, neither of which is a turnstile. Returns empty for
- * everything else, and the mail falls back to its plain code block.
+ * Fulfilment has already issued them for whatever the registry calls ticketed,
+ * so this only has to draw them. An order with none — a merch bag — falls back
+ * to its plain code block.
  */
 async function ticketsFor(receipt: Receipt): Promise<{ blocks: TicketBlock[]; files: MailAttachment[] }> {
   // Fulfilment issues the tickets, so the tokens are already in hand; a call
@@ -158,7 +158,7 @@ async function ticketsFor(receipt: Receipt): Promise<{ blocks: TicketBlock[]; fi
   try {
     const settings = await getSettings();
     files.push({
-      filename: "madooza-passes.pdf",
+      filename: receipt.product === "cosplayEntry" ? "madooza-arena-entry.pdf" : "madooza-passes.pdf",
       content: await ticketsPdf(
         receipt.tickets.map((t, i) => ({
           code: t.code,
@@ -167,6 +167,7 @@ async function ticketsFor(receipt: Receipt): Promise<{ blocks: TicketBlock[]; fi
           tierLabel: receipt.label,
           index: i + 1,
           of: receipt.tickets.length,
+          product: receipt.product,
         })),
         settings,
       ),

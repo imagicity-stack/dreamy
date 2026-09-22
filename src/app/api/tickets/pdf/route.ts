@@ -37,6 +37,7 @@ export async function POST(req: NextRequest) {
       tierLabel: ticket.tierLabel,
       index: ticket.index,
       of: ticket.of,
+      product: ticket.product,
     });
   }
 

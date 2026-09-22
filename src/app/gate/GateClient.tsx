@@ -18,6 +18,8 @@ import jsQR from "jsqr";
 export type Ticket = {
   id: string;
   code: string;
+  /** Which door it opens — a cosplay entry is the arena desk, not the gate. */
+  product?: string;
   tierLabel: string;
   holderName: string;
   holderPhone?: string;
@@ -36,8 +38,19 @@ export type Outcome =
   | { result: "void"; ticket: Ticket }
   | { result: "unknown" };
 
-const HOLD_MS = 2600;
-const REPEAT_MS = 4000;
+/** One row of the on-phone log: an answer, and when this phone got it. */
+type LogRow = { id: string; at: Date; outcome: Outcome };
+
+/** How long the full-screen answer stays up before the camera resumes. */
+const HOLD_MS = 1800;
+/**
+ * How long after a code leaves the frame before the same one will be read
+ * again. Measured from when it was last *seen*, not from when it was first
+ * submitted — a phone held steady used to re-scan itself the moment this
+ * elapsed, and the second read correctly came back "already in", which looked
+ * exactly like the system contradicting itself.
+ */
+const REPEAT_MS = 8000;
 
 function timeOf(iso: string | null): string {
   if (!iso) return "";
@@ -82,11 +95,15 @@ export default function GateClient({
   const [counts, setCounts] = useState<{ issued: number; admitted: number } | null>(null);
   const [cameraError, setCameraError] = useState("");
   const [manualOpen, setManualOpen] = useState(false);
+  /** What has been scanned on this phone, newest first. */
+  const [log, setLog] = useState<LogRow[]>([]);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const lastSeen = useRef<{ token: string; at: number }>({ token: "", at: 0 });
   const busy = useRef(false);
+  /** Decoding stops entirely while an answer is on screen. */
+  const showing = useRef(false);
 
   const refreshCounts = useCallback(async () => {
     try {
@@ -100,9 +117,20 @@ export default function GateClient({
     }
   }, []);
 
+  const show = useCallback((data: Outcome) => {
+    showing.current = true;
+    setOutcome(data);
+    feedback(data.result === "admitted");
+    setLog((rows) => [{ id: `${Date.now()}-${Math.random()}`, at: new Date(), outcome: data }, ...rows].slice(0, 40));
+    setTimeout(() => {
+      setOutcome(null);
+      showing.current = false;
+    }, HOLD_MS);
+  }, []);
+
   const submit = useCallback(
     async (token: string) => {
-      if (busy.current) return;
+      if (busy.current || showing.current) return;
       busy.current = true;
       try {
         const res = await fetch("/api/gate/check-in", {
@@ -114,19 +142,15 @@ export default function GateClient({
           setVolunteer(null);
           return;
         }
-        const data: Outcome = await res.json();
-        setOutcome(data);
-        feedback(data.result === "admitted");
+        show((await res.json()) as Outcome);
         refreshCounts();
-        setTimeout(() => setOutcome(null), HOLD_MS);
       } catch {
-        setOutcome({ result: "unknown" });
-        setTimeout(() => setOutcome(null), HOLD_MS);
+        show({ result: "unknown" });
       } finally {
         busy.current = false;
       }
     },
-    [refreshCounts],
+    [refreshCounts, show],
   );
 
   // ---- the camera ----
@@ -139,7 +163,7 @@ export default function GateClient({
     const onFrame = async () => {
       const video = videoRef.current;
       const canvas = canvasRef.current;
-      if (!stopped && video && canvas && video.readyState === video.HAVE_ENOUGH_DATA) {
+      if (!stopped && !showing.current && video && canvas && video.readyState === video.HAVE_ENOUGH_DATA) {
         const w = video.videoWidth;
         const h = video.videoHeight;
         if (w && h) {
@@ -156,10 +180,10 @@ export default function GateClient({
                 : found.data;
               const now = Date.now();
               const repeat = token === lastSeen.current.token && now - lastSeen.current.at < REPEAT_MS;
-              if (!repeat) {
-                lastSeen.current = { token, at: now };
-                submit(token);
-              }
+              // Seen again, so push the cooldown out: the window closes when
+              // the code leaves the camera, not a fixed time after it arrived.
+              lastSeen.current = { token, at: now };
+              if (!repeat) submit(token);
             }
           }
         }
@@ -205,68 +229,135 @@ export default function GateClient({
 
   return (
     <main style={{ background: "var(--ink)", minHeight: "100dvh", color: "var(--lilac)" }}>
-      <header
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 12,
-          padding: "12px 16px",
-          borderBottom: "2px solid #351059",
-        }}
-      >
-        <span className="font-display" style={{ fontSize: 16, color: "var(--teal)" }}>MADOOZA GATE</span>
-        <span style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--muted-lilac)" }}>
-          {counts ? `${counts.admitted.toLocaleString("en-IN")} IN · ${counts.issued.toLocaleString("en-IN")} SOLD` : "…"}
-        </span>
-      </header>
+      {/* One column, capped: this is worked on a phone, and a laptop showing
+          the same thing stretched across 1900px helps nobody. */}
+      <div style={{ maxWidth: 520, margin: "0 auto", padding: "0 14px 34px" }}>
+        <header
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+            padding: "12px 2px",
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 10, minWidth: 0 }}>
+            <Image
+              src="/assets/madooza-logo.png"
+              alt="MADOOZA"
+              width={44}
+              height={44}
+              priority
+              style={{ display: "block", width: 44, height: 44 }}
+            />
+            <div style={{ minWidth: 0 }}>
+              <div className="font-display" style={{ fontSize: 15, color: "var(--teal)", lineHeight: 1 }}>GATE</div>
+              <div style={{ fontSize: 11, color: "var(--muted-lilac)", marginTop: 3, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                {volunteer}
+              </div>
+            </div>
+          </div>
 
-      <div style={{ position: "relative", background: "#000", aspectRatio: "3 / 4", maxHeight: "62dvh", overflow: "hidden" }}>
-        <video ref={videoRef} playsInline muted style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-        <canvas ref={canvasRef} style={{ display: "none" }} />
+          <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
+            <Stat label="IN" value={counts ? counts.admitted.toLocaleString("en-IN") : "—"} accent />
+            <Stat label="SOLD" value={counts ? counts.issued.toLocaleString("en-IN") : "—"} />
+          </div>
+        </header>
 
-        {/* The frame is only guidance; the decoder reads the whole picture. */}
         <div
           style={{
-            position: "absolute",
-            inset: "12% 14%",
-            border: "3px solid rgba(53, 198, 212, 0.9)",
-            borderRadius: 20,
-            pointerEvents: "none",
+            position: "relative",
+            background: "#000",
+            border: "3px solid var(--purple)",
+            borderRadius: 22,
+            overflow: "hidden",
+            aspectRatio: "4 / 5",
+            maxHeight: "54dvh",
+            // On a short screen the height cap wins and the ratio narrows the
+            // card, which otherwise leaves it hanging off to the left of
+            // everything else in the column.
+            marginInline: "auto",
           }}
-        />
+        >
+          <video ref={videoRef} playsInline muted style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+          <canvas ref={canvasRef} style={{ display: "none" }} />
 
-      </div>
+          {/* Corner brackets rather than a full box: they frame without hiding
+              the thing being framed. */}
+          <div style={{ position: "absolute", inset: "11% 13%", pointerEvents: "none" }}>
+            {[
+              { top: 0, left: 0, borderTop: true, borderLeft: true },
+              { top: 0, right: 0, borderTop: true, borderRight: true },
+              { bottom: 0, left: 0, borderBottom: true, borderLeft: true },
+              { bottom: 0, right: 0, borderBottom: true, borderRight: true },
+            ].map((c, i) => (
+              <span
+                key={i}
+                style={{
+                  position: "absolute",
+                  width: 34,
+                  height: 34,
+                  top: c.top,
+                  left: c.left,
+                  right: c.right,
+                  bottom: c.bottom,
+                  borderTop: c.borderTop ? "4px solid var(--teal)" : undefined,
+                  borderBottom: c.borderBottom ? "4px solid var(--teal)" : undefined,
+                  borderLeft: c.borderLeft ? "4px solid var(--teal)" : undefined,
+                  borderRight: c.borderRight ? "4px solid var(--teal)" : undefined,
+                  borderRadius: 6,
+                }}
+              />
+            ))}
+          </div>
 
-      {outcome && <Result outcome={outcome} onDismiss={() => setOutcome(null)} />}
-
-      {manualOpen && (
-        <Registrations
-          onClose={() => setManualOpen(false)}
-          onAdmitted={refreshCounts}
-          onSignedOut={() => setVolunteer(null)}
-        />
-      )}
-
-      {cameraError && (
-        <div style={{ background: "var(--crimson)", padding: "12px 16px", fontSize: 13.5, lineHeight: 1.5 }}>
-          {cameraError}
-        </div>
-      )}
-
-      <div style={{ padding: "14px 16px 30px" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: 12, fontSize: 11.5, letterSpacing: "0.1em", color: "var(--muted-lilac)" }}>
-          <span>ON THE GATE: {volunteer.toUpperCase()}</span>
-          <button
-            onClick={async () => {
-              await fetch("/api/gate/logout", { method: "POST" });
-              setVolunteer(null);
+          <div
+            style={{
+              position: "absolute",
+              left: 0,
+              right: 0,
+              bottom: 0,
+              padding: "26px 14px 12px",
+              display: "flex",
+              justifyContent: "center",
+              // A gradient alone disappears against a pale ticket. The caption
+              // carries its own dark plate so it reads over whatever the
+              // camera happens to be pointed at.
+              background: "linear-gradient(to top, rgba(10,1,24,0.9), transparent)",
             }}
-            style={{ background: "none", border: "none", color: "var(--pink)", fontSize: 11.5, letterSpacing: "0.1em", cursor: "pointer", padding: 0 }}
           >
-            SIGN OUT
-          </button>
+            <span
+              style={{
+                background: "rgba(10,1,24,0.82)",
+                borderRadius: 999,
+                padding: "6px 13px",
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: "0.12em",
+                color: "var(--lilac)",
+              }}
+            >
+              HOLD THE QR INSIDE THE BRACKETS
+            </span>
+          </div>
         </div>
+
+        {cameraError && (
+          <div
+            style={{
+              marginTop: 12,
+              background: "rgba(223, 2, 92, 0.16)",
+              border: "2px solid var(--crimson)",
+              borderRadius: 14,
+              padding: "11px 13px",
+              fontSize: 13,
+              lineHeight: 1.5,
+              color: "#FFD9E4",
+            }}
+          >
+            {cameraError}
+          </div>
+        )}
 
         <button
           onClick={() => setManualOpen(true)}
@@ -287,8 +378,152 @@ export default function GateClient({
         >
           PHONE DEAD? SEARCH THE REGISTRATIONS
         </button>
+
+        {/* The log. The full-screen flash is gone in under two seconds; this is
+            what a volunteer looks back at when somebody argues. */}
+        <section style={{ marginTop: 22 }}>
+          <div
+            style={{
+              display: "flex",
+              alignItems: "baseline",
+              justifyContent: "space-between",
+              gap: 10,
+              marginBottom: 10,
+            }}
+          >
+            <h2 className="font-display" style={{ fontSize: 14, color: "var(--teal)", margin: 0 }}>
+              THIS PHONE
+            </h2>
+            <span style={{ fontSize: 11, letterSpacing: "0.12em", color: "var(--muted-lilac)" }}>
+              {log.length === 0 ? "NOTHING YET" : `${log.length} SCANNED`}
+            </span>
+          </div>
+
+          {log.length === 0 ? (
+            <p style={{ fontSize: 13, lineHeight: 1.6, color: "var(--muted-lilac)", margin: 0 }}>
+              Every scan lands here the moment it happens, so you can look back at what you let through.
+            </p>
+          ) : (
+            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+              {log.map((row) => (
+                <LogEntry key={row.id} row={row} />
+              ))}
+            </div>
+          )}
+        </section>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 12,
+            marginTop: 26,
+            fontSize: 11,
+            letterSpacing: "0.1em",
+            color: "var(--muted-lilac)",
+          }}
+        >
+          <span>SCANS ARE RECORDED AGAINST YOUR NAME</span>
+          <button
+            onClick={async () => {
+              await fetch("/api/gate/logout", { method: "POST" });
+              setVolunteer(null);
+            }}
+            style={{ background: "none", border: "none", color: "var(--pink)", fontSize: 11, letterSpacing: "0.1em", cursor: "pointer", padding: 0 }}
+          >
+            SIGN OUT
+          </button>
+        </div>
       </div>
+
+      {outcome && <Result outcome={outcome} onDismiss={() => setOutcome(null)} />}
+
+      {manualOpen && (
+        <Registrations
+          onClose={() => setManualOpen(false)}
+          onAdmitted={refreshCounts}
+          onSignedOut={() => setVolunteer(null)}
+        />
+      )}
     </main>
+  );
+}
+
+/** A number in the header: what is in, and what was sold. */
+function Stat({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
+  return (
+    <div
+      style={{
+        background: accent ? "var(--teal)" : "var(--purple)",
+        color: accent ? "var(--ink)" : "var(--lilac)",
+        border: "2px solid var(--ink)",
+        borderRadius: 12,
+        padding: "6px 10px",
+        textAlign: "center",
+        minWidth: 56,
+      }}
+    >
+      <div className="font-display" style={{ fontSize: 17, lineHeight: 1 }}>{value}</div>
+      <div style={{ fontSize: 8.5, fontWeight: 800, letterSpacing: "0.16em", marginTop: 3 }}>{label}</div>
+    </div>
+  );
+}
+
+/** One line of the log: what happened, to whom, at what time. */
+function LogEntry({ row }: { row: LogRow }) {
+  const { outcome } = row;
+  const skin =
+    outcome.result === "admitted"
+      ? { word: "GRANTED", bg: "#0b7a3b", fg: "#ffffff" }
+      : outcome.result === "already"
+        ? { word: "ALREADY IN", bg: "#b8730a", fg: "#ffffff" }
+        : outcome.result === "void"
+          ? { word: "REFUNDED", bg: "#8a0b3c", fg: "#ffffff" }
+          : { word: "NOT OURS", bg: "#a10a0a", fg: "#ffffff" };
+
+  const name = "ticket" in outcome ? outcome.ticket.holderName : "Unknown code";
+  const code = "ticket" in outcome ? outcome.ticket.code : "";
+
+  return (
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 11,
+        background: "var(--bg)",
+        border: "2px solid #4A2A73",
+        borderRadius: 14,
+        padding: "10px 12px",
+      }}
+    >
+      <span
+        style={{
+          flexShrink: 0,
+          fontSize: 9.5,
+          fontWeight: 800,
+          letterSpacing: "0.12em",
+          background: skin.bg,
+          color: skin.fg,
+          borderRadius: 999,
+          padding: "5px 9px",
+        }}
+      >
+        {skin.word}
+      </span>
+      <span style={{ minWidth: 0, flex: 1 }}>
+        <span style={{ display: "block", fontSize: 14, fontWeight: 700, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+          {name}
+        </span>
+        {code && (
+          <span style={{ display: "block", fontSize: 10.5, letterSpacing: "0.1em", color: "var(--muted-lilac)", marginTop: 2 }}>
+            {code}
+          </span>
+        )}
+      </span>
+      <span style={{ flexShrink: 0, fontSize: 11, color: "var(--muted-lilac)" }}>
+        {row.at.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit" })}
+      </span>
+    </div>
   );
 }
 
@@ -306,9 +541,13 @@ export default function GateClient({
  * difference between a queue moving and a queue not.
  */
 export function Result({ outcome, onDismiss }: { outcome: Outcome; onDismiss: () => void }) {
+  // An arena entry scanned at the gate is valid and still not a gate pass, so
+  // the word says which one it is rather than a green light for both.
+  const arena = "ticket" in outcome && outcome.ticket.product === "cosplayEntry";
+
   const skin =
     outcome.result === "admitted"
-      ? { bg: "#0b7a3b", word: "ENTRY GRANTED", mark: "tick" as const }
+      ? { bg: "#0b7a3b", word: arena ? "ARENA ENTRY OK" : "ENTRY GRANTED", mark: "tick" as const }
       : outcome.result === "already"
         ? { bg: "#b8730a", word: "ALREADY IN", mark: "warn" as const }
         : outcome.result === "void"
@@ -359,6 +598,11 @@ export function Result({ outcome, onDismiss }: { outcome: Outcome; onDismiss: ()
       {outcome.result === "void" && (
         <div style={{ fontSize: 14.5, lineHeight: 1.5, maxWidth: "28ch" }}>
           This pass was refunded. Do not admit — the fest desk can explain it to them.
+        </div>
+      )}
+      {outcome.result === "admitted" && arena && (
+        <div style={{ fontSize: 14.5, lineHeight: 1.5, maxWidth: "28ch" }}>
+          This is a cosplay arena entry, not a gate pass. They still need a Fete Pass to be on the grounds.
         </div>
       )}
       {outcome.result === "unknown" && (

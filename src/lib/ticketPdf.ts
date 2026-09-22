@@ -38,6 +38,8 @@ export type PdfTicket = {
   tierLabel: string;
   index: number;
   of: number;
+  /** Which door this opens. A cosplay entry is a desk, not a turnstile. */
+  product?: string;
 };
 
 export async function ticketsPdf(tickets: PdfTicket[], settings: FestSettings): Promise<Buffer> {
@@ -71,6 +73,10 @@ export async function ticketsPdf(tickets: PdfTicket[], settings: FestSettings): 
   tickets.forEach((ticket, i) => {
     if (i > 0) doc.addPage();
 
+    // A cosplay entry is a desk in the arena, not a turnstile at the gate, and
+    // the page has to say so everywhere rather than in one place.
+    const arena = ticket.product === "cosplayEntry";
+
     doc.rect(0, 0, W, H).fill(PAPER);
 
     // The fest's sticker shadow: a hard offset block, no blur anywhere.
@@ -90,13 +96,17 @@ export async function ticketsPdf(tickets: PdfTicket[], settings: FestSettings): 
       .fillColor(TEAL)
       .font("Helvetica-Bold")
       .fontSize(10)
-      .text("ADMIT ONE", cardX, top + 44, { width: cardW - 26, align: "right", characterSpacing: 2.4 });
+      .text(arena ? "ARENA ENTRY" : "ADMIT ONE", cardX, top + 44, {
+        width: cardW - 26,
+        align: "right",
+        characterSpacing: 2.4,
+      });
     doc
       .fillColor(LILAC)
       .font("Helvetica-Bold")
       .fontSize(17)
       .text(
-        ticket.of > 1 ? `${ticket.index} OF ${ticket.of}` : "FETE PASS",
+        ticket.of > 1 ? `${ticket.index} OF ${ticket.of}` : arena ? "COSPLAY" : "FETE PASS",
         cardX,
         top + 60,
         { width: cardW - 26, align: "right", characterSpacing: 1 },
@@ -157,7 +167,13 @@ export async function ticketsPdf(tickets: PdfTicket[], settings: FestSettings): 
       doc.fillColor(INK).font("Helvetica").fontSize(11.5).text(value, x, y + 13, { width, lineGap: 1 });
     };
 
-    detail("WHEN", `${date.short}\nGates 9:00 AM`, colX, tearY + 30, colW - 12);
+    detail(
+      "WHEN",
+      `${date.short}\n${arena ? "Report to the arena desk" : "Gates 9:00 AM"}`,
+      colX,
+      tearY + 30,
+      colW - 12,
+    );
     detail(
       "WHERE",
       `${HOST_NAME}\nHazaribagh, Jharkhand 825301`,
@@ -180,7 +196,9 @@ export async function ticketsPdf(tickets: PdfTicket[], settings: FestSettings): 
       .font("Helvetica")
       .fontSize(9.5)
       .text(
-        "Show this at the gate, on your phone or printed. It is scanned once — the code above is the same pass.",
+        arena
+          ? "Show this at the cosplay arena desk. It is scanned once — the code above is the same entry. A Fete Pass is still needed to be on the grounds."
+          : "Show this at the gate, on your phone or printed. It is scanned once — the code above is the same pass.",
         colX,
         zigY + 14,
         { width: cardW - 56, align: "center" },

@@ -2,6 +2,7 @@ import { createHash, randomBytes } from "crypto";
 import { FieldValue } from "firebase-admin/firestore";
 import QRCode from "qrcode";
 import { getDb } from "./firebaseAdmin";
+import { siteUrl } from "./site";
 
 /**
  * One ticket per person through the gate, and the scan that admits them.
@@ -57,12 +58,7 @@ function newToken(): string {
 
 /** Where a ticket lives. Absolute, because it goes into an email and a QR. */
 export function ticketUrl(token: string): string {
-  const base =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/+$/, "") ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`
-      : "");
-  return `${base}/t/${token}`;
+  return `${siteUrl()}/t/${token}`;
 }
 
 /** The QR as a PNG, ready to attach to an email. */
