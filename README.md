@@ -52,8 +52,8 @@ settings for deployment:
   `smtp.gmail.com` and `465`. See **Mail** below.
 - `WHATSAPP_TOKEN` / `WHATSAPP_PHONE_NUMBER_ID` — Meta WhatsApp Cloud API, for sending the pass over
   WhatsApp as well. Optional; leave either empty and nothing is attempted. See **WhatsApp** below.
-- `NEXT_PUBLIC_META_PIXEL_ID` — Meta Pixel for ad conversion tracking. Empty turns it off. Compiled
-  into the bundle, so it needs a redeploy.
+- `NEXT_PUBLIC_META_PIXEL_ID` / `NEXT_PUBLIC_GA_ID` — Meta Pixel and Google Analytics 4. Either one
+  empty turns that tag off. Compiled into the bundle, so a change needs a redeploy.
 
 All of the server-only ones are read at request time, so changing them takes effect on the next request
 rather than needing a rebuild. `NEXT_PUBLIC_RAZORPAY_KEY_ID` is compiled into the bundle, so that one
@@ -467,20 +467,27 @@ The sending code, the number normalising and the template payload are all still 
 
 ## Advertising
 
-The public pages carry the Meta Pixel. It is deliberately absent from `/gate`, `/admin` and
-`/t/<token>` — the pixel reports the page's URL, and a pass page's URL contains the token that opens
-that pass.
+The public pages carry the Meta Pixel and Google Analytics 4. Both are deliberately absent from
+`/gate`, `/admin` and `/t/<token>` — they report the page's URL, and a pass page's URL contains the
+token that opens that pass.
 
-Beyond the automatic `PageView`, three events are reported from the code that already knows the truth
-rather than from guessed button clicks:
+Beyond the automatic page view, three events are reported from the code that already knows the truth
+rather than from guessed button clicks. They are sent once, through `src/lib/analytics.ts`, which
+translates each into both vendors' names — the alternative is two lines at every call site, which is
+how one of them quietly stops being sent.
 
-- **InitiateCheckout** — the server has priced the order and Razorpay is about to open.
-- **Purchase** — the payment is server-verified, with the amount actually charged.
-- **Lead** — somebody joined the concert interest list.
+| What happened | Meta | Google |
+| --- | --- | --- |
+| The server priced the order and Razorpay is opening | `InitiateCheckout` | `begin_checkout` |
+| The payment is server-verified, with the amount charged | `Purchase` | `purchase` |
+| Somebody joined the concert interest list | `Lead` | `generate_lead` |
 
-`InitiateCheckout` and `Purchase` pass the order id as Meta's `eventID`, so adding the Conversions API
-later de-duplicates against these rather than counting every sale twice.
+The order id travels with both money events — as Meta's `eventID` and Google's `transaction_id` — so
+neither double-counts a reloaded confirmation, and adding Meta's Conversions API later de-duplicates
+against the browser event rather than counting every sale twice. The value is always the amount
+actually charged, fee and GST included.
 
-A single-page app breaks the stock snippet, which fires `PageView` once on load: moving between pages
-here never reloads the document. So the first `PageView` comes from the snippet and every later one
-from the route changing.
+A single-page app breaks both stock snippets, which send one page view on load: moving between pages
+here never reloads the document. So the first page view comes from the snippet and every later one
+from the route changing — for Google with the new path spelled out, since gtag would otherwise keep
+reporting the URL the page was opened at.
