@@ -5,6 +5,14 @@
 export const FEST = {
   fetePrice: 499,
   cosplayFee: 400,
+  // Spotlight is priced by how many people are on stage, because a band of
+  // eight takes a soundcheck, a changeover and a stage the size of a solo
+  // singer's eight times over.
+  spotlightSolo: 299,
+  spotlightDuo: 399,
+  spotlightGroup: 599,
+  spotlightLargeGroup: 799,
+  spotlightBand: 899,
   concertCapacity: 2000,
   interestBase: 1246,
   /** Charged on top of every online payment, with GST on the fee itself. */

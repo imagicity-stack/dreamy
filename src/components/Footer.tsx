@@ -87,6 +87,7 @@ export default async function Footer() {
             {live("lineup") && <Link href="/lineup" className="mz-footer-link">{words.festLinkLineup}</Link>}
             {live("concert") && <Link href="/concert" className="mz-footer-link">{words.festLinkConcert}</Link>}
             {live("cosplay") && <Link href="/cosplay" className="mz-footer-link">{words.festLinkCosplay}</Link>}
+            {live("spotlight") && <Link href="/spotlight" className="mz-footer-link">{words.festLinkSpotlight}</Link>}
             {live("fete") && <Link href="/fete" className="mz-footer-link">{words.festLinkFete}</Link>}
             {live("gallery") && <Link href="/gallery" className="mz-footer-link">{words.festLinkGallery}</Link>}
           </div>
