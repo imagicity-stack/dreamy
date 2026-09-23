@@ -148,30 +148,32 @@ export function legalDocs(settings: FestSettings): Record<LegalKey, LegalDoc> {
         },
         {
           id: "advertising",
-          heading: "4. Advertising measurement",
+          heading: "4. Measurement and advertising",
           blocks: [
             {
               kind: "p",
               text:
-                `The public pages carry the Meta Pixel, so that when the fest pays to advertise on Instagram ` +
-                `or Facebook it can tell whether the advertising worked. It records that a page was viewed, ` +
-                `that a checkout was opened, and that a purchase was completed along with its amount — and ` +
-                `it sets cookies of Meta's own to do so.`,
+                `The public pages carry two measurement tags: the Meta Pixel, so that when the fest pays to ` +
+                `advertise on Instagram or Facebook it can tell whether the advertising worked, and Google ` +
+                `Analytics, so the council can see which pages people actually read. Both record that a page ` +
+                `was viewed, that a checkout was opened, and that a purchase was completed along with its ` +
+                `amount, and both set cookies of their own to do it.`,
             },
             {
               kind: "p",
               text:
-                `Your name, your email address, your phone number and your pass codes are never sent to Meta. ` +
-                `Nor is it on the pages where those things appear: your own pass page, the gate scanner and ` +
-                `the admin panel carry no pixel at all.`,
+                `Your name, your email address, your phone number and your pass codes are never sent to ` +
+                `either of them. Nor are the tags on the pages where those things appear: your own pass ` +
+                `page, the gate scanner and the admin panel carry no measurement at all.`,
             },
             {
               kind: "p",
               text:
-                `What Meta does with what it collects is governed by Meta's own privacy policy, not ours. ` +
-                `Blocking it is entirely your right and costs you nothing on this site — a browser set to ` +
-                `refuse third-party cookies or trackers, or any of the usual blocking extensions, will stop ` +
-                `it, and every page, pass and payment goes on working exactly as before.`,
+                `What Meta and Google do with what they collect is governed by their own privacy policies, ` +
+                `not ours. Blocking them is entirely your right and costs you nothing on this site — a ` +
+                `browser set to refuse third-party cookies or trackers, or any of the usual blocking ` +
+                `extensions, will stop both, and every page, pass and payment goes on working exactly as ` +
+                `before.`,
             },
           ],
         },

@@ -1,7 +1,7 @@
 "use client";
 
 import { openRazorpayCheckout } from "./razorpayClient";
-import { toAmount, track } from "./pixel";
+import { trackCheckoutStarted, trackPurchase } from "./analytics";
 import type { PriceBreakdown } from "./pricing";
 
 /**
@@ -170,16 +170,12 @@ export async function startCheckout(args: {
   // Reported here rather than from the button, so it means what it says: the
   // server priced the order and Razorpay is about to open. A click that failed
   // validation never gets this far.
-  track(
-    "InitiateCheckout",
-    {
-      content_type: "product",
-      content_ids: [args.product],
-      value: toAmount(order.amount),
-      currency: order.currency ?? "INR",
-    },
-    order.orderId,
-  );
+  trackCheckoutStarted({
+    product: args.product,
+    totalPaise: order.amount,
+    currency: order.currency ?? "INR",
+    orderId: order.orderId,
+  });
 
   return new Promise<Receipt>((resolve, reject) => {
     let settled = false;
@@ -230,21 +226,17 @@ export async function startCheckout(args: {
 
           // The only event that matters to an ad account, and the only one
           // reported from a server-verified result rather than from anything
-          // the browser decided for itself. The order id is passed as the
-          // event id so that adding the Conversions API later de-duplicates
-          // against this instead of counting every sale twice.
-          track(
-            "Purchase",
-            {
-              content_type: "product",
-              content_ids: [receipt.product],
-              contents: [{ id: receipt.product, quantity: receipt.units }],
-              num_items: receipt.units,
-              value: toAmount(receipt.amount.totalPaise),
-              currency: receipt.amount.currency ?? "INR",
-            },
-            receipt.orderId,
-          );
+          // the browser decided for itself. The order id goes along as the
+          // event id for Meta and the transaction id for Google, so neither
+          // double-counts a sale — nor will Meta if the Conversions API is
+          // added later.
+          trackPurchase({
+            product: receipt.product,
+            units: receipt.units,
+            totalPaise: receipt.amount.totalPaise,
+            currency: receipt.amount.currency ?? "INR",
+            orderId: receipt.orderId,
+          });
 
           finish(() => resolve(receipt));
         } catch {

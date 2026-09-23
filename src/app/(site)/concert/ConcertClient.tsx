@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { track } from "@/lib/pixel";
+import { trackLead } from "@/lib/analytics";
 import Link from "next/link";
 import { isPageHidden, type FestSettings } from "@/lib/festSettings";
 import FormNote from "@/components/FormNote";
@@ -123,7 +123,7 @@ export default function ConcertClient({
 
       // Not a sale, but the closest thing this page has to one: somebody put
       // their name and a contact against a show that has no price yet.
-      track("Lead", { content_name: "Concert interest list" }, `interest-${data.queueNumber ?? Date.now()}`);
+      trackLead("Concert interest list", `interest-${data.queueNumber ?? Date.now()}`);
 
       setStatus("idle");
       window.scrollTo(0, 0);
