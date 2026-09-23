@@ -3,47 +3,45 @@
  *
  * Two rules hold everywhere below:
  *
- * 1. Money is counted in paise, as integers. A price with a percentage on top
- *    stops being representable in rupees the moment it is a float — 499 × 1.02
- *    is 508.98000000000002 — and Razorpay takes paise anyway.
+ * 1. Money is counted in paise, as integers. A price with a percentage in it
+ *    stops being representable in rupees the moment it is a float, and
+ *    Razorpay takes paise anyway.
  * 2. Nothing here runs in a browser to decide what is charged. The client may
- *    import this module to *show* a breakdown the server sent it, but the
- *    figure that reaches Razorpay is always computed on the server from the
- *    settings, never read back off a request body.
+ *    import this module to *show* a figure the server sent it, but the amount
+ *    that reaches Razorpay is always computed on the server from the settings,
+ *    never read back off a request body.
  *
- * What is charged, in the order the buyer sees it:
- *
- *   the ticket price
- *   + GST on the ticket
- *   + a convenience fee, taken as a percentage of the ticket price
- *   + GST on that fee
- *
- * GST sits on the ticket itself, which is the thing being sold; the fee is a
- * separate service and carries its own GST, which is the ordinary treatment and
- * why it is billed as its own line. A council that does not want GST on the fee
- * turns off `gstOnConvenienceFee` in the panel and the fee line goes out clean.
+ * The price is the price. A pass listed at ₹499 costs ₹499 — there is nothing
+ * added at the last screen, and nothing to itemise, because a buyer who is
+ * shown one number and charged another has been quoted a price that was never
+ * true. Tax lives inside that amount rather than on top of it: the fest is
+ * registered and has to account for GST, so the portion of each sale that is
+ * tax is worked out here and kept with the order, where the council and its
+ * accountant can find it. The buyer never sees it, and does not need to.
  *
  * If any of that changes it changes here, once, and the whole site — checkout,
  * receipts, the emails, the policies — follows.
  */
 
 export type FeeRates = {
-  /** Convenience fee, as a percentage of the ticket price. */
-  convenienceFeePercent: number;
-  /** GST, as a percentage. Applies to the ticket, and to the fee unless told otherwise. */
+  /** GST, as a percentage, contained within the listed price. */
   gstPercent: number;
-  /** Whether the convenience fee carries GST of its own. Normally it does. */
-  gstOnConvenienceFee: boolean;
+  /** Retired. Kept so orders written under the old model still read back. */
+  convenienceFeePercent?: number;
+  /** Retired, as above. */
+  gstOnConvenienceFee?: boolean;
 };
 
 export type PriceBreakdown = {
-  /** The tickets or items themselves. */
+  /** The sale net of the tax inside it — what the fest actually keeps. */
   basePaise: number;
-  /** GST on that. */
+  /** The tax contained in the price, for the fest's own books. */
   gstPaise: number;
+  /** Always 0 now. Kept so orders taken under the old model still read back. */
   convenienceFeePaise: number;
-  /** GST on the convenience fee, or 0 when the fee is exempt. */
+  /** Always 0 now, as above. */
   feeGstPaise: number;
+  /** What the buyer is charged, and what was listed. */
   totalPaise: number;
   /** The rates this breakdown was computed at, so a record can be re-read years later. */
   convenienceFeePercent: number;
@@ -60,31 +58,27 @@ export function paiseToRupees(paise: number): number {
 }
 
 /**
- * The ticket, its GST, the convenience fee, and the fee's GST.
+ * What a listed price costs, and how much of it is tax.
  *
- * Every line is rounded to a whole paisa on its own, from the ticket price,
- * rather than each one compounding on the last. The four lines on screen then
- * add up to the total that is charged — a breakdown that doesn't add up is
- * worse than no breakdown at all.
+ * The listed figure is the whole of it. GST is extracted from inside rather
+ * than added outside — ₹499 at 18% contains ₹76.12 of tax and leaves ₹422.88 —
+ * which is the ordinary treatment for a price advertised to the public, and the
+ * only one that lets the number on the poster be the number on the card.
  */
-export function priceWithFees(basePaise: number, rates: FeeRates): PriceBreakdown {
-  const base = Math.max(0, Math.round(basePaise));
-  const feePercent = clampPercent(rates.convenienceFeePercent);
+export function priceWithFees(listPaise: number, rates: FeeRates): PriceBreakdown {
+  const total = Math.max(0, Math.round(listPaise));
   const gstPercent = clampPercent(rates.gstPercent);
 
-  const gstPaise = Math.round((base * gstPercent) / 100);
-  const convenienceFeePaise = Math.round((base * feePercent) / 100);
-  const feeGstPaise = rates.gstOnConvenienceFee
-    ? Math.round((convenienceFeePaise * gstPercent) / 100)
-    : 0;
+  // The tax inside a tax-inclusive price: total × rate / (100 + rate).
+  const gstPaise = gstPercent > 0 ? Math.round((total * gstPercent) / (100 + gstPercent)) : 0;
 
   return {
-    basePaise: base,
+    basePaise: total - gstPaise,
     gstPaise,
-    convenienceFeePaise,
-    feeGstPaise,
-    totalPaise: base + gstPaise + convenienceFeePaise + feeGstPaise,
-    convenienceFeePercent: feePercent,
+    convenienceFeePaise: 0,
+    feeGstPaise: 0,
+    totalPaise: total,
+    convenienceFeePercent: 0,
     gstPercent,
   };
 }
@@ -114,29 +108,15 @@ export function formatPaise(paise: number): string {
 
 export type BreakdownLine = { label: string; amountPaise: number; strong?: boolean };
 
-/** The breakdown as the rows a checkout panel prints, in order. */
-export function breakdownLines(price: PriceBreakdown, baseLabel = "SUBTOTAL"): BreakdownLine[] {
-  const lines: BreakdownLine[] = [{ label: baseLabel, amountPaise: price.basePaise }];
-  if (price.gstPaise > 0) {
-    lines.push({
-      label: `GST (${formatPercent(price.gstPercent)}%)`,
-      amountPaise: price.gstPaise,
-    });
-  }
-  if (price.convenienceFeePaise > 0) {
-    lines.push({
-      label: `CONVENIENCE FEE (${formatPercent(price.convenienceFeePercent)}%)`,
-      amountPaise: price.convenienceFeePaise,
-    });
-  }
-  if (price.feeGstPaise > 0) {
-    lines.push({
-      label: `GST ON FEE (${formatPercent(price.gstPercent)}%)`,
-      amountPaise: price.feeGstPaise,
-    });
-  }
-  lines.push({ label: "TOTAL", amountPaise: price.totalPaise, strong: true });
-  return lines;
+/**
+ * The money as a checkout prints it: one row.
+ *
+ * There is nothing to break down. What the page listed is what the card is
+ * charged, so a second line could only restate the first — and a panel of
+ * sub-totals is how a buyer learns to expect a surprise at the end.
+ */
+export function breakdownLines(price: PriceBreakdown, baseLabel = "TOTAL"): BreakdownLine[] {
+  return [{ label: baseLabel, amountPaise: price.totalPaise, strong: true }];
 }
 
 /** 2 rather than 2.0, 2.5 rather than 2.50. */

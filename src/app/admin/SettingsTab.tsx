@@ -107,15 +107,12 @@ export default function SettingsTab({ pages }: { pages: { key: string; label: st
     </div>
   );
 
-  // What a ₹-priced thing actually costs once GST and the fee are on it. Same
-  // four lines as priceWithFees(), in paise, so the preview cannot drift from
-  // what checkout charges.
-  const chargedFor = (amount: number) => {
-    const base = Math.round(amount * 100);
-    const gst = Math.round((base * settings.gstPercent) / 100);
-    const fee = Math.round((base * settings.convenienceFeePercent) / 100);
-    const feeGst = settings.gstOnConvenienceFee ? Math.round((fee * settings.gstPercent) / 100) : 0;
-    return (base + gst + fee + feeGst) / 100;
+  // How much of a ₹-priced thing is tax. The same extraction priceWithFees()
+  // does, in paise, so this preview cannot drift from what is recorded.
+  const taxInside = (amount: number) => {
+    const total = Math.round(amount * 100);
+    const rate = settings.gstPercent;
+    return (rate > 0 ? Math.round((total * rate) / (100 + rate)) : 0) / 100;
   };
   const rupees = (n: number) => n.toLocaleString("en-IN", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
@@ -151,30 +148,23 @@ export default function SettingsTab({ pages }: { pages: { key: string; label: st
         </Grid>
       </Section>
 
-      <Section kicker="CHECKOUT" title="GST & CONVENIENCE FEE">
+      <Section kicker="CHECKOUT" title="TAX INSIDE THE PRICE">
         <Grid>
-          {rate("gstPercent", "GST (%)", "Charged on the ticket price, and on the fee below unless that is switched off.")}
-          {rate("convenienceFeePercent", "CONVENIENCE FEE (%)", "A percentage of the ticket price, added on top.")}
+          {rate("gstPercent", "GST (%)", "Contained within every price above, not added to it.")}
         </Grid>
-        <label style={{ display: "flex", alignItems: "center", gap: 10, marginTop: 16, cursor: "pointer" }}>
-          <input
-            type="checkbox"
-            checked={settings.gstOnConvenienceFee}
-            onChange={(e) => edit({ gstOnConvenienceFee: e.target.checked })}
-            style={{ width: 18, height: 18, cursor: "pointer" }}
-          />
-          <span style={{ fontSize: 13.5 }}>
-            Charge GST on the convenience fee as well <span style={{ color: "#5B4480" }}>(the usual treatment — the fee is a service of its own)</span>
-          </span>
-        </label>
         <p style={{ fontSize: 13, color: "#5B4480", margin: "16px 0 0", lineHeight: 1.6 }}>
-          {/* Said in rupees, because a stack of percentages is not something
-              anyone should have to picture on a Tuesday. */}
-          A ₹{settings.fetePrice.toLocaleString("en-IN")} Fete Pass is charged at{" "}
-          <strong>₹{rupees(chargedFor(settings.fetePrice))}</strong>, and a ₹
-          {settings.cosplayFee.toLocaleString("en-IN")} cosplay entry at{" "}
-          <strong>₹{rupees(chargedFor(settings.cosplayFee))}</strong>. Every checkout, receipt and email shows
-          the buyer this split line by line before they pay.
+          {/* Said in rupees, because a percentage is not something anyone
+              should have to picture on a Tuesday. */}
+          Prices are what buyers pay. A ₹{settings.fetePrice.toLocaleString("en-IN")} Fete Pass is charged at{" "}
+          <strong>₹{settings.fetePrice.toLocaleString("en-IN")}</strong> — nothing is added at checkout, and no
+          split is shown to the buyer. Of that, <strong>₹{rupees(taxInside(settings.fetePrice))}</strong> is
+          GST for the organiser to account for, and <strong>₹{rupees(settings.fetePrice - taxInside(settings.fetePrice))}</strong>{" "}
+          is what the fest keeps. Both figures are stored with every order for the accountant; neither is ever
+          printed on a receipt.
+        </p>
+        <p style={{ fontSize: 13, color: "#5B4480", margin: "12px 0 0", lineHeight: 1.6 }}>
+          Raising a price raises what the buyer pays. If the gateway&rsquo;s own charges need covering, build
+          them into the numbers above rather than adding a line at checkout.
         </p>
       </Section>
 

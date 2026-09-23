@@ -3,11 +3,11 @@
 import { breakdownLines, formatPaise, type PriceBreakdown } from "@/lib/pricing";
 
 /**
- * The money rows under a checkout: subtotal, convenience fee, GST, total.
+ * The money under a checkout.
  *
- * Every figure is one the server sent back with the quote, printed as given.
- * Nothing here recomputes anything — if the rows and the total ever disagreed,
- * the buyer would be right to trust neither.
+ * One row, because the price listed is the price charged and a second line
+ * could only restate the first. The figure is the one the server sent back
+ * with the quote, printed as given — nothing here recomputes anything.
  */
 export default function PriceLines({
   price,
@@ -22,9 +22,14 @@ export default function PriceLines({
   const strong = tone === "dark" ? "var(--lilac)" : "var(--ink)";
   const rule = tone === "dark" ? "1px dashed #4A2A73" : "1px dashed #C9B6E4";
 
+  const lines = breakdownLines(price, baseLabel);
+  // The rule divided a total from the rows above it; with one row there are
+  // none, and a line over the only figure reads as a mistake.
+  const ruled = lines.length > 1;
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-      {breakdownLines(price, baseLabel).map((line) => (
+      {lines.map((line) => (
         <div
           key={line.label}
           style={{
@@ -32,8 +37,8 @@ export default function PriceLines({
             justifyContent: "space-between",
             alignItems: "baseline",
             gap: 12,
-            paddingTop: line.strong ? 9 : 0,
-            borderTop: line.strong ? rule : undefined,
+            paddingTop: line.strong && ruled ? 9 : 0,
+            borderTop: line.strong && ruled ? rule : undefined,
           }}
         >
           <span

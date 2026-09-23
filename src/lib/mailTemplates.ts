@@ -88,12 +88,18 @@ function detailRows(rows: DetailRow[]): string {
 }
 
 function moneyRows(price: PriceBreakdown, baseLabel: string): string {
-  return breakdownLines(price, baseLabel)
+  const lines = breakdownLines(price, baseLabel);
+  // The rule separated a total from the rows above it. With one row there is
+  // nothing above, and a line floating over the only figure looks like a
+  // mistake rather than a flourish.
+  const ruled = lines.length > 1;
+
+  return lines
     .map(
       (line) => `
       <tr>
-        <td style="padding:8px 0;${line.strong ? `border-top:2px dashed ${INK};` : ""}font:${line.strong ? "700" : "400"} 12px/1.4 ${SANS};letter-spacing:0.1em;color:${line.strong ? INK : "#6b5292"};text-transform:uppercase;">${escape(line.label)}</td>
-        <td style="padding:8px 0;${line.strong ? `border-top:2px dashed ${INK};` : ""}font:700 ${line.strong ? "20px" : "14px"}/1.4 ${SANS};color:${INK};text-align:right;">${escape(formatPaise(line.amountPaise))}</td>
+        <td style="padding:8px 0;${line.strong && ruled ? `border-top:2px dashed ${INK};` : ""}font:${line.strong ? "700" : "400"} 12px/1.4 ${SANS};letter-spacing:0.1em;color:${line.strong ? INK : "#6b5292"};text-transform:uppercase;">${escape(line.label)}</td>
+        <td style="padding:8px 0;${line.strong && ruled ? `border-top:2px dashed ${INK};` : ""}font:700 ${line.strong ? "20px" : "14px"}/1.4 ${SANS};color:${INK};text-align:right;">${escape(formatPaise(line.amountPaise))}</td>
       </tr>`,
     )
     .join("");

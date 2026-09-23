@@ -89,14 +89,18 @@ export default function OverviewTab() {
     },
   ];
 
-  // What was charged, split the way it has to be accounted for: the fest's own
-  // money, the convenience fee, and the GST collected on that fee.
+  // What was taken, split the way it has to be accounted for. Buyers are shown
+  // one number and charged it; this is the inside of that number, for the
+  // council and whoever does its books. The fee rows only appear if there are
+  // orders old enough to have been charged one.
+  const legacyFees = money.feePaise + money.feeGstPaise;
   const moneyRows = [
-    { label: "TICKETS AND ITEMS", value: money.basePaise },
-    { label: "GST ON TICKETS", value: money.gstPaise },
-    { label: "CONVENIENCE FEES", value: money.feePaise },
-    { label: "GST ON FEES", value: money.feeGstPaise },
     { label: "TAKEN THROUGH RAZORPAY", value: money.totalPaise, strong: true },
+    { label: "OF THAT, GST TO ACCOUNT FOR", value: money.gstPaise },
+    { label: "THE FEST'S SHARE", value: money.basePaise },
+    ...(legacyFees > 0
+      ? [{ label: "FEES CHARGED UNDER THE OLD MODEL", value: legacyFees }]
+      : []),
     ...(money.refundedPaise > 0 ? [{ label: "REFUNDED", value: -money.refundedPaise }] : []),
   ];
 
