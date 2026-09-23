@@ -12,7 +12,13 @@ import type { PriceBreakdown } from "./pricing";
  * Razorpay is done. The only numbers here are the ones the server sent.
  */
 
-export type ProductKey = "fetePass" | "cosplayEntry" | "merch";
+/**
+ * Kept in step with PRODUCT_KEYS in products.ts by hand, because that module
+ * reads Firestore and must not follow an import into the browser bundle. A
+ * product added there and forgotten here fails to typecheck at its call site,
+ * which is the cheap half of the trade.
+ */
+export type ProductKey = "fetePass" | "cosplayEntry" | "spotlight" | "merch";
 
 export type QuoteLine = {
   id: string;

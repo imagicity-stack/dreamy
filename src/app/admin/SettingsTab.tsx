@@ -17,7 +17,13 @@ type NumericKey =
   | "concertCapacity"
   | "interestBase"
   | "fetePassCapacity"
-  | "cosplayCapacity";
+  | "cosplayCapacity"
+  | "spotlightSolo"
+  | "spotlightDuo"
+  | "spotlightGroup"
+  | "spotlightLargeGroup"
+  | "spotlightBand"
+  | "spotlightCapacity";
 
 type RateKey = "convenienceFeePercent" | "gstPercent";
 
@@ -127,6 +133,22 @@ export default function SettingsTab({ pages }: { pages: { key: string; label: st
         <p style={{ fontSize: 13, color: "#5B4480", margin: "16px 0 0" }}>
           Merch prices moved to the Content tab, alongside their photos.
         </p>
+      </Section>
+
+      <Section kicker="THE STAGE" title="SPOTLIGHT SLOT FEES">
+        <p style={{ fontSize: 14, color: "#5B4480", margin: "0 0 14px" }}>
+          One fee per act size, because a band takes a soundcheck and a stage that a solo singer does not.
+          The stage time each one gets is fixed in the code beside these, so an act cannot buy its way into a
+          longer slot.
+        </p>
+        <Grid>
+          {number("spotlightSolo", "SOLO (₹)", "One performer. Up to 4 minutes.")}
+          {number("spotlightDuo", "DUO (₹)", "Two performers. Up to 4 minutes.")}
+          {number("spotlightGroup", "GROUP OF 3–5 (₹)", "Up to 5 minutes.")}
+          {number("spotlightLargeGroup", "GROUP OF 6+ (₹)", "Up to 5 minutes.")}
+          {number("spotlightBand", "BAND (₹)", "Full line-up. Up to 7 minutes — the longest slot on the stage.")}
+          {number("spotlightCapacity", "SLOTS ON SALE", "Hard cap on registrations. 0 means no limit.")}
+        </Grid>
       </Section>
 
       <Section kicker="CHECKOUT" title="GST & CONVENIENCE FEE">

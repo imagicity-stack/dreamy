@@ -15,9 +15,9 @@ import { priceWithFees, rupeesToPaise, type PriceBreakdown } from "./pricing";
  * The pure money maths it uses lives in pricing.ts, which the browser may have.
  */
 
-export type ProductKey = "fetePass" | "cosplayEntry" | "merch";
+export type ProductKey = "fetePass" | "cosplayEntry" | "spotlight" | "merch";
 
-export const PRODUCT_KEYS = ["fetePass", "cosplayEntry", "merch"] as const;
+export const PRODUCT_KEYS = ["fetePass", "cosplayEntry", "spotlight", "merch"] as const;
 
 export function isProductKey(value: unknown): value is ProductKey {
   return typeof value === "string" && (PRODUCT_KEYS as readonly string[]).includes(value);
@@ -88,6 +88,34 @@ function asQty(value: unknown, max: number): number | null {
 const MAX_PASSES = 10;
 const MAX_MERCH_PER_ITEM = 10;
 
+/**
+ * What is on stage, and what it costs.
+ *
+ * Spotlight is priced by the size of the act rather than per head, because
+ * what a slot actually costs the fest is stage time: a band of eight needs a
+ * soundcheck, a changeover and a backline that a solo singer does not, and it
+ * is on stage nearly twice as long. The cap on each is the other half of the
+ * same fact — the running order only works if a slot is the length it says.
+ *
+ * The server decides all of this. The form only names an act size, and a
+ * browser that names something else gets a refusal rather than a price.
+ */
+export const SPOTLIGHT_ACTS = {
+  solo: { label: "Solo", who: "One performer", maxMinutes: 4, price: (s: FestSettings) => s.spotlightSolo },
+  duo: { label: "Duo", who: "Two performers", maxMinutes: 4, price: (s: FestSettings) => s.spotlightDuo },
+  group: { label: "Group of 3–5", who: "Three to five performers", maxMinutes: 5, price: (s: FestSettings) => s.spotlightGroup },
+  largeGroup: { label: "Group of 6+", who: "Six or more performers", maxMinutes: 5, price: (s: FestSettings) => s.spotlightLargeGroup },
+  band: { label: "Band", who: "A band, with instruments", maxMinutes: 7, price: (s: FestSettings) => s.spotlightBand },
+} as const;
+
+export type SpotlightAct = keyof typeof SPOTLIGHT_ACTS;
+
+export const SPOTLIGHT_ACT_KEYS = Object.keys(SPOTLIGHT_ACTS) as SpotlightAct[];
+
+export function isSpotlightAct(value: unknown): value is SpotlightAct {
+  return typeof value === "string" && (SPOTLIGHT_ACT_KEYS as readonly string[]).includes(value);
+}
+
 export const PRODUCTS: Record<ProductKey, Product> = {
   fetePass: {
     key: "fetePass",
@@ -156,6 +184,46 @@ export const PRODUCTS: Record<ProductKey, Product> = {
         price: priceWithFees(unitPaise, rates(settings)),
         collection: "cosplayEntries",
         codePrefix: "MDZ-C",
+        codesPerUnit: true,
+      };
+    },
+  },
+
+  spotlight: {
+    key: "spotlight",
+    label: "Spotlight slot",
+    collection: "spotlightEntries",
+    codePrefix: "MDZ-S",
+    codesPerUnit: true,
+    ticketed: true,
+    capacity: (s) => s.spotlightCapacity,
+    closed: (s) => (isPageHidden(s, "spotlight") ? "Spotlight registrations are closed." : null),
+    async quote(input, settings) {
+      // One slot per checkout, whatever the size of the act: a band is one
+      // turn on stage in the same way a solo singer is.
+      const body = (input ?? {}) as { act?: unknown };
+      if (!isSpotlightAct(body.act)) return { error: "Tell us how many of you are performing.", status: 400 };
+
+      const act = SPOTLIGHT_ACTS[body.act];
+      const unitPaise = rupeesToPaise(act.price(settings));
+
+      return {
+        product: "spotlight",
+        label: "MADOOZA Spotlight slot",
+        description: `Spotlight — ${act.label.toLowerCase()}`,
+        units: 1,
+        lines: [
+          {
+            id: "spotlight",
+            label: `${act.label} slot · up to ${act.maxMinutes} min`,
+            qty: 1,
+            unitPaise,
+            amountPaise: unitPaise,
+          },
+        ],
+        price: priceWithFees(unitPaise, rates(settings)),
+        collection: "spotlightEntries",
+        codePrefix: "MDZ-S",
         codesPerUnit: true,
       };
     },
@@ -257,6 +325,7 @@ export type Customer = {
 const EXTRA_KEYS: Record<ProductKey, string[]> = {
   fetePass: [],
   cosplayEntry: ["character", "category", "mode", "team", "members"],
+  spotlight: ["talent", "act", "actLabel", "minutes", "city", "age", "instagram", "audition", "crew", "members"],
   merch: [],
 };
 

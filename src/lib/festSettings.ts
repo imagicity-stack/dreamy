@@ -14,6 +14,12 @@ export type DateMode = "sealed" | "month" | "full";
 export type FestSettings = {
   fetePrice: number;
   cosplayFee: number;
+  /** Spotlight entry fees, one per act size. */
+  spotlightSolo: number;
+  spotlightDuo: number;
+  spotlightGroup: number;
+  spotlightLargeGroup: number;
+  spotlightBand: number;
   concertCapacity: number;
   interestBase: number;
   /** Convenience fee charged on top of every online payment, as a percentage. */
@@ -26,6 +32,8 @@ export type FestSettings = {
   fetePassCapacity: number;
   /** Cosplay entries that may be sold in total. 0 means no limit. */
   cosplayCapacity: number;
+  /** Spotlight acts that may be registered in total. 0 means no limit. */
+  spotlightCapacity: number;
   lineupUnlocked: boolean;
   /** Fete passes sold out — checkout closes, the page says so. */
   soldOut: boolean;
@@ -65,6 +73,7 @@ export const PAGES = [
   { key: "lineup", href: "/lineup", label: "LINEUP" },
   { key: "concert", href: "/concert", label: "CONCERT" },
   { key: "cosplay", href: "/cosplay", label: "COSPLAY" },
+  { key: "spotlight", href: "/spotlight", label: "SPOTLIGHT" },
   { key: "fete", href: "/fete", label: "FETE" },
   { key: "merch", href: "/merch", label: "MERCH" },
   { key: "gallery", href: "/gallery", label: "GALLERY" },
@@ -78,6 +87,11 @@ export type PageKey = (typeof PAGES)[number]["key"];
 export const DEFAULT_SETTINGS: FestSettings = {
   fetePrice: FEST.fetePrice,
   cosplayFee: FEST.cosplayFee,
+  spotlightSolo: FEST.spotlightSolo,
+  spotlightDuo: FEST.spotlightDuo,
+  spotlightGroup: FEST.spotlightGroup,
+  spotlightLargeGroup: FEST.spotlightLargeGroup,
+  spotlightBand: FEST.spotlightBand,
   concertCapacity: FEST.concertCapacity,
   interestBase: FEST.interestBase,
   convenienceFeePercent: FEST.convenienceFeePercent,
@@ -85,6 +99,7 @@ export const DEFAULT_SETTINGS: FestSettings = {
   gstOnConvenienceFee: true,
   fetePassCapacity: 0,
   cosplayCapacity: 0,
+  spotlightCapacity: 0,
   lineupUnlocked: FEST.lineupUnlocked,
   soldOut: FEST.soldOut,
   merchOpen: true,
@@ -164,6 +179,11 @@ export function normalizeSettings(raw: unknown): FestSettings {
   return {
     fetePrice: asNumber(data.fetePrice, DEFAULT_SETTINGS.fetePrice),
     cosplayFee: asNumber(data.cosplayFee, DEFAULT_SETTINGS.cosplayFee),
+    spotlightSolo: asNumber(data.spotlightSolo, DEFAULT_SETTINGS.spotlightSolo),
+    spotlightDuo: asNumber(data.spotlightDuo, DEFAULT_SETTINGS.spotlightDuo),
+    spotlightGroup: asNumber(data.spotlightGroup, DEFAULT_SETTINGS.spotlightGroup),
+    spotlightLargeGroup: asNumber(data.spotlightLargeGroup, DEFAULT_SETTINGS.spotlightLargeGroup),
+    spotlightBand: asNumber(data.spotlightBand, DEFAULT_SETTINGS.spotlightBand),
     concertCapacity: asNumber(data.concertCapacity, DEFAULT_SETTINGS.concertCapacity),
     interestBase: asNumber(data.interestBase, DEFAULT_SETTINGS.interestBase),
     // Rates are percentages, so they carry decimals and cannot go through
@@ -173,6 +193,7 @@ export function normalizeSettings(raw: unknown): FestSettings {
     gstOnConvenienceFee: asBool(data.gstOnConvenienceFee, DEFAULT_SETTINGS.gstOnConvenienceFee),
     fetePassCapacity: asNumber(data.fetePassCapacity, DEFAULT_SETTINGS.fetePassCapacity, 100_000),
     cosplayCapacity: asNumber(data.cosplayCapacity, DEFAULT_SETTINGS.cosplayCapacity, 100_000),
+    spotlightCapacity: asNumber(data.spotlightCapacity, DEFAULT_SETTINGS.spotlightCapacity, 100_000),
     lineupUnlocked: asBool(data.lineupUnlocked, DEFAULT_SETTINGS.lineupUnlocked),
     soldOut: asBool(data.soldOut, DEFAULT_SETTINGS.soldOut),
     merchOpen: asBool(data.merchOpen, DEFAULT_SETTINGS.merchOpen),

@@ -58,6 +58,7 @@ function brand(messages: MailMessage[]): MailMessage[] {
 const PRODUCT_WORDS: Record<string, { buyerTitle: string; officeNoun: string; codeLabel: string }> = {
   fetePass: { buyerTitle: "YOU'RE IN", officeNoun: "Fete Pass", codeLabel: "PASS CODE" },
   cosplayEntry: { buyerTitle: "THE ARENA HAS YOUR NAME", officeNoun: "Cosplay entry", codeLabel: "ENTRY CODE" },
+  spotlight: { buyerTitle: "THE STAGE IS YOURS", officeNoun: "Spotlight slot", codeLabel: "SLOT CODE" },
   merch: { buyerTitle: "ORDER PAID", officeNoun: "Merch order", codeLabel: "COLLECTION CODE" },
 };
 
@@ -71,6 +72,10 @@ function buyerRows(receipt: Receipt): DetailRow[] {
   if (extra.character) rows.push({ label: "Walking as", value: extra.character });
   if (extra.category) rows.push({ label: "Category", value: extra.category });
   if (extra.team) rows.push({ label: "Squad", value: extra.team });
+  if (extra.talent) rows.push({ label: "Talent", value: extra.talent });
+  if (extra.actLabel) rows.push({ label: "Act", value: extra.actLabel });
+  if (extra.minutes) rows.push({ label: "Set length", value: `${extra.minutes} min` });
+  if (extra.crew) rows.push({ label: "Act name", value: extra.crew });
   if (receipt.product === "merch") {
     for (const line of receipt.lines) {
       rows.push({ label: `${line.qty} × ${line.label}`, value: formatPaise(line.amountPaise) });
@@ -97,7 +102,22 @@ function officeRows(receipt: Receipt): DetailRow[] {
   if (extra.category) rows.push({ label: "Category", value: extra.category });
   if (extra.mode) rows.push({ label: "Mode", value: extra.mode });
   if (extra.team) rows.push({ label: "Squad", value: extra.team });
-  if (extra.members) rows.push({ label: "Squad members", value: extra.members });
+  if (extra.members) rows.push({ label: "Members", value: extra.members });
+  // Spotlight. The audition link is the reason a council member opens this
+  // email at all, so it goes in whole rather than being summarised away.
+  if (extra.talent) rows.push({ label: "Talent", value: extra.talent });
+  if (extra.actLabel) rows.push({ label: "Act size", value: extra.actLabel });
+  if (extra.minutes) rows.push({ label: "Set length", value: `${extra.minutes} min` });
+  if (extra.crew) rows.push({ label: "Act name", value: extra.crew });
+  if (extra.city) rows.push({ label: "City", value: extra.city });
+  if (extra.age) rows.push({ label: "Age", value: extra.age });
+  if (extra.instagram) rows.push({ label: "Instagram", value: `@${extra.instagram}` });
+  // Only Spotlight has an audition, and its absence is itself worth saying —
+  // but only on a Spotlight order, or every merch receipt grows a line about
+  // a clip nobody was ever going to send.
+  if (receipt.product === "spotlight") {
+    rows.push({ label: "Audition clip", value: extra.audition || "Not sent yet — chase them" });
+  }
   if (receipt.product === "merch") {
     for (const line of receipt.lines) {
       rows.push({ label: `${line.qty} × ${line.label}`, value: formatPaise(line.amountPaise) });
